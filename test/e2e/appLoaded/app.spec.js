@@ -27,7 +27,7 @@ describe('Rminder App', () => {
 		});
 
 		it('should not have tasks', async () => {
-			const tasksCount = await page.$$eval('.tasks__list > li', els => els.length);
+			const tasksCount = await page.$$eval('.tasks > vp-list-task', els => els.length);
 			expect(tasksCount).equals(0);
 		});
 	});

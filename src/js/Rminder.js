@@ -7,22 +7,17 @@ export class Rminder {
 
 		this.taskInput = document.getElementById('task');
 		this.addTaskBtn = document.querySelector('.add-task');
-		this.taskList = document.querySelector('.tasks__list');
+		this.taskList = document.querySelector('.tasks');
 		this.detailsContainer = document.querySelector('.details');
 		this.titleInput = document.querySelector('.title');
-		this.rename = document.querySelector('.rename');
-		this.remove = document.querySelector('.remove');
-		this.close = document.querySelector('.close');
 		this.myDay = document.querySelector('.my-day');
 		this.importanceCheckBtn = this.detailsContainer?.querySelector('.importance-check');
 		this.completedCheck = this.detailsContainer?.querySelector('.completed-ckeck');
 		this.note = document.querySelector('.note');
-		this.noteBtn = document.querySelector('.add-note');
-		this.countMyDay = document.querySelector('.count-my-day');
-		this.countImportant = document.querySelector('.count-important');
-		this.countCompleted = document.querySelector('.count-completed');
-		this.countTasks = document.querySelector('.count-tasks');
-		this.menuBtn = document.querySelector('.menu');
+		this.listMyDay = document.querySelector('vp-nav-list[name="my_day"]');
+		this.listImportant = document.querySelector('vp-nav-list[name="important"]');
+		this.listCompleted = document.querySelector('vp-nav-list[name="completed"]');
+		this.listTasks = document.querySelector('vp-nav-list[name="tasks"]');
 		this.sidebar = document.querySelector('.sidebar');
 		this.lists = document.querySelector('.lists');
 		this.listTitle = document.querySelector('.list-title');
@@ -32,13 +27,7 @@ export class Rminder {
 		this.settingsBtn = document.querySelector('.app__settings');
 		this.filterBtn = document.querySelector('.list-filter');
 		[...this.orderFilters] = document.querySelectorAll('.order-filter');
-		this.modal = document.querySelector('.modal');
-		this.modalCancel = this.modal?.querySelector('.default');
-		this.modalDelete = this.modal?.querySelector('.warning');
-	}
-
-	launch(data) {
-		logger('web worker initialised: ', data);
+		this.modal = document.querySelector('vp-modal');
 	}
 
 	success(data) {
@@ -70,12 +59,12 @@ export class Rminder {
 		}
 
 		// Show tasks
-		this.taskList.innerHTML = dt.map(task => `<li class="${task.completed ? 'completed ' : ''}${task.important ? 'important ' : ''}" data-id="${task.id}"><span class="completed-ckeck" title="Set it as complete"><vp-icon icon="icons:${task.completed ? 'check-square' : 'square'}"></vp-icon></span><button class="show-details">${task.title}</button><span class="importance-check" title="Set it as important"><vp-icon icon="icons:${task.important ? 'star-solid' : 'star'}"></vp-icon></span>`).join('');
+		this.taskList.innerHTML = dt.map(task => `<vp-list-task title="${task.title}" task="${task.id}" complete="${task.completed}" important="${task.important}" order="0"></vp-list-task>`).join('');
 		// Show counters
-		this.countMyDay.innerText = data.filter(d => d.my_day).length;
-		this.countImportant.innerText = data.filter(d => d.important).length;
-		this.countCompleted.innerText = data.filter(d => d.completed).length;
-		this.countTasks.innerText = data.length; // TODO: change total for tasks list after adding lists functionality
+		this.listMyDay.setAttribute('count', data.filter(d => d.my_day).length);
+		this.listImportant.setAttribute('count', data.filter(d => d.important).length);
+		this.listCompleted.setAttribute('count', data.filter(d => d.completed).length);
+		this.listTasks.setAttribute('count', data.length); // TODO: change total for tasks list after adding lists functionality
 		// Set List title
 		this.listTitle.innerText = title;
 		this.mainContainer.dataset.list = name;
@@ -98,27 +87,6 @@ export class Rminder {
 	addEventListeners(db) {
 		this.addTaskBtn.addEventListener('click', () => { this.addTask(db); }, false);
 
-		this.taskList.addEventListener('click', e => {
-			if (e.target.classList.contains('show-details')) {
-				this.showDetails(e.target, db);
-				this.setSelected(e.target.closest('[data-id]'));
-			}
-
-			if (e.target.classList.contains('importance-check') || e.target.closest('.importance-check')) {
-				const parent = e.target.closest('[data-id]');
-				this.handleEvent('importantTask', db, +parent.dataset.id);
-			}
-
-			if (e.target.classList.contains('completed-ckeck') || e.target.closest('.completed-ckeck')) {
-				const parent = e.target.closest('[data-id]');
-				if (parent.dataset.id === this.detailsContainer.dataset.id && this.toggleCompleted.checked) {
-					this.hideDetails();
-				}
-				this.handleEvent('completedTask', db, +parent.dataset.id);
-			}
-
-		}, false);
-
 		// TODO: create common function to handle completed check events
 		this.completedCheck.addEventListener('click', e => {
 			const parent = e.target.closest('[data-id]');
@@ -128,8 +96,8 @@ export class Rminder {
 			this.handleEvent('completedTask', db, +parent.dataset.id);
 		}, false);
 
-		this.lists.addEventListener('click', e => {
-			const list = e.target?.dataset.name || e.target.closest('li')?.dataset.name;
+		this.lists.addEventListener('vp-nav-list:click', e => {
+			const list = e.detail.name;
 			if (list) {
 				this.showList(list, db);
 
@@ -137,7 +105,7 @@ export class Rminder {
 					this.hideSidebar();
 				}
 			}
-		}, false);
+		});
 
 		this.taskInput.addEventListener('keyup', event => {
 			if (event.code === 'Enter') {
@@ -151,23 +119,12 @@ export class Rminder {
 			}
 		}, false);
 
-		this.rename.addEventListener('vp-button:click', () => {	this.renameTask(db); });
-		this.noteBtn.addEventListener('vp-button:click', () => { this.setTaskNote(db); });
-
-		this.remove.addEventListener('click', () => {
-			this.modal.classList.add('open');
-		}, false);
-
-		this.modalCancel.addEventListener('click', () => {
-			this.modal.classList.remove('open');
-		}, false);
-
-		this.modalDelete.addEventListener('click', () => {
-			this.handleEvent('removeTask', db);
-		}, false);
-
-		this.close.addEventListener('click', this.hideDetails.bind(this), false);
-		this.menuBtn.addEventListener('click', this.toggleSidebar.bind(this), false);
+		// TODO: move the event listener to a common parent element
+		document.addEventListener('vp-button:click', (e) => {
+			if(e.detail.trigger) {
+				this[e.detail.trigger](e.target, db);
+			}
+		});
 
 		this.importanceCheckBtn.addEventListener('click', (e) => {
 			const parent = e.target.closest('[data-id]');
@@ -202,7 +159,7 @@ export class Rminder {
 		}
 	}
 
-	renameTask(db) {
+	renameTask(elem, db) {
 		const title = this.titleInput.value.trim();
 		const id = +this.detailsContainer.dataset.id; // convert id to number
 		const list = this.mainContainer.dataset.list;
@@ -213,16 +170,29 @@ export class Rminder {
 		}
 	}
 
-	showDetails(elem, db) {
-		if (elem.classList.contains('show-details')) {
-			const parent = elem.parentNode;
-			const id = +parent.dataset.id;
-			if (id !== +this.detailsContainer.dataset.id) {
-				db.postMessage({ type: 'showDetails', id });
+	completedTask(elem, db) {
+			if (this.toggleCompleted.checked) {
+				this.hideDetails();
 			}
-			this.detailsContainer.classList.add('expanded');
-			this.screenTest();
+			this.handleEvent('completedTask', db, +elem.task);
+	}
+
+	importantTask(elem, db) {
+		this.handleEvent('importantTask', db, +elem.task);
+	}
+
+	removeTask(elem, db) {
+		this.handleEvent('removeTask', db);
+	}
+
+	showDetails(elem, db) {
+		const id = +elem.task;
+		if (id !== +this.detailsContainer.dataset.id) {
+			db.postMessage({ type: 'showDetails', id });
 		}
+		this.detailsContainer.classList.add('expanded');
+		this.screenTest();
+		this.setSelected(elem);
 	}
 
 	hideDetails() {
@@ -247,20 +217,16 @@ export class Rminder {
 		db.postMessage({ type, id, list });
 	}
 
-	setTaskNote(db) {
+	setTaskNote(elem, db) {
 		const id = +this.detailsContainer.dataset.id;
 		const text = this.note.value.trim();
 		const list = this.mainContainer.dataset.list;
-		if (text) {
-			db.postMessage({ type: 'noteTask', id, note: text, list });
-		} else {
-			logger('Required field(s) missing: note');
-		}
+		db.postMessage({ type: 'noteTask', id, note: text, list });
 	}
 
 	selectList({ list }) {
-		document.querySelector('.list.selected')?.classList?.remove('selected');
-		document.querySelector(`.list[data-name="${list}"]`).classList.add('selected');
+		document.querySelector('vp-nav-list.selected')?.classList?.remove('selected');
+		document.querySelector(`vp-nav-list[name="${list}"]`).classList.add('selected');
 	}
 
 	showList(list, db) {
@@ -281,7 +247,7 @@ export class Rminder {
 		this.importanceCheckBtn?.querySelector('vp-icon')?.setAttribute('icon', `icons:star${ dt?.important ? '-solid' : ''}`);
 		this.completedCheck?.querySelector('vp-icon')?.setAttribute('icon', `icons:${ dt?.completed ? 'check-' : ''}square`);
 
-		// TODO: remove this classes 
+		// TODO: remove this classes
 		if (dt?.important) {
 			this.detailsContainer.classList.add('important');
 		}
@@ -331,16 +297,15 @@ export class Rminder {
 			return false;
 		}
 
-		const completedList = this.lists.querySelector('[data-name="completed"]');
 		if (settings.completed === 'hide') {
 			this.toggleCompleted.checked = true;
-			completedList.classList.add('hidden');
-			if (completedList.classList.contains('selected')) {
-				this.lists.querySelector('[data-name="tasks"]').click(); // Select Tasks list if Completed list was selected before hidding
+			this.listCompleted.classList.add('hidden');
+			if (this.listCompleted.classList.contains('selected')) {
+				this.listTasks.click(); // Select Tasks list if Completed list was selected before hidding
 			}
 		} else {
 			this.toggleCompleted.checked = false;
-			completedList.classList.remove('hidden');
+			this.listCompleted.classList.remove('hidden');
 		}
 
 		if (settings.filter) {
@@ -354,5 +319,13 @@ export class Rminder {
 
 	filterUpdate(elem, db) {
 		db.postMessage({ type: 'filter', filter: elem.value });
+	}
+
+	openModal() {
+		this.modal.classList.add('open');
+	}
+
+	closeModal() {
+		this.modal.classList.remove('open');
 	}
 }

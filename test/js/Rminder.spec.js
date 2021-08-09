@@ -29,26 +29,12 @@ describe('Rminder', () => {
 					<span class="menu" aria-label="Toggle sidebar"></span>
 				</div>
 				<div class="sidebar__content">
-					<nav aria-label="Lists" role="navigation">
-						<ul class="lists" role="tree">
-							<li class="list" data-name="my_day" role="treeitem" aria-label="My day">
-								<span>My day</span>
-								<span class="count count-my-day"></span>
-							</li>
-							<li class="list" data-name="important" role="treeitem" aria-label="Important">
-								<span>Important</span>
-								<span class="count count-important"></span>
-							</li>
-							<li class="list" data-name="completed" role="treeitem" aria-label="Completed">
-								<span>Completed</span>
-								<span class="count count-completed"></span>
-							</li>
-							<li class="list selected" data-name="tasks" role="treeitem" aria-label="Tasks">
-								<span>Tasks</span>
-								<span class="count count-tasks"></span>
-							</li>
-						</ul>
-					</nav>
+					<div class="lists" aria-label="Lists" role="navigation">
+						<vp-nav-list name="my_day" label="My day" count="0" icon="icons:today"></vp-nav-list>
+						<vp-nav-list name="important" label="Important" count="0" icon="icons:star"></vp-nav-list>
+						<vp-nav-list name="completed" label="Completed" count="0" icon="icons:check-square"></vp-nav-list>
+						<vp-nav-list name="tasks" label="Tasks" count="0" icon="icons:tasks"></vp-nav-list>
+					</div>
 				</div>
 				<div class="sidebar__add-list">
 					<div class="add-list"></div>
@@ -74,9 +60,7 @@ describe('Rminder', () => {
 						<input type="text" name="task" id="task" maxlength="255" aria-label="Add a task" placeholder="Add a task" />
 						<button class="add-task">Add</button>
 					</div>
-					<div class="tasks">
-						<ul class="tasks__list"></ul>
-					</div>
+					<div class="tasks"></div>
 				</div>
 			</div>
 			<!-- right colunm -->
@@ -85,7 +69,7 @@ describe('Rminder', () => {
 					<div class="detail__title">
 						<span class="completed-ckeck" title="Set it as complete"></span>
 						<input class="title" type="text" value="" />
-						<vp-button class="rename">Rename</vp-button>
+						<vp-button class="rename" trigger="renameTask">Rename</vp-button>
 					</div>
 					<div class="detail__my-day">
 						<span class="my-day" title="Add to my day"></span>
@@ -93,25 +77,23 @@ describe('Rminder', () => {
 					</div>
 					<div class="detail__note">
 						<textarea class="note" cols="30" rows="5" placeholder="Add notes"></textarea>
-						<vp-button class="add-note">Add</vp-button>
+						<vp-button class="add-note" trigger="setTaskNote">Add</vp-button>
 					</div>
 				</div>
 				<div class="details__footer">
-					<button class="close"></button>
+					<vp-button class="close"></vp-button>
 					<span class="creation-date"></span>
-					<button class="remove"></button>
+					<vp-button class="remove"></vp-button>
 				</div>
 			</aside>
 		</main>
-		<div class="modal">
-			<div class="modal__content">
-				<span>Task will be permanent deleted, you won't be able to undo this action.</span>
-				<div class="modal__actions">
-					<button class="default">Cancel</button>
-					<button class="warning">Delete task</button>
-				</div>
+		<vp-modal>
+			<span slot="body">Task will be permanent deleted, you won't be able to undo this action.</span>
+			<div slot="footer">
+				<vp-button class="default" type="default" trigger="closeModal">Cancel</vp-button>
+				<vp-button class="warning" type="danger" trigger="removeTask">Delete task</vp-button>
 			</div>
-		</div>
+		</vp-modal>
 		`;
 
 		rminder = new Rminder();
@@ -121,17 +103,6 @@ describe('Rminder', () => {
 		td.reset();
 		window.location.hash = '';
 		document.body.innerHTML = '';
-	});
-
-	describe('Rminder.launch', () => {
-		it('Should log launch is successful', () => {
-			td.replace(console, 'log');
-			const data = { type: 'test', message: 'ok' };
-
-			rminder.launch(data);
-
-			td.verify(console.log('web worker initialised: ', [data]));
-		});
 	});
 
 	describe('Rminder.success', () => {
@@ -199,10 +170,10 @@ describe('Rminder', () => {
 
 			rminder.tasks(data);
 
-			expect(rminder.taskList.innerHTML).equals('<li class="" data-id="1"><span class="completed-ckeck" title="Set it as complete"><vp-icon icon="icons:square"></vp-icon></span><button class="show-details">test</button><span class="importance-check" title="Set it as important"><vp-icon icon="icons:star"></vp-icon></span></li>');
-			expect(rminder.countMyDay.innerText).equals('0');
-			expect(rminder.countImportant.innerText).equals('0');
-			expect(rminder.countTasks.innerText).equals('1');
+			expect(rminder.taskList.innerHTML).equals('<vp-list-task title="test" task="1" complete="false" important="false" order="0"></vp-list-task>');
+			expect(rminder.listMyDay.getAttribute('count')).equals('0');
+			expect(rminder.listImportant.getAttribute('count')).equals('0');
+			expect(rminder.listTasks.getAttribute('count')).equals('1');
 			expect(rminder.listTitle.innerText).equals('Tasks');
 			expect(rminder.mainContainer.dataset.list).equals('tasks');
 
@@ -226,7 +197,7 @@ describe('Rminder', () => {
 
 			rminder.tasks(data);
 
-			expect(rminder.taskList.innerHTML).equals('<li class="completed " data-id="1"><span class="completed-ckeck" title="Set it as complete"><vp-icon icon="icons:check-square"></vp-icon></span><button class="show-details">test</button><span class="importance-check" title="Set it as important"><vp-icon icon="icons:star"></vp-icon></span></li>');
+			expect(rminder.taskList.innerHTML).equals('<vp-list-task title="test" task="1" complete="true" important="false" order="0"></vp-list-task>');
 
 			td.verify(rminder.setDetailClasses(data.value));
 		});
@@ -248,8 +219,8 @@ describe('Rminder', () => {
 
 			rminder.tasks(data);
 
-			expect(rminder.taskList.innerHTML).equals('<li class="important " data-id="1"><span class="completed-ckeck" title="Set it as complete"><vp-icon icon="icons:square"></vp-icon></span><button class="show-details">test</button><span class="importance-check" title="Set it as important"><vp-icon icon="icons:star-solid"></vp-icon></span></li>');
-			expect(rminder.countImportant.innerText).equals('1');
+			expect(rminder.taskList.innerHTML).equals('<vp-list-task title="test" task="1" complete="false" important="true" order="0"></vp-list-task>');
+			expect(rminder.listImportant.getAttribute('count')).equals('1');
 
 			td.verify(rminder.setDetailClasses(data.value));
 		});
@@ -271,8 +242,8 @@ describe('Rminder', () => {
 
 			rminder.tasks(data);
 
-			expect(rminder.taskList.innerHTML).equals('<li class="completed important " data-id="1"><span class="completed-ckeck" title="Set it as complete"><vp-icon icon="icons:check-square"></vp-icon></span><button class="show-details">test</button><span class="importance-check" title="Set it as important"><vp-icon icon="icons:star-solid"></vp-icon></span></li>');
-			expect(rminder.countImportant.innerText).equals('1');
+			expect(rminder.taskList.innerHTML).equals('<vp-list-task title="test" task="1" complete="true" important="true" order="0"></vp-list-task>');
+			expect(rminder.listImportant.getAttribute('count')).equals('1');
 
 			td.verify(rminder.setDetailClasses(data.value));
 		});
@@ -307,7 +278,7 @@ describe('Rminder', () => {
 
 			rminder.tasks(data);
 
-			expect(rminder.taskList.innerHTML).equals('<li class="important " data-id="2"><span class="completed-ckeck" title="Set it as complete"><vp-icon icon="icons:square"></vp-icon></span><button class="show-details">test2</button><span class="importance-check" title="Set it as important"><vp-icon icon="icons:star-solid"></vp-icon></span></li>');
+			expect(rminder.taskList.innerHTML).equals('<vp-list-task title="test2" task="2" complete="false" important="true" order="0"></vp-list-task>');
 			expect(rminder.listTitle.innerText).equals('Important');
 			expect(rminder.mainContainer.dataset.list).equals('important');
 
@@ -417,7 +388,7 @@ describe('Rminder', () => {
 			rminder.titleInput.value = 'test2';
 			rminder.detailsContainer.dataset.id = '2';
 
-			rminder.renameTask(db);
+			rminder.renameTask(rminder.rename, db);
 
 			td.verify(db.postMessage(data));
 		});
@@ -441,6 +412,7 @@ describe('Rminder', () => {
 	describe('Rminder.showDetails', () => {
 		it('Should send postMessage to show details', () => {
 			td.replace(rminder, 'screenTest');
+			td.replace(rminder, 'setSelected');
 
 			const db = {
 				postMessage: td.func()
@@ -467,12 +439,17 @@ describe('Rminder', () => {
 
 			rminder.detailsContainer.dataset.id = '2';
 
+			const listTask = document.querySelector('vp-list-task');
+
+			listTask.task = '1';
+
 			expect(rminder.detailsContainer.classList.contains('expanded')).to.be.false;
 
-			rminder.showDetails(document.querySelector('.show-details'), db);
+			rminder.showDetails(listTask, db);
 
 			td.verify(db.postMessage(data));
 			td.verify(rminder.screenTest());
+			td.verify(rminder.setSelected(listTask));
 
 			expect(rminder.detailsContainer.classList.contains('expanded')).to.be.true;
 		});
@@ -499,29 +476,31 @@ describe('Rminder', () => {
 
 			rminder.detailsContainer.dataset.id = '1';
 
+			document.querySelector('vp-list-task').task = '1';
+
 			expect(rminder.detailsContainer.classList.contains('expanded')).to.be.false;
 
-			rminder.showDetails(document.querySelector('.show-details'), db);
+			rminder.showDetails(document.querySelector('vp-list-task'), db);
 
 			td.verify(db.postMessage(), { times: 0, ignoreExtraArgs: true });
 			td.verify(rminder.screenTest());
 			expect(rminder.detailsContainer.classList.contains('expanded')).to.be.true;
 		});
 
-		it('Should not call postMessage and add expanded class is element does not have class "show-details"', () => {
-			td.replace(rminder, 'screenTest');
-			const db = {
-				postMessage: td.func()
-			};
+		// it('Should not call postMessage and add expanded class is element does not have class "show-details"', () => {
+		// 	td.replace(rminder, 'screenTest');
+		// 	const db = {
+		// 		postMessage: td.func()
+		// 	};
 
-			expect(rminder.detailsContainer.classList.contains('expanded')).to.be.false;
+		// 	expect(rminder.detailsContainer.classList.contains('expanded')).to.be.false;
 
-			rminder.showDetails(document.querySelector('.tasks'), db);
+		// 	rminder.showDetails(document.querySelector('.tasks'), db);
 
-			td.verify(db.postMessage(), { times: 0, ignoreExtraArgs: true });
-			td.verify(rminder.screenTest(), { times: 0 });
-			expect(rminder.detailsContainer.classList.contains('expanded')).to.be.false;
-		});
+		// 	td.verify(db.postMessage(), { times: 0, ignoreExtraArgs: true });
+		// 	td.verify(rminder.screenTest(), { times: 0 });
+		// 	expect(rminder.detailsContainer.classList.contains('expanded')).to.be.false;
+		// });
 	});
 
 	describe('Rminder.hideDetails', () => {
@@ -619,24 +598,9 @@ describe('Rminder', () => {
 			rminder.note.value = 'something';
 			rminder.detailsContainer.dataset.id = '1';
 
-			rminder.setTaskNote(db);
+			rminder.setTaskNote(rminder.note, db);
 
 			td.verify(db.postMessage(data));
-		});
-
-		it('Should not send postMessage if title is missing', () => {
-			td.replace(console, 'log');
-			const db = {
-				postMessage: td.func()
-			};
-
-			rminder.note.value = '';
-			rminder.detailsContainer.dataset.id = '2';
-
-			rminder.setTaskNote(db);
-
-			td.verify(db.postMessage(), { times: 0, ignoreExtraArgs: true });
-			td.verify(console.log('Required field(s) missing: note', []), { times: 1 });
 		});
 	});
 
@@ -745,7 +709,7 @@ describe('Rminder', () => {
 
 			rminder.tasks(task);
 
-			const elem = document.querySelector('li[data-id]');
+			const elem = document.querySelector('vp-list-task');
 
 			expect(elem.classList.contains('selected')).to.be.false;
 
@@ -799,7 +763,6 @@ describe('Rminder', () => {
 			expect(rminder.settings()).to.be.false;
 		});
 		it('Should hide Completed tasks', () => {
-			const completedList = rminder.lists.querySelector('[data-name="completed"]');
 			const data = {
 				settings: {
 					completed: 'hide'
@@ -809,29 +772,26 @@ describe('Rminder', () => {
 			rminder.settings(data);
 
 			expect(rminder.toggleCompleted.checked).to.be.true;
-			expect(completedList.classList.contains('hidden')).to.be.true;
+			expect(rminder.listCompleted.classList.contains('hidden')).to.be.true;
 		});
 		it('Should select Tasks list if Completed list is selected before hidding', () => {
-			const completedList = rminder.lists.querySelector('[data-name="completed"]');
-			const tasksList = rminder.lists.querySelector('[data-name="tasks"]');
 			const data = {
 				settings: {
 					completed: 'hide'
 				}
 			}
 
-			completedList.classList.add('selected');
+			rminder.listCompleted.classList.add('selected');
 
-			td.replace(tasksList, 'click')
+			td.replace(rminder.listTasks, 'click')
 
 			rminder.settings(data);
 
 			expect(rminder.toggleCompleted.checked).to.be.true;
-			expect(completedList.classList.contains('hidden')).to.be.true;
-			td.verify(tasksList.click());
+			expect(rminder.listCompleted.classList.contains('hidden')).to.be.true;
+			td.verify(rminder.listTasks.click());
 		});
 		it('Should show Completed tasks', () => {
-			const completedList = rminder.lists.querySelector('[data-name="completed"]');
 			const data = {
 				settings: {
 					completed: 'show'
@@ -841,7 +801,7 @@ describe('Rminder', () => {
 			rminder.settings(data);
 
 			expect(rminder.toggleCompleted.checked).to.be.false;
-			expect(completedList.classList.contains('hidden')).to.be.false;
+			expect(rminder.listCompleted.classList.contains('hidden')).to.be.false;
 		});
 		it('Should set order filter', () => {
 			const data = {
@@ -927,13 +887,31 @@ describe('Rminder', () => {
 		it('Should call handleEvent for removeTask', () => {
 			td.replace(rminder, 'handleEvent');
 
-			rminder.modalDelete.click();
+			const modalDelete = document.querySelector('vp-button.warning');
+			modalDelete.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'removeTask'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			td.verify(rminder.handleEvent('removeTask', db));
 		});
 
 		it('Should add open class to modal', () => {
-			rminder.remove.click();
+			const remove = document.querySelector('.remove');
+			remove.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'openModal'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			expect(rminder.modal.classList.contains('open')).to.be.true;
 		});
@@ -941,7 +919,16 @@ describe('Rminder', () => {
 		it('Should remove open class to modal', () => {
 			rminder.modal.classList.add('open');
 
-			rminder.modalCancel.click();
+			const modalCancel = document.querySelector('vp-button.default');
+			modalCancel.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'closeModal'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			expect(rminder.modal.classList.contains('open')).to.be.false;
 		});
@@ -970,27 +957,35 @@ describe('Rminder', () => {
 		it('Should call setTaskNote', () => {
 			td.replace(rminder, 'setTaskNote');
 
-			rminder.noteBtn.dispatchEvent(
+			const noteBtn = document.querySelector('.add-note');
+			noteBtn.dispatchEvent(
 				new CustomEvent('vp-button:click', {
-					detail: {},
+					detail: {
+						trigger: 'setTaskNote'
+					},
 					bubbles: true,
+					composed: true
 				})
 			);
 
-			td.verify(rminder.setTaskNote(db));
+			td.verify(rminder.setTaskNote(noteBtn, db));
 		});
 
 		it('Should call renameTask', () => {
 			td.replace(rminder, 'renameTask');
 
-			rminder.rename.dispatchEvent(
+			const rename = document.querySelector('.rename');
+			rename.dispatchEvent(
 				new CustomEvent('vp-button:click', {
-					detail: {},
+					detail: {
+						trigger: 'renameTask'
+					},
 					bubbles: true,
+					composed: true
 				})
 			);
 
-			td.verify(rminder.renameTask(db));
+			td.verify(rminder.renameTask(rename, db));
 		});
 
 		it('Should call renameTask on keyup', () => {
@@ -1025,23 +1020,57 @@ describe('Rminder', () => {
 			td.verify(rminder.addTask(), { times: 0, ignoreExtraArgs: true });
 		});
 
-		it('Should call showList on li click', () => {
+		it('Should call showList on list click', () => {
 			rminder.smallMediaQuery = { matches: true };
 			td.replace(rminder, 'showList');
 			td.replace(rminder, 'hideSidebar');
 
-			rminder.lists.querySelector('[data-name]').click();
+			rminder.listMyDay.dispatchEvent(
+				new CustomEvent('vp-nav-list:click', {
+					detail: {
+						name: 'my_day'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			td.verify(rminder.showList('my_day', db));
 			td.verify(rminder.hideSidebar());
 		});
 
-		it('Should call showList on count click', () => {
+		it('Should not call hideSidebar on list click', () => {
 			td.replace(rminder, 'showList');
+			td.replace(rminder, 'hideSidebar');
 
-			rminder.lists.querySelector('.count').click();
+			rminder.listMyDay.dispatchEvent(
+				new CustomEvent('vp-nav-list:click', {
+					detail: {
+						name: 'my_day'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			td.verify(rminder.showList('my_day', db));
+			td.verify(rminder.hideSidebar(), { times: 0 });
+		});
+
+		it('Should not call showList and hideSidebar on list click if list does not have name', () => {
+			td.replace(rminder, 'showList');
+			td.replace(rminder, 'hideSidebar');
+
+			rminder.listMyDay.dispatchEvent(
+				new CustomEvent('vp-nav-list:click', {
+					detail: {},
+					bubbles: true,
+					composed: true
+				})
+			);
+
+			td.verify(rminder.showList(), { times: 0, ignoreExtraArgs: true });
+			td.verify(rminder.hideSidebar(), { times: 0 });
 		});
 
 		it('Should not call showList', () => {
@@ -1052,10 +1081,9 @@ describe('Rminder', () => {
 			td.verify(rminder.showList(), { times: 0, ignoreExtraArgs: true });
 		});
 
-		it('Should call showDetails and setSelected on li click', () => {
+		it('Should call showDetails on task click', () => {
 			rminder.smallMediaQuery = { matches: true };
 			td.replace(rminder, 'showDetails');
-			td.replace(rminder, 'setSelected');
 
 			const task = {
 				value: [{
@@ -1071,23 +1099,27 @@ describe('Rminder', () => {
 
 			rminder.tasks(task);
 
-			const showDetails = document.querySelector('.show-details');
+			const listTask = document.querySelector('vp-list-task');
+			listTask.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'showDetails'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
-			showDetails.click();
-
-			td.verify(rminder.showDetails(showDetails, db));
-			td.verify(rminder.setSelected(showDetails.closest('[data-id]')));
+			td.verify(rminder.showDetails(listTask, db));
 		});
 
-		it('Should not call showDetails and setSelected on li click', () => {
+		it('Should not call showDetails on task click', () => {
 			rminder.smallMediaQuery = { matches: true };
 			td.replace(rminder, 'showDetails');
-			td.replace(rminder, 'setSelected');
 
 			rminder.taskList.click();
 
 			td.verify(rminder.showDetails(), { times: 0, ignoreExtraArgs: true });
-			td.verify(rminder.setSelected(), { times: 0, ignoreExtraArgs: true });
 		});
 
 		it('Should call handleEvent with importantTask', () => {
@@ -1106,7 +1138,18 @@ describe('Rminder', () => {
 
 			rminder.tasks(task);
 
-			rminder.taskList.querySelector('.importance-check').click();
+			const listTask = document.querySelector('vp-list-task');
+			listTask.task = '1';
+
+			listTask.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'importantTask'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			td.verify(rminder.handleEvent('importantTask', db, 1));
 		});
@@ -1128,7 +1171,18 @@ describe('Rminder', () => {
 
 			rminder.tasks(task);
 
-			rminder.taskList.querySelector('.completed-ckeck').click();
+			const listTask = document.querySelector('vp-list-task');
+			listTask.task = '1';
+
+			listTask.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'completedTask'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			td.verify(rminder.handleEvent('completedTask', db, 1));
 			td.verify(rminder.hideDetails(), { times: 0 });
@@ -1153,7 +1207,18 @@ describe('Rminder', () => {
 
 			rminder.tasks(task);
 
-			rminder.taskList.querySelector('.completed-ckeck').click();
+			const listTask = document.querySelector('vp-list-task');
+			listTask.task = '1';
+
+			listTask.dispatchEvent(
+				new CustomEvent('vp-button:click', {
+					detail: {
+						trigger: 'completedTask'
+					},
+					bubbles: true,
+					composed: true
+				})
+			);
 
 			td.verify(rminder.handleEvent('completedTask', db, 1));
 			td.verify(rminder.hideDetails());
