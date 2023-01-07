@@ -5,19 +5,21 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 14
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-    - run: npm run e2e:ci
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
+      - run: yarn install --frozen-lockfile
+      - run: yarn build --if-present
+      - run: yarn run lint
+      - run: yarn run prettier:ci
+      - run: yarn test
+      - run: yarn run e2e:ci

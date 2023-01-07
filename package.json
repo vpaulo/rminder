@@ -7,12 +7,10 @@
   "scripts": {
     "start": "node server.js",
     "test": "karma start karma.conf.cjs",
-    "e2e": "mocha test/bootstrap.js -t=10000 --recursive test/e2e",
-    "e2e:open": "OPEN=true mocha test/bootstrap.js -t=10000 --recursive test/e2e",
-    "e2e:ci": "PORT=5501 start-server-and-test start http://localhost:5501 e2e",
-    "e2e:ci-open": "PORT=5501 start-server-and-test start http://localhost:5501 e2e:open",
     "lint": "eslint **/src/**/*.js",
-    "build": "npm run lint && node build.js && cp ./src/site.webmanifest ./docs/ && cp -r ./src/favicons/ ./docs/"
+    "build": "npm run lint && node build.js && cp ./src/site.webmanifest ./dist/ && cp -r ./src/favicons/ ./dist/favicons/",
+    "prettier": "prettier --write . --ignore-path ./.prettierignore",
+    "prettier:ci": "prettier --list-different \"./*.{scss,js}\" --ignore-path ./.prettierignore"
   },
   "repository": {
     "type": "git",
@@ -32,9 +30,11 @@
   },
   "homepage": "https://github.com/vpaulo/reminder#readme",
   "devDependencies": {
+    "@fastify/cors": "^8.2.0",
+    "@fastify/static": "^6.6.0",
     "chai": "^4.3.4",
     "eslint": "^7.32.0",
-    "express": "^4.17.1",
+    "fastify": "^4.11.0",
     "html-minifier": "^4.0.0",
     "karma": "^6.3.4",
     "karma-chai": "^0.1.0",
@@ -46,14 +46,14 @@
     "karma-testdouble": "^1.0.2",
     "mkdirp": "^1.0.4",
     "mocha": "^9.0.3",
-    "puppeteer": "^10.2.0",
+    "prettier": "^2.8.1",
     "sass": "^1.37.5",
-    "start-server-and-test": "^1.13.1",
     "terser": "^5.7.1",
     "testdouble": "^3.16.1"
   },
   "engines": {
-    "node": ">= 14.12.0",
-    "npm": ">= 6.14.8"
-  }
+    "node": ">= 18.7.0",
+    "npm": ">= 8.15.0"
+  },
+  "dependencies": {}
 }
