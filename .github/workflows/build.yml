@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 18
       - run: yarn install --frozen-lockfile
-      - run: yarn build --if-present
+      - run: yarn build
       - run: yarn run lint
       - run: yarn run prettier:ci
       - run: yarn test
