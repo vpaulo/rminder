@@ -1,359 +1,404 @@
 import { logger } from './logger.js';
 
 export class Rminder {
-	constructor() {
-		this.mediaQueryList = matchMedia('only screen and (max-width: 900px)');
-		this.smallMediaQuery = matchMedia('only screen and (max-width: 630px)');
+  constructor() {
+    this.mediaQueryList = matchMedia('only screen and (max-width: 900px)');
+    this.smallMediaQuery = matchMedia('only screen and (max-width: 630px)');
 
-		this.taskInput = document.getElementById('task');
-		this.addTaskBtn = document.querySelector('.add-task');
-		this.taskList = document.querySelector('.tasks__list');
-		this.detailsContainer = document.querySelector('.details');
-		this.titleInput = document.querySelector('.title');
-		this.rename = document.querySelector('.rename');
-		this.remove = document.querySelector('.remove');
-		this.close = document.querySelector('.close');
-		this.myDay = document.querySelector('.my-day');
-		this.importanceCheckBtn = this.detailsContainer?.querySelector('.importance-check');
-		this.completedCheck = this.detailsContainer?.querySelector('.completed-ckeck');
-		this.note = document.querySelector('.note');
-		this.noteBtn = document.querySelector('.add-note');
-		this.countMyDay = document.querySelector('.count-my-day');
-		this.countImportant = document.querySelector('.count-important');
-		this.countCompleted = document.querySelector('.count-completed');
-		this.countTasks = document.querySelector('.count-tasks');
-		this.menuBtn = document.querySelector('.menu');
-		this.sidebar = document.querySelector('.sidebar');
-		this.checkSquareTmp = document.getElementById('check-square');
-		this.starTmp = document.getElementById('star');
-		this.lists = document.querySelector('.lists');
-		this.listTitle = document.querySelector('.list-title');
-		this.mainContainer = document.querySelector('.main');
-		this.creationDate = document.querySelector('.creation-date');
-		this.toggleCompleted = document.querySelector('.toggle-completed');
-		this.settingsBtn = document.querySelector('.app__settings');
-		this.filterBtn = document.querySelector('.list-filter');
-		[...this.orderFilters] = document.querySelectorAll('.order-filter');
-		this.modal = document.querySelector('.modal');
-		this.modalCancel = this.modal?.querySelector('.default');
-		this.modalDelete = this.modal?.querySelector('.warning');
-	}
+    this.detailsContainer = document.querySelector('.details');
+    this.titleInput = document.querySelector('.title');
+    this.myDay = document.querySelector('.my-day');
+    this.importanceCheckBtn =
+      this.detailsContainer?.querySelector('.importance-check');
+    this.completedCheck =
+      this.detailsContainer?.querySelector('.completed-ckeck');
+    this.note = document.querySelector('.note');
+    this.drawer = document.querySelector('vp-rminder-tasks-drawer');
+    this.creationDate = document.querySelector('.creation-date');
+    this.toggleCompleted = document.querySelector('.toggle-completed');
+    this.settingsBtn = document.querySelector('.app__settings');
+    this.modal = document.querySelector('vp-modal');
+    this.rminderList = document.querySelector('vp-rminder-list');
+  }
 
-	launch(data) {
-		logger('web worker initialised: ', data);
-	}
+  success(data) {
+    const msg =
+      typeof data.message !== 'undefined'
+        ? `Success: ${data.message}`
+        : 'Success: ';
+    logger(msg, data);
+  }
 
-	success(data) {
-		const msg = typeof data.message !== 'undefined' ? `Success: ${data.message}` : 'Success: ';
-		logger(msg, data);
-	}
+  opened(data, db) {
+    logger(data.message);
+    this.addEventListeners(db);
+  }
 
-	opened(data, db) {
-		logger(data.message);
-		this.addEventListeners(db);
-	}
+  initialiseSettings(data) {
+    this.rminderList.setAttribute('list', data.settings.list);
+    this.rminderList.setAttribute('filter', data.settings.filter);
+  }
 
-	clear(data) {
-		logger(data.message);
-		this.taskInput.value = '';
-		this.taskList.innerHTML = '';
-	}
+  // clear(data) {
+  // 	logger(data.message);
+  // 	this.taskList.innerHTML = '';
+  // }
 
-	tasks({ value: data, list }) {
-		logger('Tasks:', data);
-		let dt = data;
-		let title = 'Tasks';
-		let name = 'tasks';
+  tasks({ value: data, list }) {
+    logger('Tasks:', data);
+    let dt = data;
+    let title = 'Tasks';
+    let name = 'tasks';
 
-		if (list?.title) {
-			dt = list.value;
-			title = list.title;
-			name = list.name;
-		}
+    if (list?.title) {
+      dt = list.value;
+      title = list.title;
+      name = list.name;
+    }
 
-		// Show tasks
-		this.taskList.innerHTML = dt.map(task => `<li class="${task.completed ? 'completed ' : ''}${task.important ? 'important ' : ''}" data-id="${task.id}"><span class="completed-ckeck" title="Set it as complete">${this.checkSquareTmp.innerHTML}</span><button class="show-details">${task.title}</button><span class="importance-check" title="Set it as important">${this.starTmp.innerHTML}</span>`).join('');
-		// Show counters
-		this.countMyDay.innerText = data.filter(d => d.my_day).length;
-		this.countImportant.innerText = data.filter(d => d.important).length;
-		this.countCompleted.innerText = data.filter(d => d.completed).length;
-		this.countTasks.innerText = data.length; // TODO: change total for tasks list after adding lists functionality
-		// Set List title
-		this.listTitle.innerText = title;
-		this.mainContainer.dataset.list = name;
+    // Show counters
+    this.drawer.updateTasks(data);
 
-		this.setDetailClasses(data);
-	}
+    this.setDetailClasses(data);
 
-	details({ value: data }) {
-		logger('Details: ', data);
-		const date = new Date(data.creation_date);
-		this.detailsContainer.setAttribute('aria-label', `Detail for task: ${data.title}`);
-		this.detailsContainer.dataset.id = data.id;
-		this.titleInput.value = data.title;
-		this.note.value = data.note || '';
-		this.creationDate.innerText = new Intl.DateTimeFormat().format(date);
+    this.rminderList.dispatchEvent(
+      new CustomEvent('vp:tasks', {
+        detail: {
+          tasks: dt,
+          list: name,
+          title,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
 
-		this.setDetailClasses(data);
-	}
+  details({ value: data }) {
+    logger('Details: ', data);
+    const date = new Date(data.creation_date);
+    this.detailsContainer.setAttribute(
+      'aria-label',
+      `Detail for task: ${data.title}`
+    );
+    this.detailsContainer.dataset.id = data.id;
+    this.titleInput.value = data.title;
+    this.note.value = data.note || '';
+    this.creationDate.innerText = new Intl.DateTimeFormat().format(date);
 
-	addEventListeners(db) {
-		this.addTaskBtn.addEventListener('click', () => { this.addTask(db); }, false);
+    this.setDetailClasses(data);
+  }
 
-		this.taskList.addEventListener('click', e => {
-			if (e.target.classList.contains('show-details')) {
-				this.showDetails(e.target, db);
-				this.setSelected(e.target.closest('[data-id]'));
-			}
+  addEventListeners(db) {
+    // TODO: create common function to handle completed check events
+    this.completedCheck.addEventListener(
+      'click',
+      (e) => {
+        const parent = e.target.closest('[data-id]');
+        if (this.toggleCompleted.checked) {
+          this.hideDetails();
+        }
+        this.handleEvent('completedTask', db, +parent.dataset.id);
+      },
+      false
+    );
 
-			if (e.target.classList.contains('importance-check') || e.target.closest('.importance-check')) {
-				const parent = e.target.closest('[data-id]');
-				this.handleEvent('importantTask', db, +parent.dataset.id);
-			}
+    this.drawer.addEventListener('vp-nav-list:click', (e) => {
+      const list = e.detail.name;
+      if (list) {
+        this.showList(list, db);
 
-			if (e.target.classList.contains('completed-ckeck') || e.target.closest('.completed-ckeck')) {
-				const parent = e.target.closest('[data-id]');
-				if (parent.dataset.id === this.detailsContainer.dataset.id && this.toggleCompleted.checked) {
-					this.hideDetails();
-				}
-				this.handleEvent('completedTask', db, +parent.dataset.id);
-			}
+        if (this.smallMediaQuery.matches) {
+          this.hideSidebar();
+        }
+      }
+    });
 
-		}, false);
+    this.titleInput.addEventListener(
+      'keyup',
+      (event) => {
+        if (event.code === 'Enter') {
+          this.renameTask(db);
+        }
+      },
+      false
+    );
 
-		// TODO: create common function to handle completed check events
-		this.completedCheck.addEventListener('click', e => {
-			const parent = e.target.closest('[data-id]');
-			if (this.toggleCompleted.checked) {
-				this.hideDetails();
-			}
-			this.handleEvent('completedTask', db, +parent.dataset.id);
-		}, false);
+    // TODO: move the event listener to a common parent element
+    // TODO: showDetails trigger throws error
+    // TODO: it adds extra task from add-list-task
+    document.addEventListener('vp:trigger', (e) => {
+      if (e.detail.trigger) {
+        this[e.detail.trigger](e.target, db, e.detail);
+      }
+    });
 
-		this.lists.addEventListener('click', e => {
-			const list = e.target?.dataset.name || e.target.closest('li')?.dataset.name;
-			if (list) {
-				this.showList(list, db);
+    document.addEventListener('modal', (e) => {
+      this.eventHandler(e, db);
+    });
+    document.addEventListener('vp:addTask', (e) => {
+      this.addTask(e.detail, db);
+    });
+    document.addEventListener('vp:showList', (e) => {
+      this.showList(e.detail.list, db);
+    });
+    document.addEventListener('vp:updateTask', (e) => {
+      this[e.detail.type](e.detail.id, db, e.detail);
+    });
+    document.addEventListener('vp:filterUpdate', (e) => {
+      this.filterUpdate(e.detail.filter, db);
+    });
 
-				if (this.smallMediaQuery.matches) {
-					this.hideSidebar();
-				}
-			}
-		}, false);
+    this.importanceCheckBtn.addEventListener(
+      'click',
+      (e) => {
+        const parent = e.target.closest('[data-id]');
+        this.handleEvent('importantTask', db, +parent.dataset.id);
+      },
+      false
+    );
 
-		this.taskInput.addEventListener('keyup', event => {
-			if (event.code === 'Enter') {
-				this.addTask(db);
-			}
-		}, false);
+    this.myDay.addEventListener(
+      'click',
+      () => {
+        this.handleEvent('myDayTask', db);
+      },
+      false
+    );
 
-		this.titleInput.addEventListener('keyup', event => {
-			if (event.code === 'Enter') {
-				this.renameTask(db);
-			}
-		}, false);
+    this.mediaQueryList.addEventListener(
+      'change',
+      this.screenTest.bind(this),
+      false
+    );
 
-		this.rename.addEventListener('click', () => {
-			this.renameTask(db);
-		}, false);
+    this.toggleCompleted.addEventListener(
+      'click',
+      (evt) => {
+        this.settingsCompleted(evt.target, db);
+      },
+      false
+    );
 
-		this.remove.addEventListener('click', () => {
-			this.modal.classList.add('open');
-		}, false);
+    this.settingsBtn.addEventListener(
+      'click',
+      () => this.toggle(this.settingsBtn),
+      false
+    );
 
-		this.modalCancel.addEventListener('click', () => {
-			this.modal.classList.remove('open');
-		}, false);
+    window.addEventListener('resize', this.setDocHeight, false);
+    window.addEventListener('orientationchange', this.setDocHeight, false);
+  }
 
-		this.modalDelete.addEventListener('click', () => {
-			this.handleEvent('removeTask', db);
-		}, false);
+  addTask(data, db) {
+    db.postMessage({
+      type: 'addTask',
+      title: data.title,
+      creationDate: data.creationDate,
+    });
+  }
 
-		this.close.addEventListener('click', this.hideDetails.bind(this), false);
-		this.menuBtn.addEventListener('click', this.toggleSidebar.bind(this), false);
+  renameTask(elem, db) {
+    const title = this.titleInput.value.trim();
+    const id = +this.detailsContainer.dataset.id; // convert id to number
+    if (title) {
+      db.postMessage({
+        type: 'renameTask',
+        id,
+        title,
+      });
+    } else {
+      logger('Required field(s) missing: title');
+    }
+  }
 
-		this.importanceCheckBtn.addEventListener('click', (e) => {
-			const parent = e.target.closest('[data-id]');
-			this.handleEvent('importantTask', db, +parent.dataset.id);
-		}, false);
+  completedTask(id, db) {
+    if (this.toggleCompleted.checked) {
+      this.hideDetails();
+    }
+    this.handleEvent('completedTask', db, id);
+  }
 
-		this.myDay.addEventListener('click', () => {
-			this.handleEvent('myDayTask', db);
-		}, false);
+  importantTask(id, db) {
+    this.handleEvent('importantTask', db, id);
+  }
 
-		this.noteBtn.addEventListener('click', () => { this.setTaskNote(db); }, false);
+  removeTask(elem, db) {
+    this.handleEvent('removeTask', db);
+  }
 
-		this.mediaQueryList.addEventListener('change', this.screenTest.bind(this), false);
+  showDetails(id, db) {
+    if (id !== +this.detailsContainer.dataset.id) {
+      db.postMessage({
+        type: 'showDetails',
+        id,
+      });
+    }
+    this.detailsContainer.classList.add('expanded');
+    this.screenTest();
+  }
 
-		this.toggleCompleted.addEventListener('click', (evt) => { this.settingsCompleted(evt.target, db); }, false);
+  hideDetails() {
+    this.detailsContainer.classList.remove('expanded');
+    // this.taskList.querySelector('.selected')?.classList?.remove('selected');
+    this.modal.close();
+    this.screenTest();
+  }
 
-		this.settingsBtn.addEventListener('click', () => this.toggle(this.settingsBtn), false);
-		this.filterBtn.addEventListener('click', () => this.toggle(this.filterBtn), false);
+  toggleSidebar() {
+    // TODO: this.drawer.toggle(); should work
+    this.drawer.classList.toggle('expanded');
+    this.screenTest(undefined, this.detailsContainer);
+  }
 
-		this.orderFilters.forEach(filter => filter.addEventListener('change', evt => { this.filterUpdate(evt.target, db); }, false));
+  hideSidebar() {
+    // TODO: maybe create a Drawer.hide() method
+    this.drawer.classList.remove('expanded');
+    this.screenTest();
+  }
 
-		window.addEventListener('resize', this.setDocHeight, false);
-		window.addEventListener('orientationchange', this.setDocHeight, false);
-	}
+  handleEvent(type, db, id = +this.detailsContainer.dataset.id) {
+    db.postMessage({
+      type,
+      id,
+    });
+  }
 
-	addTask(db) {
-		const title = this.taskInput.value.trim();
-		const creationDate = Date.now();
-		const list = this.mainContainer.dataset.list;
-		if (title) {
-			db.postMessage({ type: 'addTask', title, creationDate, list });
-		} else {
-			logger('Required field(s) missing: title');
-		}
-	}
+  setTaskNote(elem, db) {
+    const id = +this.detailsContainer.dataset.id;
+    const text = this.note.value.trim();
+    db.postMessage({
+      type: 'noteTask',
+      id,
+      note: text,
+    });
+  }
 
-	renameTask(db) {
-		const title = this.titleInput.value.trim();
-		const id = +this.detailsContainer.dataset.id; // convert id to number
-		const list = this.mainContainer.dataset.list;
-		if (title) {
-			db.postMessage({ type: 'renameTask', id, title, list });
-		} else {
-			logger('Required field(s) missing: title');
-		}
-	}
+  selectList({ list }) {
+    document
+      .querySelector('vp-nav-list.selected')
+      ?.classList.remove('selected');
+    document
+      .querySelector(`vp-nav-list[name="${list}"]`)
+      ?.classList.add('selected');
+  }
 
-	showDetails(elem, db) {
-		if (elem.classList.contains('show-details')) {
-			const parent = elem.parentNode;
-			const id = +parent.dataset.id;
-			if (id !== +this.detailsContainer.dataset.id) {
-				db.postMessage({ type: 'showDetails', id });
-			}
-			this.detailsContainer.classList.add('expanded');
-			this.screenTest();
-		}
-	}
+  showList(list, db) {
+    this.selectList({
+      list,
+    });
+    db.postMessage({
+      type: 'list',
+      list,
+    });
+  }
 
-	hideDetails() {
-		this.detailsContainer.classList.remove('expanded');
-		this.taskList.querySelector('.selected')?.classList?.remove('selected');
-		this.modal.classList.remove('open');
-		this.screenTest();
-	}
+  setDetailClasses(data) {
+    const id = +this.detailsContainer.dataset.id;
+    let dt = data;
 
-	toggleSidebar() {
-		this.sidebar.classList.toggle('expanded');
-		this.screenTest(undefined, this.detailsContainer);
-	}
+    if (Array.isArray(data)) {
+      dt = data.find((d) => d.id === id);
+    }
 
-	hideSidebar() {
-		this.sidebar.classList.remove('expanded');
-		this.screenTest();
-	}
+    this.detailsContainer.classList.remove('important', 'completed', 'today');
 
-	handleEvent(type, db, id = +this.detailsContainer.dataset.id) {
-		const list = this.mainContainer.dataset.list;
-		db.postMessage({ type, id, list });
-	}
+    this.importanceCheckBtn
+      ?.querySelector('vp-icon')
+      ?.setAttribute('icon', `icons:star${dt?.important ? '-solid' : ''}`);
+    this.completedCheck
+      ?.querySelector('vp-icon')
+      ?.setAttribute('icon', `icons:${dt?.completed ? 'check-' : ''}square`);
 
-	setTaskNote(db) {
-		const id = +this.detailsContainer.dataset.id;
-		const text = this.note.value.trim();
-		const list = this.mainContainer.dataset.list;
-		if (text) {
-			db.postMessage({ type: 'noteTask', id, note: text, list });
-		} else {
-			logger('Required field(s) missing: note');
-		}
-	}
+    // TODO: remove this classes
+    if (dt?.important) {
+      this.detailsContainer.classList.add('important');
+    }
 
-	selectList({ list }) {
-		document.querySelector('.list.selected')?.classList?.remove('selected');
-		document.querySelector(`.list[data-name="${list}"]`).classList.add('selected');
-	}
+    if (dt?.completed) {
+      this.detailsContainer.classList.add('completed');
+    }
 
-	showList(list, db) {
-		this.selectList({ list });
-		db.postMessage({ type: 'list', list });
-	}
+    if (dt?.my_day) {
+      this.detailsContainer.classList.add('today');
+    }
+  }
 
-	setDetailClasses(data) {
-		const id = +this.detailsContainer.dataset.id;
-		let dt = data;
+  screenTest(mql = this.mediaQueryList, elem = this.drawer) {
+    if (mql.matches && document.querySelectorAll('.expanded').length > 1) {
+      elem.classList.remove('expanded');
+    }
 
-		if (Array.isArray(data)) {
-			dt = data.find(d => d.id === id);
-		}
+    if (this.smallMediaQuery.matches && document.querySelector('.expanded')) {
+      this.mainContainer?.classList.add('hidden');
+    } else {
+      this.mainContainer?.classList.remove('hidden');
+    }
+  }
 
-		this.detailsContainer.classList.remove('important', 'completed', 'today');
+  setDocHeight() {
+    document.documentElement.style.setProperty(
+      '--vh',
+      `${window.innerHeight}px`
+    );
+  }
 
-		if (dt?.important) {
-			this.detailsContainer.classList.add('important');
-		}
+  // setSelected(el) {
+  // 	this.taskList.querySelector('.selected')?.classList?.remove('selected');
+  // 	el.classList.add('selected');
+  // }
 
-		if (dt?.completed) {
-			this.detailsContainer.classList.add('completed');
-		}
+  settingsCompleted(elem, db) {
+    const checked = elem.checked;
+    db.postMessage({
+      type: 'settings',
+      completed: checked,
+    });
+  }
 
-		if (dt?.my_day) {
-			this.detailsContainer.classList.add('today');
-		}
-	}
+  toggle(elem) {
+    elem.classList.toggle('open');
+  }
 
-	screenTest(mql = this.mediaQueryList, elem = this.sidebar) {
-		if (mql.matches && document.querySelectorAll('.expanded').length > 1) {
-			elem.classList.remove('expanded');
-		}
+  // settings({ settings } = {}) {
+  // 	if (!settings) {
+  // 		return false;
+  // 	}
 
-		if (this.smallMediaQuery.matches && document.querySelector('.expanded')) {
-			this.mainContainer?.classList.add('hidden');
-		} else {
-			this.mainContainer?.classList.remove('hidden');
-		}
-	}
+  // 	if (settings.completed === 'hide') {
+  // 		this.toggleCompleted.checked = true;
+  // 		this.listCompleted.classList.add('hidden');
+  // 		if (this.listCompleted.classList.contains('selected')) {
+  // 			this.listTasks.click(); // Select Tasks list if Completed list was selected before hidding
+  // 		}
+  // 	} else {
+  // 		this.toggleCompleted.checked = false;
+  // 		this.listCompleted.classList.remove('hidden');
+  // 	}
 
-	setDocHeight() {
-		document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
-	}
+  // 	if (settings.filter) {
+  // 		this.rminderList.setAttribute('filter', settings.filter);
+  // 	}
+  // }
 
-	setSelected(el) {
-		this.taskList.querySelector('.selected')?.classList?.remove('selected');
-		el.classList.add('selected');
-	}
+  filterUpdate(filter, db) {
+    db.postMessage({
+      type: 'filter',
+      filter,
+    });
+  }
 
-	settingsCompleted(elem, db) {
-		const checked = elem.checked;
-		const list = this.mainContainer.dataset.list;
-		db.postMessage({ type: 'settings', completed: checked, list });
-	}
+  openModal() {
+    this.modal.open();
+  }
 
-	toggle(elem) {
-		elem.classList.toggle('open');
-	}
+  closeModal() {
+    this.modal.close();
+  }
 
-	settings({ settings } = {}) {
-		if (!settings) {
-			return false;
-		}
-
-		const completedList = this.lists.querySelector('[data-name="completed"]');
-		if (settings.completed === 'hide') {
-			this.toggleCompleted.checked = true;
-			completedList.classList.add('hidden');
-			if (completedList.classList.contains('selected')) {
-				this.lists.querySelector('[data-name="tasks"]').click(); // Select Tasks list if Completed list was selected before hidding
-			}
-		} else {
-			this.toggleCompleted.checked = false;
-			completedList.classList.remove('hidden');
-		}
-
-		if (settings.filter) {
-			this.orderFilters.forEach(filter => {
-				if (filter.value === settings.filter) {
-					filter.parentNode.click();
-				}
-			});
-		}
-	}
-
-	filterUpdate(elem, db) {
-		db.postMessage({ type: 'filter', filter: elem.value });
-	}
+  eventHandler(event, db) {
+    if (event.detail.trigger) {
+      this[event.detail.trigger](event.target, db, event.detail);
+    }
+  }
 }
