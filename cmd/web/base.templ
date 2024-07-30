@@ -1,0 +1,111 @@
+package web
+
+templ Base() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+			<meta
+				name="viewport"
+				content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"
+			/>
+			<meta name="description" content="Keep track of your tasks" />
+			<meta name="keywords" content="Notes, Todo, Reminder" />
+
+			<!-- Android  -->
+			<meta name="theme-color" content="white" />
+			<meta name="mobile-web-app-capable" content="yes" />
+
+			<!-- iOS -->
+			<meta name="apple-mobile-web-app-title" content="Rminder" />
+			<meta name="apple-mobile-web-app-capable" content="yes" />
+			<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+			<!-- Disable night mode for this page  -->
+			<meta name="nightmode" content="enable" />
+
+			<!-- Layout mode -->
+			<meta name="layoutmode" content="fitscreen" />
+
+			<!-- imagemode - show image even in text only mode  -->
+			<meta name="imagemode" content="force" />
+
+			<!-- Orientation  -->
+			<meta name="screen-orientation" content="portrait" />
+
+			<!-- iOS  -->
+			<link href="assets/favicons/icon-180x180.png" rel="apple-touch-icon" />
+			<link
+				href="assets/favicons/icon-76x76.png"
+				rel="apple-touch-icon"
+				sizes="76x76"
+			/>
+			<link
+				href="assets/favicons/icon-120x120.png"
+				rel="apple-touch-icon"
+				sizes="120x120"
+			/>
+			<link
+				href="assets/favicons/icon-152x152.png"
+				rel="apple-touch-icon"
+				sizes="152x152"
+			/>
+
+			<!-- Startup Image  -->
+			<link
+				href="assets/favicons/icon-512x512.png"
+				rel="apple-touch-startup-image"
+			/>
+
+			<!-- Main Link Tags  -->
+			<link
+				href="assets/favicons/icon-16x16.png"
+				rel="icon"
+				type="image/png"
+				sizes="16x16"
+			/>
+			<link
+				href="assets/favicons/icon-32x32.png"
+				rel="icon"
+				type="image/png"
+				sizes="32x32"
+			/>
+			<link
+				href="assets/favicons/icon-96x96.png"
+				rel="icon"
+				type="image/png"
+				sizes="96x96"
+			/>
+
+			<!-- Android  -->
+			<link href="assets/favicons/icon-192x192.png" rel="icon" sizes="192x192" />
+			<link href="assets/favicons/icon-512x512.png" rel="icon" sizes="512x512" />
+
+			<!-- Others -->
+			<link
+				href="assets/favicons/favicon.ico"
+				rel="shortcut icon"
+				type="image/x-icon"
+			/>
+			<link href="assets/favicons/favicon.ico" rel="icon" type="image/x-icon" />
+
+			<!-- Manifest  -->
+			<link rel="manifest" href="assets/site.webmanifest" />
+
+			<link rel="canonical" href="https://rminder.app" />
+
+			<title>Rminder</title>
+
+			<!-- App Styles/Scripts -->
+            <link href="assets/css/styles.css" rel="stylesheet"/>
+			<script src="assets/js/htmx.min.js"></script>
+		</head>
+		<body>
+			<main>
+				{ children... }
+			</main>
+			<script type="module" src="assets/js/app.js"></script>
+		</body>
+	</html>
+}
