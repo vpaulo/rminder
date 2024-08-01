@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	server := server.NewServer()
 
 	log.Printf("Listening on %s...", server.Addr)

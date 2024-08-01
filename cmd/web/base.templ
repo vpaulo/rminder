@@ -102,9 +102,11 @@ templ Base() {
 			<script src="assets/js/htmx.min.js"></script>
 		</head>
 		<body>
-			<main>
+		    @Header()
+			<main id="app">
 				{ children... }
 			</main>
+			@Modal()
 			<script type="module" src="assets/js/app.js"></script>
 		</body>
 	</html>

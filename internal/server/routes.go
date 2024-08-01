@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"rminder/cmd/web"
+
+	"github.com/a-h/templ"
 )
 
 type Middleware func(http.Handler) http.Handler
@@ -31,20 +33,17 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	router := http.NewServeMux()
 
-	apiMiddlewares := MiddlewareStack(
-		IsCustomer, // TODO: check if MW will be need for api routes
-	)
+	// apiMiddlewares := MiddlewareStack(
+	// 	IsCustomer, // TODO: check if MW will be need for api routes
+	// )
 	apiRouter := http.NewServeMux()
 	apiRouter.HandleFunc("GET /task", s.getAllTasks)
 	apiRouter.HandleFunc("POST /task", s.createTask)
 	apiRouter.HandleFunc("GET /task/{taskID}", s.getTask)
 	apiRouter.HandleFunc("PUT /task/{taskID}", s.updateTask)
 	apiRouter.HandleFunc("DELETE /task/{taskID}", s.deleteTask)
-	router.Handle("/api/v0/", http.StripPrefix("/api/v0", apiMiddlewares(apiRouter)))
-
-	// Public routes
-	router.HandleFunc("/{$}", s.HelloWorldHandler)
-	router.HandleFunc("GET /health", s.healthHandler)
+	// router.Handle("/api/v0/", http.StripPrefix("/api/v0", apiMiddlewares(apiRouter)))
+	router.Handle("/api/v0/", http.StripPrefix("/api/v0", apiRouter))
 
 	// Static files
 	fileServer := http.FileServer(http.FS(web.Files))
@@ -53,8 +52,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// // API
 	// router.HandleFunc("/hello", web.HelloWebHandler)
 
-	// // Views/pages
+	// Views/pages
+	router.Handle("/{$}", templ.Handler(web.TasksApp()))
+	// router.HandleFunc("/{$}", s.HelloWorldHandler)
 	// router.Handle("/web", templ.Handler(web.HelloForm()))
+	// router.HandleFunc("/{$}", s.HelloWorldHandler)
+	// router.HandleFunc("GET /health", s.healthHandler)
 
 	return stack(router)
 }
