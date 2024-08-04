@@ -53,7 +53,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// router.HandleFunc("/hello", web.HelloWebHandler)
 
 	// Views/pages
-	router.Handle("/{$}", templ.Handler(web.TasksApp()))
+	router.Handle("/{$}", templ.Handler(web.Tasks()))
 	// router.HandleFunc("/{$}", s.HelloWorldHandler)
 	// router.Handle("/web", templ.Handler(web.HelloForm()))
 	// router.HandleFunc("/{$}", s.HelloWorldHandler)

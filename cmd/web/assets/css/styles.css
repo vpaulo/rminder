@@ -264,9 +264,14 @@ header {
     cursor: pointer;
     text-align: center;
     line-height: 28px;
+
+    mask: url("/assets/icons/add-icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    background-color: var(--base-color);
 }
-.add-task--label:hover .add-icon {
-    color: var(--primary);
+.add-task--label:hover {
+    background-color: var(--primary);
 }
 .show-details {
     background: none;
@@ -429,14 +434,34 @@ header {
 .remove {
     border-left: 1px solid var(--base-grey);
 }
+.trash-icon {
+    display: block;
+    mask: url("/assets/icons/trash-icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 16px;
+    background-color: var(--base-color);
+    width: 27px;
+    height: 27px;
+}
 .remove:hover .trash-icon {
-    color: var(--base-red);
+    background-color: var(--base-red);
 }
 .close {
     border-right: 1px solid var(--base-grey);
 }
+.close-icon {
+    display: block;
+    mask: url("/assets/icons/close-icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 27px 18px;
+    background-color: var(--base-color);
+    width: 27px;
+    height: 27px;
+}
 .close:hover .close-icon {
-    color: var(--primary);
+    background-color: var(--primary);
 }
 .sidebar__header {
     display: flex;
@@ -448,6 +473,10 @@ header {
     width: 20px;
     height: 20px;
     cursor: pointer;
+
+    background-image: url("/assets/icons/menu-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
 }
 .list-toolbar {
     display: flex;
