@@ -1,0 +1,12 @@
+<svg
+    aria-hidden="true"
+    role="img"
+    viewBox="0 0 448 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        fill="currentColor"
+        class="icon-square"
+        d="M 400 32 H 48 C 21.49 32 0 53.49 0 80 v 352 c 0 26.51 21.49 48 48 48 h 352 c 26.51 0 48 -21.49 48 -48 V 80 c 0 -26.51 -21.49 -48 -48 -48 z m 0 400 H 48 V 80 h 352 v 352 z"
+    ></path>
+</svg>

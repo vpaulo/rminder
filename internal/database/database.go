@@ -48,8 +48,6 @@ func New() Service {
 		log.Fatal(err)
 	}
 
-	// TODO: initialise tables
-
 	dbInstance = &service{
 		db: db,
 	}
@@ -140,7 +138,7 @@ func (s *service) Close() error {
 }
 
 func (s *service) Tasks() ([]*Task, error) {
-	query, err := s.db.Prepare("select * from task")
+	query, err := s.db.Prepare("SELECT * FROM task ORDER BY created_at DESC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Tasks - prepare query failed: %v", err)
 	}

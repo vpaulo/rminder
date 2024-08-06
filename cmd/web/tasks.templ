@@ -1,6 +1,11 @@
 package web
 
-templ Tasks() {
+import (
+    "rminder/internal/database"
+    "strconv"
+)
+
+templ Tasks(tasks templ.Component, total int) {
 	@Base() {
         <!-- left colunm -->
         <aside class="sidebar expanded" aria-label="Lists menu">
@@ -101,7 +106,8 @@ templ Tasks() {
                                 ></path>
                             </svg>
                             <span>Tasks</span>
-                            <span class="count count-tasks"></span>
+                            <!-- TODO: move logic to router? maybe?? -->
+                            <span class="count count-tasks">{ strconv.Itoa(total) }</span>
                         </li>
                     </ul>
                 </nav>
@@ -125,9 +131,7 @@ templ Tasks() {
                     />
                     <button class="add-task">Add</button>
                 </div>
-                <div class="tasks">
-                    <ul class="tasks__list"></ul>
-                </div>
+                <div class="tasks">@tasks</div>
             </div>
         </div>
         <!-- right colunm -->
@@ -197,4 +201,16 @@ templ Modal() {
             </div>
         </div>
     </div>
+}
+
+templ TaskList(tasks []*database.Task) {
+  <ul class="tasks__list">
+  for _, task := range tasks {
+    <li class="" data-id={ strconv.Itoa(task.ID) }>
+      <span class="completed-ckeck" title="Set it as complete"></span>
+      <button class="show-details">{ task.Title } { task.CreatedAt }</button>
+      <span class="importance-check" title="Set it as important"></span>
+    </li>
+  }
+  </ul>
 }

@@ -8,22 +8,9 @@ import (
 	"time"
 
 	"rminder/cmd/web"
-
-	"github.com/a-h/templ"
 )
 
 type Middleware func(http.Handler) http.Handler
-
-// wrappedResponseWriter add statusCode to ResponseWriter
-// type wrappedResponseWriter struct {
-// 	http.ResponseWriter
-// 	statusCode int
-// }
-
-// func (w *wrappedResponseWriter) WriteHeader(statusCode int) {
-// 	w.ResponseWriter.WriteHeader(statusCode)
-// 	w.statusCode = statusCode
-// }
 
 func (s *Server) RegisterRoutes() http.Handler {
 	stack := MiddlewareStack(
@@ -33,33 +20,36 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	router := http.NewServeMux()
 
-	// apiMiddlewares := MiddlewareStack(
-	// 	IsCustomer, // TODO: check if MW will be need for api routes
-	// )
 	apiRouter := http.NewServeMux()
 	apiRouter.HandleFunc("GET /task", s.getAllTasks)
 	apiRouter.HandleFunc("POST /task", s.createTask)
 	apiRouter.HandleFunc("GET /task/{taskID}", s.getTask)
 	apiRouter.HandleFunc("PUT /task/{taskID}", s.updateTask)
 	apiRouter.HandleFunc("DELETE /task/{taskID}", s.deleteTask)
-	// router.Handle("/api/v0/", http.StripPrefix("/api/v0", apiMiddlewares(apiRouter)))
 	router.Handle("/api/v0/", http.StripPrefix("/api/v0", apiRouter))
 
 	// Static files
 	fileServer := http.FileServer(http.FS(web.Files))
 	router.Handle("GET /assets/", fileServer)
 
-	// // API
-	// router.HandleFunc("/hello", web.HelloWebHandler)
-
 	// Views/pages
-	router.Handle("/{$}", templ.Handler(web.Tasks()))
-	// router.HandleFunc("/{$}", s.HelloWorldHandler)
-	// router.Handle("/web", templ.Handler(web.HelloForm()))
-	// router.HandleFunc("/{$}", s.HelloWorldHandler)
-	// router.HandleFunc("GET /health", s.healthHandler)
+	router.HandleFunc("/{$}", s.tasksHandler)
 
 	return stack(router)
+}
+
+func (s *Server) tasksHandler(w http.ResponseWriter, r *http.Request) {
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	component := web.TaskList(tasks)
+	err = web.Tasks(component, len(tasks)).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in tasksHandler: %e", err)
+	}
 }
 
 func (s *Server) getAllTasks(w http.ResponseWriter, r *http.Request) {
