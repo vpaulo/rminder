@@ -208,13 +208,18 @@ header {
     padding: 0;
     list-style: none;
 }
-.list.selected > svg {
-    color: var(--primary);
+.tasks__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.list.selected > .icon {
+    background-color: var(--primary);
 }
 .tasks__list > li {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    gap: 12px;
     padding: 0 12px;
     background-color: #fff;
 }
@@ -282,7 +287,7 @@ header {
     text-align: left;
     font-size: 1.2rem;
     color: var(--base-color);
-    padding: 8px 12px;
+    padding: 8px 0;
     cursor: pointer;
 }
 .completed .show-details {
@@ -383,6 +388,35 @@ header {
 }
 .list:hover {
     background-color: var(--base-grey);
+}
+.list .icon {
+    background-color: var(--base-color);
+    width: 20px;
+    height: 20px;
+}
+.today-icon {
+    mask: url("/assets/icons/today-icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 20px;
+}
+.icon-star {
+    mask: url("/assets/icons/icon-star.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 20px;
+}
+.icon-check-square {
+    mask: url("/assets/icons/icon-check-square.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 20px;
+}
+.icon-tasks {
+    mask: url("/assets/icons/icon-tasks.svg");
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 20px;
 }
 .count {
     background-color: var(--primary);

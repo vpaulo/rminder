@@ -99,7 +99,9 @@ templ Base() {
 
 			<!-- App Styles/Scripts -->
             <link href="assets/css/styles.css" rel="stylesheet"/>
+            <link href="assets/css/quill.snow.css" rel="stylesheet"/>
 			<script src="assets/js/htmx.min.js"></script>
+			<script src="assets/js/quill.js"></script>
 		</head>
 		<body>
 		    @Header()
@@ -107,6 +109,12 @@ templ Base() {
 				{ children... }
 			</main>
 			@Modal()
+			<script>
+			   // TODO: configure
+                const quill = new Quill('#note-editor', {
+                    theme: 'snow'
+                });
+            </script>
 			<script type="module" src="assets/js/app.js"></script>
 		</body>
 	</html>
