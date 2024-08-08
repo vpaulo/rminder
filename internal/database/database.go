@@ -24,6 +24,7 @@ type Service interface {
 	Close() error
 
 	Tasks() ([]*Task, error)
+	Totals() (*Total, error)
 }
 
 type service struct {
@@ -138,7 +139,7 @@ func (s *service) Close() error {
 }
 
 func (s *service) Tasks() ([]*Task, error) {
-	query, err := s.db.Prepare("SELECT * FROM task ORDER BY created_at DESC")
+	query, err := s.db.Prepare("SELECT * FROM task ORDER BY updated_at DESC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Tasks - prepare query failed: %v", err)
 	}
@@ -156,7 +157,11 @@ func (s *service) Tasks() ([]*Task, error) {
 			&data.ID,
 			&data.Title,
 			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.MyDay,
 			&data.CreatedAt,
+			&data.UpdatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("DB.Tasks - result scan failed: %v", err)
@@ -165,4 +170,38 @@ func (s *service) Tasks() ([]*Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (s *service) Totals() (*Total, error) {
+	query, err := s.db.Prepare(`SELECT SUM(CASE WHEN completed = true THEN 1 ELSE 0 END) AS total_completed,
+			SUM(CASE WHEN important = true THEN 1 ELSE 0 END) AS total_important,
+			SUM(CASE WHEN my_day = true THEN 1 ELSE 0 END) AS total_my_day,
+			COUNT(*) as total_tasks	FROM task;`)
+	if err != nil {
+		return nil, fmt.Errorf("DB.Totals - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Totals - query result failed: %v", err)
+	}
+
+	total := make([]*Total, 0)
+	for result.Next() {
+		data := new(Total)
+		err := result.Scan(
+			&data.Completed,
+			&data.Important,
+			&data.MyDay,
+			&data.Tasks,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Totals - result scan failed: %v", err)
+		}
+		total = append(total, data)
+	}
+
+	// Return the only row
+	return total[0], nil
 }

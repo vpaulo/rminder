@@ -44,8 +44,12 @@ func (s *Server) tasksHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
-	component := web.TaskList(tasks)
-	err = web.Tasks(component, len(tasks)).Render(r.Context(), w)
+	totals, err := s.db.Totals()
+	if err != nil {
+		log.Fatalf("error handling totals. Err: %v", err)
+	}
+
+	err = web.Tasks(tasks, totals).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Fatalf("Error rendering in tasksHandler: %e", err)

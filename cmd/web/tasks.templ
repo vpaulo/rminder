@@ -5,7 +5,7 @@ import (
     "strconv"
 )
 
-templ Tasks(tasks templ.Component, total int) {
+templ Tasks(tasks []*database.Task, total *database.Total) {
 	@Base() {
         <!-- left colunm -->
         <aside class="sidebar expanded" aria-label="Lists menu">
@@ -23,7 +23,7 @@ templ Tasks(tasks templ.Component, total int) {
                         >
                             <span class="icon today-icon"></span>
                             <span>My day</span>
-                            <span class="count count-my-day">0</span>
+                            <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
                         </li>
                         <li
                             class="list"
@@ -33,7 +33,7 @@ templ Tasks(tasks templ.Component, total int) {
                         >
                             <span class="icon icon-star"></span>
                             <span>Important</span>
-                            <span class="count count-important">0</span>
+                            <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
                         </li>
                         <li
                             class="list"
@@ -43,7 +43,7 @@ templ Tasks(tasks templ.Component, total int) {
                         >
                             <span class="icon icon-check-square"></span>
                             <span>Completed</span>
-                            <span class="count count-completed">0</span>
+                            <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
                         </li>
                         <li
                             class="list selected"
@@ -53,8 +53,7 @@ templ Tasks(tasks templ.Component, total int) {
                         >
                             <span class="icon icon-tasks"></span>
                             <span>Tasks</span>
-                            <!-- TODO: move logic to router? maybe?? -->
-                            <span class="count count-tasks">{ strconv.Itoa(total) }</span>
+                            <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
                         </li>
                     </ul>
                 </nav>
@@ -78,7 +77,9 @@ templ Tasks(tasks templ.Component, total int) {
                     />
                     <button class="add-task">Add</button>
                 </div>
-                <div class="tasks">@tasks</div>
+                <div class="tasks">
+                    @TaskList(tasks)
+                </div>
             </div>
         </div>
         <!-- right colunm -->
@@ -132,9 +133,9 @@ templ Modal() {
 templ TaskList(tasks []*database.Task) {
   <ul class="tasks__list">
   for _, task := range tasks {
-    <li class="" data-id={ strconv.Itoa(task.ID) }>
+    <li class={ taskClasses(task.Completed, task.Important, task.MyDay) } data-id={ strconv.Itoa(task.ID) }>
       <span class="completed-ckeck" title="Set it as complete"></span>
-      <button class="show-details">{ task.Title } { task.CreatedAt }</button>
+      <button class="show-details">{ task.Title } { task.CreatedAt } - { task.UpdatedAt }</button>
       <span class="my-day" title="Set it as todo for today"></span>
       <span class="importance-check" title="Set it as important"></span>
     </li>
