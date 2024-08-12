@@ -25,6 +25,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	apiRouter.HandleFunc("POST /task", s.createTask)
 	apiRouter.HandleFunc("GET /task/{taskID}", s.getTask)
 	apiRouter.HandleFunc("PUT /task/{taskID}", s.updateTask)
+	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-complete", s.toggleComplete)
+	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-important", s.toggleImportant)
+	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-my-day", s.toggleMyDay)
 	apiRouter.HandleFunc("DELETE /task/{taskID}", s.deleteTask)
 	router.Handle("/api/v0/", http.StripPrefix("/api/v0", apiRouter))
 
@@ -72,8 +75,32 @@ func (s *Server) getAllTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
-	// TODO: create tasks from db
-	fmt.Fprintln(w, "Create task")
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}
+
+	// create new task
+	title := r.FormValue("task")
+	if title != "" {
+		err := s.db.CreateTask(title)
+		if err != nil {
+			log.Fatalf("error creating task. Err: %v", err)
+		}
+	}
+
+	// get all tasks
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
 }
 
 func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +111,79 @@ func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
 func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 	// TODO: update task from db
 	fmt.Fprintln(w, "Update task")
+}
+
+// TODO: maybe combine updates in one handler
+func (s *Server) toggleComplete(w http.ResponseWriter, r *http.Request) {
+	taskID := r.PathValue("taskID")
+
+	if taskID != "" {
+		err := s.db.ToggleComplete(taskID)
+		if err != nil {
+			log.Fatalf("error updating task. Err: %v", err)
+		}
+	}
+
+	// get all tasks
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
+}
+
+func (s *Server) toggleImportant(w http.ResponseWriter, r *http.Request) {
+	taskID := r.PathValue("taskID")
+
+	if taskID != "" {
+		err := s.db.ToggleImportant(taskID)
+		if err != nil {
+			log.Fatalf("error updating task. Err: %v", err)
+		}
+	}
+
+	// get all tasks
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
+}
+
+func (s *Server) toggleMyDay(w http.ResponseWriter, r *http.Request) {
+	taskID := r.PathValue("taskID")
+
+	if taskID != "" {
+		err := s.db.ToggleMyDay(taskID)
+		if err != nil {
+			log.Fatalf("error updating task. Err: %v", err)
+		}
+	}
+
+	// get all tasks
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
 }
 
 func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {

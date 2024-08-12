@@ -25,6 +25,10 @@ type Service interface {
 
 	Tasks() ([]*Task, error)
 	Totals() (*Total, error)
+	CreateTask(title string) error
+	ToggleComplete(ID string) error
+	ToggleImportant(ID string) error
+	ToggleMyDay(ID string) error
 }
 
 type service struct {
@@ -176,7 +180,7 @@ func (s *service) Totals() (*Total, error) {
 	query, err := s.db.Prepare(`SELECT SUM(CASE WHEN completed = true THEN 1 ELSE 0 END) AS total_completed,
 			SUM(CASE WHEN important = true THEN 1 ELSE 0 END) AS total_important,
 			SUM(CASE WHEN my_day = true THEN 1 ELSE 0 END) AS total_my_day,
-			COUNT(*) as total_tasks	FROM task;`)
+			COUNT(*) as total_tasks	FROM task`)
 	if err != nil {
 		return nil, fmt.Errorf("DB.Totals - prepare query failed: %v", err)
 	}
@@ -204,4 +208,68 @@ func (s *service) Totals() (*Total, error) {
 
 	// Return the only row
 	return total[0], nil
+}
+
+func (s *service) CreateTask(title string) error {
+	query, err := s.db.Prepare("INSERT INTO task (title) Values (?)")
+	if err != nil {
+		return fmt.Errorf("DB.CreateTask - prepare create query failed: %v", err)
+	}
+	defer query.Close()
+
+	task := &Task{
+		Title: title,
+	}
+
+	_, err = query.Exec(task.Title)
+	if err != nil {
+		return fmt.Errorf("DB.CreateTask - create query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) ToggleComplete(ID string) error {
+	query, err := s.db.Prepare("UPDATE task SET completed = NOT completed WHERE task_id=?")
+	if err != nil {
+		return fmt.Errorf("DB.ToggleComplete - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(ID)
+	if err != nil {
+		return fmt.Errorf("DB.ToggleComplete - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) ToggleImportant(ID string) error {
+	query, err := s.db.Prepare("UPDATE task SET important = NOT important WHERE task_id=?")
+	if err != nil {
+		return fmt.Errorf("DB.ToggleImportant - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(ID)
+	if err != nil {
+		return fmt.Errorf("DB.ToggleImportant - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) ToggleMyDay(ID string) error {
+	query, err := s.db.Prepare("UPDATE task SET my_day = NOT my_day WHERE task_id=?")
+	if err != nil {
+		return fmt.Errorf("DB.ToggleMyDay - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(ID)
+	if err != nil {
+		return fmt.Errorf("DB.ToggleMyDay - update query result failed: %v", err)
+	}
+
+	return nil
 }

@@ -8,5 +8,3 @@ CREATE TABLE IF NOT EXISTS task (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-INSERT INTO task (title) Values('first task')
