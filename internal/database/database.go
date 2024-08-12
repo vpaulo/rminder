@@ -177,9 +177,9 @@ func (s *service) Tasks() ([]*Task, error) {
 }
 
 func (s *service) Totals() (*Total, error) {
-	query, err := s.db.Prepare(`SELECT SUM(CASE WHEN completed = true THEN 1 ELSE 0 END) AS total_completed,
-			SUM(CASE WHEN important = true THEN 1 ELSE 0 END) AS total_important,
-			SUM(CASE WHEN my_day = true THEN 1 ELSE 0 END) AS total_my_day,
+	query, err := s.db.Prepare(`SELECT COUNT(CASE WHEN completed = true THEN 1 ELSE 0 END) AS total_completed,
+			COUNT(CASE WHEN important = true THEN 1 ELSE 0 END) AS total_important,
+			COUNT(CASE WHEN my_day = true THEN 1 ELSE 0 END) AS total_my_day,
 			COUNT(*) as total_tasks	FROM task`)
 	if err != nil {
 		return nil, fmt.Errorf("DB.Totals - prepare query failed: %v", err)
@@ -230,7 +230,7 @@ func (s *service) CreateTask(title string) error {
 }
 
 func (s *service) ToggleComplete(ID string) error {
-	query, err := s.db.Prepare("UPDATE task SET completed = NOT completed WHERE task_id=?")
+	query, err := s.db.Prepare("UPDATE task SET completed = NOT completed, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
 	if err != nil {
 		return fmt.Errorf("DB.ToggleComplete - prepare update query failed: %v", err)
 	}
@@ -245,7 +245,7 @@ func (s *service) ToggleComplete(ID string) error {
 }
 
 func (s *service) ToggleImportant(ID string) error {
-	query, err := s.db.Prepare("UPDATE task SET important = NOT important WHERE task_id=?")
+	query, err := s.db.Prepare("UPDATE task SET important = NOT important, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
 	if err != nil {
 		return fmt.Errorf("DB.ToggleImportant - prepare update query failed: %v", err)
 	}
@@ -260,7 +260,7 @@ func (s *service) ToggleImportant(ID string) error {
 }
 
 func (s *service) ToggleMyDay(ID string) error {
-	query, err := s.db.Prepare("UPDATE task SET my_day = NOT my_day WHERE task_id=?")
+	query, err := s.db.Prepare("UPDATE task SET my_day = NOT my_day, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
 	if err != nil {
 		return fmt.Errorf("DB.ToggleMyDay - prepare update query failed: %v", err)
 	}
