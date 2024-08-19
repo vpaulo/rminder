@@ -20,6 +20,9 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                             data-name="my_day"
                             role="treeitem"
                             aria-label="My day"
+                            hx-get="/api/v0/task/my-day"
+                            hx-trigger="click"
+                            hx-target=".tasks"
                         >
                             <span class="icon today-icon"></span>
                             <span>My day</span>
@@ -30,6 +33,9 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                             data-name="important"
                             role="treeitem"
                             aria-label="Important"
+                            hx-get="/api/v0/task/important"
+                            hx-trigger="click"
+                            hx-target=".tasks"
                         >
                             <span class="icon icon-star"></span>
                             <span>Important</span>
@@ -40,6 +46,9 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                             data-name="completed"
                             role="treeitem"
                             aria-label="Completed"
+                            hx-get="/api/v0/task/completed"
+                            hx-trigger="click"
+                            hx-target=".tasks"
                         >
                             <span class="icon icon-check-square"></span>
                             <span>Completed</span>
@@ -50,6 +59,9 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                             data-name="tasks"
                             role="treeitem"
                             aria-label="Tasks"
+                            hx-get="/api/v0/task"
+                            hx-trigger="click"
+                            hx-target=".tasks"
                         >
                             <span class="icon icon-tasks"></span>
                             <span>Tasks</span>

@@ -22,8 +22,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	apiRouter := http.NewServeMux()
 	apiRouter.HandleFunc("GET /task", s.getAllTasks)
+	apiRouter.HandleFunc("GET /task/my-day", s.getAllMyDayTasks)
+	apiRouter.HandleFunc("GET /task/important", s.getAllImportantTasks)
+	apiRouter.HandleFunc("GET /task/completed", s.getAllCompletedTasks)
 	apiRouter.HandleFunc("POST /task", s.createTask)
 	apiRouter.HandleFunc("GET /task/{taskID}", s.getTask)
+	// TODO: make the updates to have only one handler
 	apiRouter.HandleFunc("PUT /task/{taskID}", s.updateTask)
 	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-complete", s.toggleComplete)
 	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-important", s.toggleImportant)
@@ -59,19 +63,79 @@ func (s *Server) tasksHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Return json response
+// func (s *Server) getAllTasks(w http.ResponseWriter, r *http.Request) {
+// 	// TODO: instead of log.Fatalf maybe send message to FE that something went wrong or just log and return zero tasks
+// 	tasks, err := s.db.Tasks()
+// 	if err != nil {
+// 		log.Fatalf("error handling tasks. Err: %v", err)
+// 	}
+
+// 	jsonResp, err := json.Marshal(tasks)
+// 	if err != nil {
+// 		log.Fatalf("error handling JSON marshal. Err: %v", err)
+// 	}
+
+//		_, _ = w.Write(jsonResp)
+//	}
 func (s *Server) getAllTasks(w http.ResponseWriter, r *http.Request) {
-	// TODO: instead of log.Fatalf maybe send message to FE that something went wrong or just log and return zero tasks
+	// get all tasks
 	tasks, err := s.db.Tasks()
 	if err != nil {
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
-	jsonResp, err := json.Marshal(tasks)
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
 	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
+}
+
+func (s *Server) getAllMyDayTasks(w http.ResponseWriter, r *http.Request) {
+	// get all My Day tasks
+	tasks, err := s.db.MyDayTasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
-	_, _ = w.Write(jsonResp)
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
+}
+
+func (s *Server) getAllImportantTasks(w http.ResponseWriter, r *http.Request) {
+	// get all important tasks
+	tasks, err := s.db.ImportantTasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
+}
+
+func (s *Server) getAllCompletedTasks(w http.ResponseWriter, r *http.Request) {
+	// get all completed tasks
+	tasks, err := s.db.CompletedTasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
 }
 
 func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +145,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new task
+	// TODO: sanatise string to prevent mallicious requests
 	title := r.FormValue("task")
 	if title != "" {
 		err := s.db.CreateTask(title)

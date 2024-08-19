@@ -24,6 +24,9 @@ type Service interface {
 	Close() error
 
 	Tasks() ([]*Task, error)
+	MyDayTasks() ([]*Task, error)
+	ImportantTasks() ([]*Task, error)
+	CompletedTasks() ([]*Task, error)
 	Totals() (*Total, error)
 	CreateTask(title string) error
 	ToggleComplete(ID string) error
@@ -176,10 +179,113 @@ func (s *service) Tasks() ([]*Task, error) {
 	return tasks, nil
 }
 
+func (s *service) MyDayTasks() ([]*Task, error) {
+	query, err := s.db.Prepare("SELECT * FROM task WHERE my_day = true ORDER BY updated_at DESC")
+	if err != nil {
+		return nil, fmt.Errorf("DB.MyDayTasks - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.MyDayTasks - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.MyDay,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.MyDayTasks - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	return tasks, nil
+}
+
+func (s *service) ImportantTasks() ([]*Task, error) {
+	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY updated_at DESC")
+	if err != nil {
+		return nil, fmt.Errorf("DB.ImportantTasks - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.ImportantTasks - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.MyDay,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.ImportantTasks - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	return tasks, nil
+}
+
+func (s *service) CompletedTasks() ([]*Task, error) {
+	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY updated_at DESC")
+	if err != nil {
+		return nil, fmt.Errorf("DB.CompletedTasks - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.CompletedTasks - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.MyDay,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.CompletedTasks - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	return tasks, nil
+}
+
 func (s *service) Totals() (*Total, error) {
-	query, err := s.db.Prepare(`SELECT COUNT(CASE WHEN completed = true THEN 1 ELSE 0 END) AS total_completed,
-			COUNT(CASE WHEN important = true THEN 1 ELSE 0 END) AS total_important,
-			COUNT(CASE WHEN my_day = true THEN 1 ELSE 0 END) AS total_my_day,
+	query, err := s.db.Prepare(`SELECT
+		    COALESCE(SUM(CASE WHEN completed = true THEN 1 ELSE 0 END), 0) AS total_completed,
+			COALESCE(SUM(CASE WHEN important = true THEN 1 ELSE 0 END), 0) AS total_important,
+			COALESCE(SUM(CASE WHEN my_day = true THEN 1 ELSE 0 END), 0) AS total_my_day,
 			COUNT(*) as total_tasks	FROM task`)
 	if err != nil {
 		return nil, fmt.Errorf("DB.Totals - prepare query failed: %v", err)
