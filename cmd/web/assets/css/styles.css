@@ -202,7 +202,6 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-.lists,
 .tasks__list {
     margin: 0;
     padding: 0;
@@ -213,7 +212,7 @@ header {
     flex-direction: column;
     gap: 10px;
 }
-.list.selected > .icon {
+.list:has(input:checked) > .icon {
     background-color: var(--primary);
 }
 .tasks__list > li {

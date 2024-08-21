@@ -13,61 +13,59 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                 <span class="menu" aria-label="Toggle sidebar"></span>
             </div>
             <div class="sidebar__content">
-                <nav aria-label="Lists" role="navigation">
-                    <ul class="lists" role="tree">
-                        <li
-                            class="list"
-                            data-name="my_day"
-                            role="treeitem"
-                            aria-label="My day"
-                            hx-get="/api/v0/task/my-day"
-                            hx-trigger="click"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon today-icon"></span>
-                            <span>My day</span>
-                            <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
-                        </li>
-                        <li
-                            class="list"
-                            data-name="important"
-                            role="treeitem"
-                            aria-label="Important"
-                            hx-get="/api/v0/task/important"
-                            hx-trigger="click"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon icon-star"></span>
-                            <span>Important</span>
-                            <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
-                        </li>
-                        <li
-                            class="list"
-                            data-name="completed"
-                            role="treeitem"
-                            aria-label="Completed"
-                            hx-get="/api/v0/task/completed"
-                            hx-trigger="click"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon icon-check-square"></span>
-                            <span>Completed</span>
-                            <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
-                        </li>
-                        <li
-                            class="list selected"
-                            data-name="tasks"
-                            role="treeitem"
-                            aria-label="Tasks"
-                            hx-get="/api/v0/task"
-                            hx-trigger="click"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon icon-tasks"></span>
-                            <span>Tasks</span>
-                            <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
-                        </li>
-                    </ul>
+                <nav aria-label="Lists">
+                    <label
+                        class="list"
+                        data-name="my_day"
+                        aria-label="My day"
+                        hx-get="/api/v0/task/my-day"
+                        hx-trigger="click"
+                        hx-target=".tasks"
+                    >
+                        <span class="icon today-icon"></span>
+                        <span>My day</span>
+                        <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
+                        <input class="hidden" type="radio" name="list-group" value="1">
+                    </label>
+                    <label
+                        class="list"
+                        data-name="important"
+                        aria-label="Important"
+                        hx-get="/api/v0/task/important"
+                        hx-trigger="click"
+                        hx-target=".tasks"
+                    >
+                        <span class="icon icon-star"></span>
+                        <span>Important</span>
+                        <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
+                        <input class="hidden" type="radio" name="list-group" value="2">
+                    </label>
+                    <label
+                        class="list"
+                        data-name="completed"
+                        aria-label="Completed"
+                        hx-get="/api/v0/task/completed"
+                        hx-trigger="click"
+                        hx-target=".tasks"
+                    >
+                        <span class="icon icon-check-square"></span>
+                        <span>Completed</span>
+                        <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
+                        <input class="hidden" type="radio" name="list-group" value="3">
+                    </label>
+                    <label
+                        class="list"
+                        data-name="tasks"
+                        aria-label="Tasks"
+                        hx-get="/api/v0/task"
+                        hx-trigger="click"
+                        hx-target=".tasks"
+                    >
+                        <span class="icon icon-tasks"></span>
+                        <span>Tasks</span>
+                        <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
+                        <input class="hidden" type="radio" name="list-group" value="4" checked>
+                    </label>
                 </nav>
             </div>
         </aside>
@@ -150,7 +148,7 @@ templ TaskList(tasks []*database.Task) {
   <ul class="tasks__list">
   for _, task := range tasks {
     <li class={ taskClasses(task.Completed, task.Important, task.MyDay) } data-id={ strconv.Itoa(task.ID) }>
-      <!-- maybe have these as checkboxesand add a form here -->
+      <!-- maybe have these as checkboxes and add a form here -->
       <span
         class="completed-ckeck"
         title="Set it as complete"
