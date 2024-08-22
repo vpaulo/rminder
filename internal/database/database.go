@@ -32,6 +32,7 @@ type Service interface {
 	ToggleComplete(ID string) error
 	ToggleImportant(ID string) error
 	ToggleMyDay(ID string) error
+	Task(ID string) (*Task, error)
 }
 
 type service struct {
@@ -378,4 +379,38 @@ func (s *service) ToggleMyDay(ID string) error {
 	}
 
 	return nil
+}
+
+func (s *service) Task(ID string) (*Task, error) {
+	query, err := s.db.Prepare("SELECT * FROM task WHERE task_id=?")
+	if err != nil {
+		return nil, fmt.Errorf("DB.Task - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query(ID)
+	if err != nil {
+		return nil, fmt.Errorf("DB.Task - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.MyDay,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Task - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	return tasks[0], nil
 }

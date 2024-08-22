@@ -169,8 +169,19 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
-	// TODO: get task from db
-	fmt.Fprintln(w, "Get task by ID")
+	taskID := r.PathValue("taskID")
+
+	task, err := s.db.Task(taskID)
+	if err != nil {
+		log.Fatalf("error handling task. Err: %v", err)
+	}
+
+	// update details
+	err = web.TaskDetails(task).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
 }
 
 func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {

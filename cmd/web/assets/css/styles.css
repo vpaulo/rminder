@@ -117,48 +117,12 @@ header {
     background-repeat: no-repeat;
     background-position: 50%;
 }
-.app__logo,
-.app__settings {
+.app__logo {
     display: flex;
     align-items: center;
     width: var(--size-40);
     height: var(--size-40);
     justify-content: center;
-}
-.app__settings {
-    position: relative;
-    cursor: pointer;
-}
-.app__settings.open {
-    color: var(--primary);
-}
-.settings {
-    display: none;
-    color: var(--base-color);
-    position: absolute;
-    width: 300px;
-    background-color: #fff;
-    padding: 20px;
-    top: var(--size-40);
-    margin-top: 4px;
-    box-shadow: 2px 2px 10px var(--base-color);
-    cursor: auto;
-    right: 10px;
-    z-index: 1;
-}
-.open .settings {
-    display: block;
-}
-.settings::before {
-    content: "";
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #fff;
-    position: absolute;
-    top: -10px;
-    right: 0;
 }
 #app {
     display: flex;
@@ -185,13 +149,13 @@ header {
     justify-content: space-between;
     min-width: var(--details-width);
 }
-.details:not(.expanded) > * {
+#app:not(:has(.tasks__list input:checked)) .details > * {
     display: none;
 }
-.details.expanded {
+#app:has(.tasks__list input:checked) .details {
     --details-width: 300px;
 }
-.details.expanded .details__footer {
+#app:has(.tasks__list input:checked) .details .details__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -223,7 +187,7 @@ header {
     background-color: #fff;
 }
 .tasks__list > li:hover,
-.tasks__list > li.selected {
+.tasks__list > li:has(input:checked) {
     background-color: var(--base-grey);
 }
 .add-tasks {
@@ -278,11 +242,8 @@ header {
     background-color: var(--primary);
 }
 .show-details {
-    background: none;
     width: 100%;
     height: 100%;
-    border: none;
-    box-shadow: none;
     text-align: left;
     font-size: 1.2rem;
     color: var(--base-color);
@@ -291,9 +252,6 @@ header {
 }
 .completed .show-details {
     text-decoration: line-through from-font var(--primary);
-}
-.show-details:focus {
-    outline: none;
 }
 .completed-ckeck,
 .importance-check,

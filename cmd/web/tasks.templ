@@ -99,35 +99,8 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
         <!-- right colunm -->
         <aside
             class="details"
-            aria-label="Detail for task: {{task-selected}}"
             data-id=""
         >
-            <div class="details__body">
-                <div class="detail__title">
-                    <span class="completed-ckeck" title="Set it as complete"></span>
-                    <input class="title" type="text" value="" />
-                    <button class="rename">Rename</button>
-                </div>
-                <div class="detail__note">
-                    <div id="note-editor"></div>
-                    <textarea
-                        class="note"
-                        cols="30"
-                        rows="5"
-                        placeholder="Add notes"
-                    ></textarea>
-                    <button class="add-note">Add</button>
-                </div>
-            </div>
-            <div class="details__footer">
-                <button class="close">
-                    <i class="close-icon"></i>
-                </button>
-                <span class="creation-date"></span>
-                <button class="remove">
-                    <i class="trash-icon"></i>
-                </button>
-            </div>
         </aside>
 	}
 }
@@ -155,7 +128,15 @@ templ TaskList(tasks []*database.Task) {
         hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) + "/toggle-complete" }
         hx-trigger="click"
         hx-target=".tasks"></span>
-      <button class="show-details">{ task.Title } { task.CreatedAt } - { task.UpdatedAt }</button>
+      <label
+        class="show-details"
+        hx-get={ "/api/v0/task/" + strconv.Itoa(task.ID) }
+        hx-trigger="change"
+        hx-target=".details"
+      >
+        <span>{ task.Title } { task.CreatedAt } - { task.UpdatedAt }</span>
+        <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }>
+      </label>
       <span
         class="my-day"
         title="Set it as todo for today"
@@ -171,4 +152,39 @@ templ TaskList(tasks []*database.Task) {
     </li>
   }
   </ul>
+}
+
+templ TaskDetails(task *database.Task) {
+    <div class="details__body">
+        <div class="detail__title">
+            <span class="completed-ckeck" title="Set it as complete"></span>
+            <input class="title" type="text" value={ task.Title } />
+            <button class="rename">Rename</button>
+        </div>
+        <div class="detail__note">
+            <div id="note-editor"></div>
+            <textarea
+                class="note"
+                cols="30"
+                rows="5"
+                placeholder="Add notes"
+            >{ task.Description }</textarea>
+            <button class="add-note">Add</button>
+        </div>
+    </div>
+    <div class="details__footer">
+        <button class="close">
+            <i class="close-icon"></i>
+        </button>
+        <span class="creation-date">{ task.CreatedAt }</span>
+        <button class="remove">
+            <i class="trash-icon"></i>
+        </button>
+    </div>
+    <script>
+        // TODO: configure
+        //let quill = new Quill('#note-editor', {
+        //    theme: 'snow'
+        //});
+    </script>
 }
