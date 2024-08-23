@@ -8,9 +8,12 @@ import (
 templ Tasks(tasks []*database.Task, total *database.Total) {
 	@Base() {
         <!-- left colunm -->
-        <aside class="sidebar expanded" aria-label="Lists menu">
+        <aside class="sidebar" aria-label="Lists menu">
             <div class="sidebar__header">
-                <span class="menu" aria-label="Toggle sidebar"></span>
+                <label>
+                    <span class="menu" aria-label="Toggle sidebar"></span>
+                    <input class="hidden" type="checkbox" value="1" checked/>
+                </label>
             </div>
             <div class="sidebar__content">
                 <nav aria-label="Lists">
@@ -25,7 +28,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         <span class="icon today-icon"></span>
                         <span>My day</span>
                         <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="1">
+                        <input class="hidden" type="radio" name="list-group" value="1"/>
                     </label>
                     <label
                         class="list"
@@ -38,7 +41,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         <span class="icon icon-star"></span>
                         <span>Important</span>
                         <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="2">
+                        <input class="hidden" type="radio" name="list-group" value="2"/>
                     </label>
                     <label
                         class="list"
@@ -51,7 +54,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         <span class="icon icon-check-square"></span>
                         <span>Completed</span>
                         <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="3">
+                        <input class="hidden" type="radio" name="list-group" value="3"/>
                     </label>
                     <label
                         class="list"
@@ -64,7 +67,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         <span class="icon icon-tasks"></span>
                         <span>Tasks</span>
                         <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="4" checked>
+                        <input class="hidden" type="radio" name="list-group" value="4" checked/>
                     </label>
                 </nav>
             </div>
@@ -135,7 +138,7 @@ templ TaskList(tasks []*database.Task) {
         hx-target=".details"
       >
         <span>{ task.Title } { task.CreatedAt } - { task.UpdatedAt }</span>
-        <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }>
+        <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
       </label>
       <span
         class="my-day"
