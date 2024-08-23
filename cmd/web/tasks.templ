@@ -22,7 +22,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         data-name="my_day"
                         aria-label="My day"
                         hx-get="/api/v0/task/my-day"
-                        hx-trigger="click"
+                        hx-trigger="change"
                         hx-target=".tasks"
                     >
                         <span class="icon today-icon"></span>
@@ -35,7 +35,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         data-name="important"
                         aria-label="Important"
                         hx-get="/api/v0/task/important"
-                        hx-trigger="click"
+                        hx-trigger="change"
                         hx-target=".tasks"
                     >
                         <span class="icon icon-star"></span>
@@ -48,7 +48,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         data-name="completed"
                         aria-label="Completed"
                         hx-get="/api/v0/task/completed"
-                        hx-trigger="click"
+                        hx-trigger="change"
                         hx-target=".tasks"
                     >
                         <span class="icon icon-check-square"></span>
@@ -61,7 +61,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         data-name="tasks"
                         aria-label="Tasks"
                         hx-get="/api/v0/task"
-                        hx-trigger="click"
+                        hx-trigger="change"
                         hx-target=".tasks"
                     >
                         <span class="icon icon-tasks"></span>
