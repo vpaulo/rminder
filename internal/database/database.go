@@ -33,6 +33,7 @@ type Service interface {
 	ToggleImportant(ID string) error
 	ToggleMyDay(ID string) error
 	Task(ID string) (*Task, error)
+	UpdateTask(ID string, title string) error
 }
 
 type service struct {
@@ -148,10 +149,10 @@ func (s *service) Close() error {
 
 func (s *service) Tasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task ORDER BY updated_at DESC")
+	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Tasks - prepare query failed: %v", err)
 	}
-	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -182,10 +183,10 @@ func (s *service) Tasks() ([]*Task, error) {
 
 func (s *service) MyDayTasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE my_day = true ORDER BY updated_at DESC")
+	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.MyDayTasks - prepare query failed: %v", err)
 	}
-	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -216,10 +217,10 @@ func (s *service) MyDayTasks() ([]*Task, error) {
 
 func (s *service) ImportantTasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY updated_at DESC")
+	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.ImportantTasks - prepare query failed: %v", err)
 	}
-	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -250,10 +251,10 @@ func (s *service) ImportantTasks() ([]*Task, error) {
 
 func (s *service) CompletedTasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY updated_at DESC")
+	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.CompletedTasks - prepare query failed: %v", err)
 	}
-	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -288,10 +289,10 @@ func (s *service) Totals() (*Total, error) {
 			COALESCE(SUM(CASE WHEN important = true THEN 1 ELSE 0 END), 0) AS total_important,
 			COALESCE(SUM(CASE WHEN my_day = true THEN 1 ELSE 0 END), 0) AS total_my_day,
 			COUNT(*) as total_tasks	FROM task`)
+	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Totals - prepare query failed: %v", err)
 	}
-	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -319,10 +320,10 @@ func (s *service) Totals() (*Total, error) {
 
 func (s *service) CreateTask(title string) error {
 	query, err := s.db.Prepare("INSERT INTO task (title) Values (?)")
+	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.CreateTask - prepare create query failed: %v", err)
 	}
-	defer query.Close()
 
 	task := &Task{
 		Title: title,
@@ -338,10 +339,10 @@ func (s *service) CreateTask(title string) error {
 
 func (s *service) ToggleComplete(ID string) error {
 	query, err := s.db.Prepare("UPDATE task SET completed = NOT completed, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
+	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.ToggleComplete - prepare update query failed: %v", err)
 	}
-	defer query.Close()
 
 	_, err = query.Exec(ID)
 	if err != nil {
@@ -353,10 +354,10 @@ func (s *service) ToggleComplete(ID string) error {
 
 func (s *service) ToggleImportant(ID string) error {
 	query, err := s.db.Prepare("UPDATE task SET important = NOT important, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
+	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.ToggleImportant - prepare update query failed: %v", err)
 	}
-	defer query.Close()
 
 	_, err = query.Exec(ID)
 	if err != nil {
@@ -368,10 +369,10 @@ func (s *service) ToggleImportant(ID string) error {
 
 func (s *service) ToggleMyDay(ID string) error {
 	query, err := s.db.Prepare("UPDATE task SET my_day = NOT my_day, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
+	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.ToggleMyDay - prepare update query failed: %v", err)
 	}
-	defer query.Close()
 
 	_, err = query.Exec(ID)
 	if err != nil {
@@ -383,10 +384,10 @@ func (s *service) ToggleMyDay(ID string) error {
 
 func (s *service) Task(ID string) (*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE task_id=?")
+	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Task - prepare query failed: %v", err)
 	}
-	defer query.Close()
 
 	result, err := query.Query(ID)
 	if err != nil {
@@ -413,4 +414,19 @@ func (s *service) Task(ID string) (*Task, error) {
 	}
 
 	return tasks[0], nil
+}
+
+func (s *service) UpdateTask(ID string, title string) error {
+	query, err := s.db.Prepare("UPDATE task SET title = ?, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTask - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(title, ID)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTask - update query result failed: %v", err)
+	}
+
+	return nil
 }

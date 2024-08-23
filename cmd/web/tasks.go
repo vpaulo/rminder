@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 func taskClasses(isCompleted bool, isImportant bool, isMyDay bool) string {
@@ -23,4 +24,14 @@ func taskClasses(isCompleted bool, isImportant bool, isMyDay bool) string {
 	}
 
 	return strings.Trim(fmt.Sprintf("%s %s %s", completed, important, myDay), " ")
+}
+
+func formatDate(date string) string {
+	tm, err := time.Parse(time.RFC3339, date)
+
+	if err != nil {
+		return "NA"
+	}
+
+	return tm.Format(time.DateTime)
 }

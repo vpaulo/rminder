@@ -185,8 +185,34 @@ func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
-	// TODO: update task from db
-	fmt.Fprintln(w, "Update task")
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}
+
+	taskID := r.PathValue("taskID")
+	// TODO: sanatise string to prevent mallicious requests
+	title := r.FormValue("title")
+	// TODO: also update description
+	if taskID != "" && title != "" {
+		err := s.db.UpdateTask(taskID, title)
+		if err != nil {
+			log.Fatalf("error updating task. Err: %v", err)
+		}
+	}
+
+	// get all tasks
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
 }
 
 // TODO: maybe combine updates in one handler

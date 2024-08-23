@@ -9,6 +9,14 @@ build:
 
 	@go build -o bin/main cmd/api/main.go
 
+build-prod:
+	@echo "Building PROD..."
+	@templ generate
+
+	@go build -a -ldflags "-s -w" -o bin/main cmd/api/main.go
+	#upx --best --lzma bin/main
+	#upx --ultra-brute bin/main
+
 # Run the application
 run:
 	@go run cmd/api/main.go
@@ -25,7 +33,7 @@ test:
 # Clean the binary
 clean:
 	@echo "Cleaning..."
-	@rm -f main
+	@rm -f bin/main
 
 # Live Reload
 watch:

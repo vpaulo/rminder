@@ -100,11 +100,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
             </div>
         </div>
         <!-- right colunm -->
-        <aside
-            class="details"
-            data-id=""
-        >
-        </aside>
+        <aside class="details"></aside>
 	}
 }
 
@@ -137,7 +133,7 @@ templ TaskList(tasks []*database.Task) {
         hx-trigger="change"
         hx-target=".details"
       >
-        <span>{ task.Title } { task.CreatedAt } - { task.UpdatedAt }</span>
+        <span>{ task.Title }</span>
         <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
       </label>
       <span
@@ -160,9 +156,17 @@ templ TaskList(tasks []*database.Task) {
 templ TaskDetails(task *database.Task) {
     <div class="details__body">
         <div class="detail__title">
-            <span class="completed-ckeck" title="Set it as complete"></span>
-            <input class="title" type="text" value={ task.Title } />
-            <button class="rename">Rename</button>
+            <form class="add-tasks" hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) } method="POST" hx-target=".tasks">
+                <input
+                    class="title"
+                    name="title"
+                    type="text"
+                    value={ task.Title }
+                    minlength="3"
+                    maxlength="255"
+                    hx-validate="true"/>
+                <button class="rename" type="submit">Rename</button>
+            </form>
         </div>
         <div class="detail__note">
             <div id="note-editor"></div>
@@ -179,7 +183,7 @@ templ TaskDetails(task *database.Task) {
         <button class="close">
             <i class="close-icon"></i>
         </button>
-        <span class="creation-date">{ task.CreatedAt }</span>
+        <span class="creation-date" title="Creation date">{ formatDate(task.CreatedAt) }</span>
         <button class="remove">
             <i class="trash-icon"></i>
         </button>
