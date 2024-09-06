@@ -154,44 +154,40 @@ templ TaskList(tasks []*database.Task) {
 }
 
 templ TaskDetails(task *database.Task) {
-    <div class="details__body">
-        <div class="detail__title">
-            <form class="add-tasks" hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) } method="POST" hx-target=".tasks">
-                <input
-                    class="title"
-                    name="title"
-                    type="text"
-                    value={ task.Title }
-                    minlength="3"
-                    maxlength="255"
-                    hx-validate="true"/>
-                <button class="rename" type="submit">Rename</button>
-            </form>
+    <rm-details task-id={ strconv.Itoa(task.ID) }>
+        <div class="details__body">
+            <div class="detail__title">
+                <form class="add-tasks" hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) } method="POST" hx-target=".tasks">
+                    <input
+                        class="title"
+                        name="title"
+                        type="text"
+                        value={ task.Title }
+                        minlength="3"
+                        maxlength="255"
+                        hx-validate="true"/>
+                    <button class="rename" type="submit">Rename</button>
+                </form>
+            </div>
+            <div class="detail__note">
+                <div id="note-editor">{ task.Description }</div>
+                <textarea
+                    class="note"
+                    cols="30"
+                    rows="5"
+                    placeholder="Add notes"
+                >{ task.Description }</textarea>
+                <button class="add-note">Add</button>
+            </div>
         </div>
-        <div class="detail__note">
-            <div id="note-editor"></div>
-            <textarea
-                class="note"
-                cols="30"
-                rows="5"
-                placeholder="Add notes"
-            >{ task.Description }</textarea>
-            <button class="add-note">Add</button>
+        <div class="details__footer">
+            <button class="close">
+                <i class="close-icon"></i>
+            </button>
+            <span class="creation-date" title="Creation date">{ formatDate(task.CreatedAt) }</span>
+            <button class="remove">
+                <i class="trash-icon"></i>
+            </button>
         </div>
-    </div>
-    <div class="details__footer">
-        <button class="close">
-            <i class="close-icon"></i>
-        </button>
-        <span class="creation-date" title="Creation date">{ formatDate(task.CreatedAt) }</span>
-        <button class="remove">
-            <i class="trash-icon"></i>
-        </button>
-    </div>
-    <script>
-        // TODO: configure
-        //let quill = new Quill('#note-editor', {
-        //    theme: 'snow'
-        //});
-    </script>
+    </rm-details>
 }
