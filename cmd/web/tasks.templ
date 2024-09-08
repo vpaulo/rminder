@@ -154,7 +154,7 @@ templ TaskList(tasks []*database.Task) {
 }
 
 templ TaskDetails(task *database.Task) {
-    <rm-details task-id={ strconv.Itoa(task.ID) }>
+    <rm-task-details task-id={ strconv.Itoa(task.ID) }>
         <div class="details__body">
             <div class="detail__title">
                 <form class="add-tasks" hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) } method="POST" hx-target=".tasks">
@@ -183,5 +183,5 @@ templ TaskDetails(task *database.Task) {
                 <i class="trash-icon"></i>
             </button>
         </div>
-    </rm-details>
+    </rm-task-details>
 }

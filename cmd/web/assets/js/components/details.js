@@ -3,7 +3,6 @@ class DetailsElement extends HTMLElement {
     const task_id = this.getAttribute("task-id");
     console.log("task id : ", task_id);
 
-    // TODO: configure
     const quill = new Quill("#note-editor", {
       modules: {
         toolbar: [
@@ -21,4 +20,4 @@ class DetailsElement extends HTMLElement {
   }
 }
 
-customElements.define("rm-details", DetailsElement);
+customElements.define("rm-task-details", DetailsElement);
