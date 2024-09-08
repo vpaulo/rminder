@@ -170,13 +170,7 @@ templ TaskDetails(task *database.Task) {
                 </form>
             </div>
             <div class="detail__note">
-                <div id="note-editor">{ task.Description }</div>
-                <textarea
-                    class="note"
-                    cols="30"
-                    rows="5"
-                    placeholder="Add notes"
-                >{ task.Description }</textarea>
+                <div id="note-editor" class="ql-container ql-snow">{ task.Description }</div>
                 <button class="add-note">Add</button>
             </div>
         </div>

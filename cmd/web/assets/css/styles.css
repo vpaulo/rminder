@@ -193,7 +193,6 @@ header {
 .add-tasks {
     display: flex;
     align-items: center;
-    padding: 0 12px;
 }
 #task {
     font-size: 1.3rem;
@@ -317,13 +316,6 @@ header {
 .title:focus {
     background-color: var(--base-grey);
 }
-.note {
-    resize: none;
-    border: 1px solid var(--base-grey);
-}
-.note::placeholder {
-    font-size: 0.7rem;
-}
 .tasks {
     overflow-y: auto;
     height: calc(var(--vh) - (2 * var(--size-40) + 60px));
@@ -399,8 +391,19 @@ header {
 .detail__note {
     display: flex;
     flex-direction: column;
-    /* align-items: flex-end;
-    gap: 10px; */
+    align-items: flex-end;
+}
+#note-editor {
+    width: 100%;
+    height: 300px;
+}
+/* TODO: Check new CSS features as nesting */
+rm-details .ql-toolbar.ql-snow,
+rm-details .ql-container.ql-snow {
+    border: 1px solid var(--base-grey);
+}
+.add-note {
+    margin-top: 10px;
 }
 .rename,
 .add-note {
