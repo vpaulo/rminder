@@ -29,6 +29,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	apiRouter.HandleFunc("GET /task/{taskID}", s.getTask)
 	// TODO: make the updates to have only one handler
 	apiRouter.HandleFunc("PUT /task/{taskID}", s.updateTask)
+	apiRouter.HandleFunc("PUT /task/{taskID}/description", s.updateTaskDescription)
 	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-complete", s.toggleComplete)
 	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-important", s.toggleImportant)
 	apiRouter.HandleFunc("PUT /task/{taskID}/toggle-my-day", s.toggleMyDay)
@@ -280,6 +281,8 @@ func (s *Server) toggleMyDay(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
+	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
+
 	// update task list
 	err = web.TaskList(tasks).Render(r.Context(), w)
 	if err != nil {
@@ -291,6 +294,28 @@ func (s *Server) toggleMyDay(w http.ResponseWriter, r *http.Request) {
 func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	// TODO: delete task from db
 	fmt.Fprintln(w, "Delete task")
+}
+
+func (s *Server) updateTaskDescription(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}
+
+	taskID := r.PathValue("taskID")
+	// TODO: sanatise string to prevent mallicious requests
+	// TODO: make sure that is not nil
+	description := r.FormValue("description")
+
+	if taskID != "" {
+		err := s.db.UpdateTaskDescription(taskID, description)
+		if err != nil {
+			log.Fatalf("error updating task description. Err: %v", err)
+		}
+	}
+
+	// TODO: write a proper message
+	fmt.Fprint(w, "Updated descripiton")
 }
 
 func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {

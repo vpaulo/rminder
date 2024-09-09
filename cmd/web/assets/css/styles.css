@@ -193,6 +193,7 @@ header {
 .add-tasks {
     display: flex;
     align-items: center;
+    width: 100%;
 }
 #task {
     font-size: 1.3rem;
@@ -388,7 +389,7 @@ header {
 .details__body > div:first-child {
     margin-top: 0;
 }
-.detail__note {
+.detail__note > form {
     display: flex;
     flex-direction: column;
     align-items: flex-end;

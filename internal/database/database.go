@@ -34,6 +34,7 @@ type Service interface {
 	ToggleMyDay(ID string) error
 	Task(ID string) (*Task, error)
 	UpdateTask(ID string, title string) error
+	UpdateTaskDescription(ID string, description string) error
 }
 
 type service struct {
@@ -426,6 +427,21 @@ func (s *service) UpdateTask(ID string, title string) error {
 	_, err = query.Exec(title, ID)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTask - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdateTaskDescription(ID string, description string) error {
+	query, err := s.db.Prepare("UPDATE task SET description = ?, updated_at = CURRENT_TIMESTAMP WHERE task_id=?")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskDescription - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(description, ID)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskDescription - update query result failed: %v", err)
 	}
 
 	return nil

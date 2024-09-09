@@ -170,8 +170,13 @@ templ TaskDetails(task *database.Task) {
                 </form>
             </div>
             <div class="detail__note">
-                <div id="note-editor" class="ql-container ql-snow">{ task.Description }</div>
-                <button class="add-note">Add</button>
+                <form
+                    hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) + "/description" }
+                    hx-vals='js:{description: getDescription()}'
+                    hx-swap="none" method="POST">
+                    <div id="note-editor" class="ql-container ql-snow">@templ.Raw(task.Description)</div>
+                    <button class="add-note" type="submit">Add</button>
+                </form>
             </div>
         </div>
         <div class="details__footer">
