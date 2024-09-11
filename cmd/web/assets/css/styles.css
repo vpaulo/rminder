@@ -501,30 +501,18 @@ rm-details .ql-container.ql-snow {
 .creation-date {
     font-size: 0.8rem;
 }
-.modal {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.3);
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s;
+
+rm-task-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }
-.modal.open {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: auto;
+.modal {
+    border: none;
 }
 .modal__content {
     width: var(--modal-width);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     padding: 20px;
     background: #fff;
 }

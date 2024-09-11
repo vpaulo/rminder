@@ -292,8 +292,29 @@ func (s *Server) toggleMyDay(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
-	// TODO: delete task from db
-	fmt.Fprintln(w, "Delete task")
+	taskID := r.PathValue("taskID")
+
+	if taskID != "" {
+		err := s.db.DeleteTask(taskID)
+		if err != nil {
+			log.Fatalf("error deleting task. Err: %v", err)
+		}
+	}
+
+	// get all tasks
+	tasks, err := s.db.Tasks()
+	if err != nil {
+		log.Fatalf("error handling tasks. Err: %v", err)
+	}
+
+	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
+
+	// update task list
+	err = web.TaskList(tasks).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("Error rendering in TaskList: %e", err)
+	}
 }
 
 func (s *Server) updateTaskDescription(w http.ResponseWriter, r *http.Request) {

@@ -35,6 +35,7 @@ type Service interface {
 	Task(ID string) (*Task, error)
 	UpdateTask(ID string, title string) error
 	UpdateTaskDescription(ID string, description string) error
+	DeleteTask(ID string) error
 }
 
 type service struct {
@@ -442,6 +443,21 @@ func (s *service) UpdateTaskDescription(ID string, description string) error {
 	_, err = query.Exec(description, ID)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskDescription - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) DeleteTask(ID string) error {
+	query, err := s.db.Prepare("DELETE FROM task WHERE task_id=?")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.DeleteTask - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(ID)
+	if err != nil {
+		return fmt.Errorf("DB.DeleteTask - update query result failed: %v", err)
 	}
 
 	return nil

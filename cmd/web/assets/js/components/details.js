@@ -8,6 +8,10 @@ class DetailsElement extends HTMLElement {
   connectedCallback() {
     const task_id = this.getAttribute("task-id");
     const close_btn = this.querySelector("button.close");
+    const remove_btn = this.querySelector("button.remove");
+    const dialog = this.querySelector("dialog.modal");
+    const cancel_btn = this.querySelector("dialog button.default");
+    const delete_btn = this.querySelector("dialog button.warning");
     console.log("task id : ", task_id);
 
     this.quill = new Quill("#note-editor", {
@@ -30,6 +34,16 @@ class DetailsElement extends HTMLElement {
       if (input) {
         input.checked = false;
       }
+    });
+
+    remove_btn.addEventListener("click", () => {
+      dialog?.showModal();
+    });
+    cancel_btn.addEventListener("click", () => {
+      dialog?.close();
+    });
+    delete_btn.addEventListener("click", () => {
+      dialog?.close();
     });
   }
 }

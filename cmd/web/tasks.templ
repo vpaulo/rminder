@@ -104,16 +104,16 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
 	}
 }
 
-templ Modal() {
-    <div class="modal">
+templ Modal(id int) {
+    <dialog class="modal">
         <div class="modal__content">
             <span>Task will be permanent deleted, you won't be able to undo this action.</span>
             <div class="modal__actions">
                 <button class="default">Cancel</button>
-                <button class="warning">Delete task</button>
+                <button class="warning" hx-delete={ "/api/v0/task/" + strconv.Itoa(id) } hx-target=".tasks">Delete task</button>
             </div>
         </div>
-    </div>
+    </dialog>
 }
 
 templ TaskList(tasks []*database.Task) {
@@ -188,5 +188,6 @@ templ TaskDetails(task *database.Task) {
                 <i class="trash-icon"></i>
             </button>
         </div>
+        @Modal(task.ID)
     </rm-task-details>
 }
