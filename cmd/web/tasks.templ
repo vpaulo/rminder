@@ -21,7 +21,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         class="list"
                         data-name="my_day"
                         aria-label="My day"
-                        hx-get="/api/v0/task/my-day"
+                        hx-get="/tasks/my-day"
                         hx-trigger="change"
                         hx-target=".tasks"
                     >
@@ -34,7 +34,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         class="list"
                         data-name="important"
                         aria-label="Important"
-                        hx-get="/api/v0/task/important"
+                        hx-get="/tasks/important"
                         hx-trigger="change"
                         hx-target=".tasks"
                     >
@@ -47,7 +47,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         class="list"
                         data-name="completed"
                         aria-label="Completed"
-                        hx-get="/api/v0/task/completed"
+                        hx-get="/tasks/completed"
                         hx-trigger="change"
                         hx-target=".tasks"
                     >
@@ -60,7 +60,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         class="list"
                         data-name="tasks"
                         aria-label="Tasks"
-                        hx-get="/api/v0/task"
+                        hx-get="/tasks/all"
                         hx-trigger="change"
                         hx-target=".tasks"
                     >
@@ -78,13 +78,12 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                 <span class="list-title">Tasks</span>
             </div>
             <div class="container">
-                <form class="add-tasks" hx-post="/api/v0/task" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
+                <form class="add-tasks" hx-post="/tasks/create" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
                     <label class="add-task--label" for="task"></label>
                     <input
                         type="text"
                         name="task"
                         id="task"
-                        maxlength="255"
                         aria-label="Add a task"
                         placeholder="Add a task"
                         required
@@ -110,7 +109,7 @@ templ Modal(id int) {
             <span>Task will be permanent deleted, you won't be able to undo this action.</span>
             <div class="modal__actions">
                 <button class="default">Cancel</button>
-                <button class="warning" hx-delete={ "/api/v0/task/" + strconv.Itoa(id) } hx-target=".tasks">Delete task</button>
+                <button class="warning" hx-delete={ "/tasks/" + strconv.Itoa(id) } hx-target=".tasks">Delete task</button>
             </div>
         </div>
     </dialog>
@@ -120,16 +119,15 @@ templ TaskList(tasks []*database.Task) {
   <ul class="tasks__list">
   for _, task := range tasks {
     <li class={ taskClasses(task.Completed, task.Important, task.MyDay) } data-id={ strconv.Itoa(task.ID) }>
-      <!-- maybe have these as checkboxes and add a form here -->
       <span
         class="completed-ckeck"
         title="Set it as complete"
-        hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) + "/toggle-complete" }
+        hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/completed" }
         hx-trigger="click"
         hx-target=".tasks"></span>
       <label
         class="show-details"
-        hx-get={ "/api/v0/task/" + strconv.Itoa(task.ID) }
+        hx-get={ "/tasks/" + strconv.Itoa(task.ID) }
         hx-trigger="change"
         hx-target=".details"
       >
@@ -139,13 +137,13 @@ templ TaskList(tasks []*database.Task) {
       <span
         class="my-day"
         title="Set it as todo for today"
-        hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) + "/toggle-my-day" }
+        hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/my-day" }
         hx-trigger="click"
         hx-target=".tasks"></span>
       <span
         class="importance-check"
         title="Set it as important"
-        hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) + "/toggle-important" }
+        hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/important" }
         hx-trigger="click"
         hx-target=".tasks"></span>
     </li>
@@ -157,7 +155,7 @@ templ TaskDetails(task *database.Task) {
     <rm-task-details task-id={ strconv.Itoa(task.ID) }>
         <div class="details__body">
             <div class="detail__title">
-                <form class="add-tasks" hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) } method="POST" hx-target=".tasks">
+                <form class="add-tasks" hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/title" } method="POST" hx-target=".tasks">
                     <input
                         class="title"
                         name="title"
@@ -171,7 +169,7 @@ templ TaskDetails(task *database.Task) {
             </div>
             <div class="detail__note">
                 <form
-                    hx-put={ "/api/v0/task/" + strconv.Itoa(task.ID) + "/description" }
+                    hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/description" }
                     hx-vals='js:{description: getDescription()}'
                     hx-swap="none" method="POST">
                     <div id="note-editor" class="ql-container ql-snow">@templ.Raw(task.Description)</div>

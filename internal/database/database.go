@@ -302,6 +302,7 @@ func (s *service) Totals() (*Total, error) {
 	}
 
 	total := make([]*Total, 0)
+	// TODO: no need to go through all rows
 	for result.Next() {
 		data := new(Total)
 		err := result.Scan(
