@@ -301,24 +301,21 @@ func (s *service) Totals() (*Total, error) {
 		return nil, fmt.Errorf("DB.Totals - query result failed: %v", err)
 	}
 
-	total := make([]*Total, 0)
-	// TODO: no need to go through all rows
-	for result.Next() {
-		data := new(Total)
-		err := result.Scan(
-			&data.Completed,
-			&data.Important,
-			&data.MyDay,
-			&data.Tasks,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("DB.Totals - result scan failed: %v", err)
-		}
-		total = append(total, data)
+	result.Next()
+	total := new(Total)
+	err = result.Scan(
+		&total.Completed,
+		&total.Important,
+		&total.MyDay,
+		&total.Tasks,
+	)
+	result.Close()
+
+	if err != nil {
+		return nil, fmt.Errorf("DB.Totals - result scan failed: %v", err)
 	}
 
-	// Return the only row
-	return total[0], nil
+	return total, nil
 }
 
 func (s *service) CreateTask(title string) error {
@@ -397,26 +394,25 @@ func (s *service) Task(ID string) (*Task, error) {
 		return nil, fmt.Errorf("DB.Task - query result failed: %v", err)
 	}
 
-	tasks := make([]*Task, 0)
-	for result.Next() {
-		data := new(Task)
-		err := result.Scan(
-			&data.ID,
-			&data.Title,
-			&data.Description,
-			&data.Completed,
-			&data.Important,
-			&data.MyDay,
-			&data.CreatedAt,
-			&data.UpdatedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("DB.Task - result scan failed: %v", err)
-		}
-		tasks = append(tasks, data)
+	result.Next()
+	task := new(Task)
+	err = result.Scan(
+		&task.ID,
+		&task.Title,
+		&task.Description,
+		&task.Completed,
+		&task.Important,
+		&task.MyDay,
+		&task.CreatedAt,
+		&task.UpdatedAt,
+	)
+	result.Close()
+
+	if err != nil {
+		return nil, fmt.Errorf("DB.Task - result scan failed: %v", err)
 	}
 
-	return tasks[0], nil
+	return task, nil
 }
 
 func (s *service) UpdateTask(ID string, title string) error {

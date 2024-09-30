@@ -104,9 +104,8 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new task
-	// TODO: sanatise string to prevent mallicious requests
 	title := r.FormValue("task")
-	if title != "" {
+	if title != "" && len(title) >= 3 && len(title) <= 255 {
 		err := s.db.CreateTask(title)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -114,6 +113,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Fatalf("error title validation failed. Err: %v", err)
 	}
 	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
@@ -148,21 +148,8 @@ func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	}
 	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
-	// get all tasks
-	tasks, err := s.db.Tasks()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatalf("error handling tasks. Err: %v", err)
-	}
-
-	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
-
 	// update task list
-	err = web.TaskList(tasks).Render(r.Context(), w)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatalf("Error rendering in TaskList: %e", err)
-	}
+	w.Write([]byte(""))
 }
 
 func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
@@ -211,18 +198,18 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
-		// get all tasks
-		tasks, err := s.db.Tasks()
+		// get task
+		task, err := s.db.Task(taskID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Fatalf("error handling tasks. Err: %v", err)
+			log.Fatalf("error handling task. Err: %v", err)
 		}
 
-		// update task list
-		err = web.TaskList(tasks).Render(r.Context(), w)
+		// update task
+		err = web.Task(task).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Fatalf("Error rendering in TaskList: %e", err)
+			log.Fatalf("Error rendering in Task: %e", err)
 		}
 	}
 }
