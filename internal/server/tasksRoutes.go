@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"rminder/cmd/web"
@@ -55,16 +54,15 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling totals. Err: %v", err)
 		}
-		// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = web.Tasks(tasks, totals).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in tasksHandler: %e", err)
 		}
 	} else {
-		// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
-		// update task list
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = web.TaskList(tasks).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -90,9 +88,8 @@ func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
-	// update details
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = web.TaskDetails(task).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -119,16 +116,14 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Fatalf("error title validation failed. Err: %v", err)
 	}
-	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
-	// get all tasks
 	tasks, err := s.db.Tasks()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
-	// update task list
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = web.TaskList(tasks).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -150,9 +145,8 @@ func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
 
-	// update task list
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Write([]byte(""))
 }
 
@@ -198,10 +192,8 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 
 	if slug == "description" {
 		// TODO return proper message
-		fmt.Fprint(w, "Updated descripiton")
+		w.Write([]byte("Updated descripiton"))
 	} else {
-		// TODO: should i set  w.Header().Set("Content-Type", "text/html; charset=utf-8")???
-
 		// get task
 		task, err := s.db.Task(taskID)
 		if err != nil {
@@ -209,7 +201,7 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("error handling task. Err: %v", err)
 		}
 
-		// update task
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = web.Task(task).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
