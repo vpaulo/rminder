@@ -27,8 +27,10 @@ func (s *Server) TasksRoutes() *http.ServeMux {
 func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 	slug := strings.TrimPrefix(r.URL.Path, "/")
 
-	var tasks []*database.Task
-	var err error
+	var (
+		tasks []*database.Task
+		err   error
+	)
 
 	switch slug {
 	case "my-day":
@@ -74,8 +76,10 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
 	taskID := r.PathValue("taskID")
 
-	var task *database.Task
-	var err error
+	var (
+		task *database.Task
+		err  error
+	)
 
 	if taskID != "" {
 		task, err = s.db.Task(taskID)

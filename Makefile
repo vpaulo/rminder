@@ -28,6 +28,9 @@ test:
 	@echo "Testing..."
 	@go test ./tests -v
 
+# Quality check
+lint:
+	@golangci-lint run --enable-all
 
 
 # Clean the binary
