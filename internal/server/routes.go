@@ -82,6 +82,7 @@ func MiddlewareStack(ms ...Middleware) Middleware {
 			m := ms[i]
 			next = m(next)
 		}
+
 		return next
 	})
 }
@@ -89,6 +90,7 @@ func MiddlewareStack(ms ...Middleware) Middleware {
 func IsCustomer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("checking if is api...")
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -96,6 +98,7 @@ func IsCustomer(next http.Handler) http.Handler {
 func Logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
+
 		next.ServeHTTP(w, r)
 		log.Println(time.Since(start), r.Method, r.URL.Path)
 	})

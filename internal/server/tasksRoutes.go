@@ -147,7 +147,7 @@ func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write([]byte(""))
+	_, _ = w.Write([]byte(""))
 }
 
 func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
@@ -192,7 +192,7 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 
 	if slug == "description" {
 		// TODO return proper message
-		w.Write([]byte("Updated descripiton"))
+		_, _ = w.Write([]byte("Updated description"))
 	} else {
 		// get task
 		task, err := s.db.Task(taskID)
