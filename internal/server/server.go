@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,8 +19,13 @@ type Server struct {
 	db database.Service
 }
 
-func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+func NewServer(key string) *http.Server {
+	port, err := strconv.Atoi(os.Getenv(key))
+
+	if err != nil {
+		log.Fatalf("Port not found in .env file: %v", err)
+	}
+
 	NewServer := &Server{
 		port: port,
 

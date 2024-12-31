@@ -1,18 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"rminder/internal/server"
 )
 
 func main() {
-	server := server.NewServer()
-
-	log.Printf("Listening on %s...", server.Addr)
+	server := server.NewServer("PORT")
 
 	err := server.ListenAndServe()
 	if err != nil {
-		panic(fmt.Sprintf("cannot start server: %s", err))
+		log.Fatalf("cannot start server: %s", err)
 	}
+
+	log.Printf("Listening on %s...", server.Addr)
 }

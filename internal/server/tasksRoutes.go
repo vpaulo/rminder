@@ -3,8 +3,8 @@ package server
 import (
 	"log"
 	"net/http"
-	"rminder/cmd/web"
 	"rminder/internal/database"
+	"rminder/web"
 	"strings"
 )
 
