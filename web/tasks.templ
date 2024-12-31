@@ -7,99 +7,101 @@ import (
 
 templ Tasks(tasks []*database.Task, total *database.Total) {
 	@Base() {
-        <!-- left colunm -->
-        <aside class="sidebar" aria-label="Lists menu">
-            <div class="sidebar__header">
-                <label>
-                    <span class="menu" aria-label="Toggle sidebar"></span>
-                    <input class="hidden" type="checkbox" value="1" checked/>
-                </label>
-            </div>
-            <div class="sidebar__content">
-                <nav aria-label="Lists">
-                    <label
-                        class="list"
-                        data-name="my_day"
-                        aria-label="My day"
-                        hx-get="/tasks/my-day"
-                        hx-trigger="change"
-                        hx-target=".tasks"
-                    >
-                        <span class="icon today-icon"></span>
-                        <span>My day</span>
-                        <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="1"/>
+	    <rm-tasks-app>
+			<!-- left colunm -->
+            <aside class="sidebar" aria-label="Lists menu">
+                <div class="sidebar__header">
+                    <label>
+                        <span class="menu" aria-label="Toggle sidebar"></span>
+                        <input class="hidden" type="checkbox" value="1" checked/>
                     </label>
-                    <label
-                        class="list"
-                        data-name="important"
-                        aria-label="Important"
-                        hx-get="/tasks/important"
-                        hx-trigger="change"
-                        hx-target=".tasks"
-                    >
-                        <span class="icon icon-star"></span>
-                        <span>Important</span>
-                        <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="2"/>
-                    </label>
-                    <label
-                        class="list"
-                        data-name="completed"
-                        aria-label="Completed"
-                        hx-get="/tasks/completed"
-                        hx-trigger="change"
-                        hx-target=".tasks"
-                    >
-                        <span class="icon icon-check-square"></span>
-                        <span>Completed</span>
-                        <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="3"/>
-                    </label>
-                    <label
-                        class="list"
-                        data-name="tasks"
-                        aria-label="Tasks"
-                        hx-get="/tasks/all"
-                        hx-trigger="change"
-                        hx-target=".tasks"
-                    >
-                        <span class="icon icon-tasks"></span>
-                        <span>Tasks</span>
-                        <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
-                        <input class="hidden" type="radio" name="list-group" value="4" checked/>
-                    </label>
-                </nav>
-            </div>
-        </aside>
-        <!-- center column -->
-        <div class="main" role="main" data-list="">
-            <div class="list-toolbar">
-                <span class="list-title">Tasks</span>
-            </div>
-            <div class="container">
-                <form class="add-tasks" hx-post="/tasks/create" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
-                    <label class="add-task--label" for="task"></label>
-                    <input
-                        type="text"
-                        name="task"
-                        id="task"
-                        aria-label="Add a task"
-                        placeholder="Add a task"
-                        required
-                        minlength="3"
-                        maxlength="255"
-                        hx-validate="true"
-                    />
-                    <button class="add-task" type="submit">Add</button>
-                </form>
-                <div class="tasks">
-                    @TaskList(tasks)
+                </div>
+                <div class="sidebar__content">
+                    <nav aria-label="Lists">
+                        <!-- <label
+                            class="list"
+                            data-name="my_day"
+                            aria-label="My day"
+                            hx-get="/tasks/my-day"
+                            hx-trigger="change"
+                            hx-target=".tasks"
+                        >
+                            <span class="icon today-icon"></span>
+                            <span>My day</span>
+                            <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
+                            <input class="hidden" type="radio" name="list-group" value="1"/>
+                        </label> -->
+                        <label
+                            class="list"
+                            data-name="important"
+                            aria-label="Important"
+                            hx-get="/tasks/important"
+                            hx-trigger="change"
+                            hx-target=".tasks"
+                        >
+                            <span class="icon icon-star"></span>
+                            <span>Important</span>
+                            <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
+                            <input class="hidden" type="radio" name="list-group" value="2"/>
+                        </label>
+                        <label
+                            class="list"
+                            data-name="completed"
+                            aria-label="Completed"
+                            hx-get="/tasks/completed"
+                            hx-trigger="change"
+                            hx-target=".tasks"
+                        >
+                            <span class="icon icon-check-square"></span>
+                            <span>Completed</span>
+                            <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
+                            <input class="hidden" type="radio" name="list-group" value="3"/>
+                        </label>
+                        <label
+                            class="list"
+                            data-name="tasks"
+                            aria-label="Tasks"
+                            hx-get="/tasks/all"
+                            hx-trigger="change"
+                            hx-target=".tasks"
+                        >
+                            <span class="icon icon-tasks"></span>
+                            <span>Tasks</span>
+                            <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
+                            <input class="hidden" type="radio" name="list-group" value="4" checked/>
+                        </label>
+                    </nav>
+                </div>
+            </aside>
+            <!-- center column -->
+            <div class="main" role="main" data-list="">
+                <div class="list-toolbar">
+                    <span class="list-title">Tasks</span>
+                </div>
+                <div class="container">
+                    <form class="add-tasks" hx-post="/tasks/create" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
+                        <label class="add-task--label" for="task"></label>
+                        <input
+                            type="text"
+                            name="task"
+                            id="task"
+                            aria-label="Add a task"
+                            placeholder="Add a task"
+                            required
+                            minlength="3"
+                            maxlength="255"
+                            hx-validate="true"
+                        />
+                        <button class="add-task" type="submit">Add</button>
+                    </form>
+                    <div class="tasks">
+                        @TaskList(tasks)
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- right colunm -->
-        <aside class="details"></aside>
+            <!-- right colunm -->
+            <aside class="details"></aside>
+		</rm-tasks-app>
 	}
 }
 
@@ -128,7 +130,7 @@ templ TaskList(tasks []*database.Task) {
 }
 
 templ Task(task *database.Task) {
-  <li class={ taskClasses(task.Completed, task.Important, task.MyDay) } data-id={ strconv.Itoa(task.ID) }>
+  <li class={ taskClasses(task.Completed, task.Important, false) } data-id={ strconv.Itoa(task.ID) }>
     <span
       class="completed-ckeck"
       title="Set it as complete"

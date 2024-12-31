@@ -6,12 +6,17 @@ import "embed"
 var Schema embed.FS
 
 type Task struct {
-	ID          int    `json:"task_id"`
+	ID          int    `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Completed   bool   `json:"completed"`
 	Important   bool   `json:"important"`
-	MyDay       bool   `json:"my_day"`
+	Priority    int    `json:"priority"`
+	Position    int    `json:"position"`
+	StartAt     string `json:"start_at"`
+	EndAt       string `json:"end_at"`
+	ListId      int    `json:"list_id"`
+	ParentId    int    `json:"parent_id"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 }
@@ -20,5 +25,4 @@ type Total struct {
 	Tasks     int `json:"total_tasks"`
 	Completed int `json:"total_completed"`
 	Important int `json:"total_important"`
-	MyDay     int `json:"total_my_day"`
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"rminder/internal/database"
 	mw "rminder/internal/middleware"
 	"rminder/web"
 )
@@ -32,12 +33,12 @@ func (s *Server) tasksHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
-	totals, err := s.db.Totals()
-	if err != nil {
-		log.Fatalf("error handling totals. Err: %v", err)
-	}
+	// totals, err := s.db.Totals()
+	// if err != nil {
+	// 	log.Fatalf("error handling totals. Err: %v", err)
+	// }
 
-	err = web.Tasks(tasks, totals).Render(r.Context(), w)
+	err = web.Tasks(tasks, new(database.Total)).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Fatalf("Error rendering in tasksHandler: %e", err)

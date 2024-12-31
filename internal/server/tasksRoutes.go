@@ -33,7 +33,7 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 
 	switch slug {
 	case "my-day":
-		tasks, err = s.db.MyDayTasks()
+		// tasks, err = s.db.MyDayTasks()
 	case "important":
 		tasks, err = s.db.ImportantTasks()
 	case "completed":
@@ -49,14 +49,14 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 
 	if slug == "" {
 		// TODO: find better way to update totals of tasks lists
-		totals, err := s.db.Totals()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Fatalf("error handling totals. Err: %v", err)
-		}
+		// totals, err := s.db.Totals()
+		// if err != nil {
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	log.Fatalf("error handling totals. Err: %v", err)
+		// }
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(tasks, totals).Render(r.Context(), w)
+		err = web.Tasks(tasks, nil).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in tasksHandler: %e", err)
@@ -179,7 +179,7 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 		case "completed":
 			err = s.db.ToggleComplete(taskID)
 		case "my-day":
-			err = s.db.ToggleMyDay(taskID)
+			// err = s.db.ToggleMyDay(taskID)
 		}
 
 		if err != nil {
