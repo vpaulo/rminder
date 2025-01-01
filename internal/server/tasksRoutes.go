@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"rminder/internal/database"
@@ -19,6 +20,7 @@ func (s *Server) TasksRoutes() *http.ServeMux {
 	routes.HandleFunc("GET /{taskID}", s.getTask)
 	routes.HandleFunc("DELETE /{taskID}", s.deleteTask)
 	routes.HandleFunc("PUT /{taskID}/{slug}", s.updateTask)
+	routes.HandleFunc("GET /lists", s.getLists)
 
 	return routes
 }
@@ -208,4 +210,23 @@ func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("Error rendering in Task: %e", err)
 		}
 	}
+}
+
+func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
+	lists, err := s.db.Lists()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Fatalf("error handling lists. Err: %v", err)
+	}
+
+	// slog.Info("MY LISTS: ", "", lists)
+
+	jsonResp, err := json.Marshal(lists)
+
+	if err != nil {
+		log.Fatalf("error handling JSON marshal. Err: %v", err)
+	}
+
+	_, _ = w.Write(jsonResp)
 }

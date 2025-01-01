@@ -33,6 +33,9 @@ type Service interface {
 	UpdateTask(ID string, title string) error
 	UpdateTaskDescription(ID string, description string) error
 	DeleteTask(ID string) error
+
+	Lists() ([]*List, error)
+	ListTasks(id int) ([]*Task, error)
 }
 
 type service struct {
@@ -71,6 +74,12 @@ func New() Service {
 }
 
 func (s *service) loadSqlFile() error {
+	// Check db already has been initialised
+	lists, err := s.Lists()
+	if len(lists) > 0 || err == nil {
+		return nil
+	}
+
 	// Read file
 	file, err := Schema.ReadFile("schema.sql")
 	if err != nil {
@@ -147,6 +156,7 @@ func (s *service) Close() error {
 }
 
 func (s *service) Tasks() ([]*Task, error) {
+	// TODO: maybe change the default for order by created_at
 	query, err := s.db.Prepare("SELECT * FROM task ORDER BY updated_at DESC")
 	defer query.Close()
 	if err != nil {
@@ -458,4 +468,86 @@ func (s *service) DeleteTask(id string) error {
 	}
 
 	return nil
+}
+
+func (s *service) Lists() ([]*List, error) {
+	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at DESC")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
+	}
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Lists - query result failed: %v", err)
+	}
+
+	var tasks []*Task
+
+	lists := make([]*List, 0)
+	for result.Next() {
+		data := new(List)
+		err := result.Scan(
+			&data.ID,
+			&data.Name,
+			&data.Colour,
+			&data.Icon,
+			&data.FilterBy,
+			&data.GroupId,
+			&data.Pinned,
+			&data.Position,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Lists - result scan failed: %v", err)
+		}
+		tasks, err = s.ListTasks(data.ID)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Lists - get list tasks failed: %v", err)
+		}
+		data.Tasks = tasks
+		lists = append(lists, data)
+	}
+
+	return lists, nil
+}
+
+func (s *service) ListTasks(id int) ([]*Task, error) {
+	query, err := s.db.Prepare("SELECT * FROM task WHERE list_id=?")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.ListTasks - prepare query failed: %v", err)
+	}
+
+	result, err := query.Query(id)
+	if err != nil {
+		return nil, fmt.Errorf("DB.ListTasks - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.Priority,
+			&data.Position,
+			&data.StartAt,
+			&data.EndAt,
+			&data.ListId,
+			&data.ParentId,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.ListTasks - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	return tasks, nil
 }

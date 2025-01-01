@@ -21,6 +21,29 @@ type Task struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
+type List struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Colour    string `json:"colour"`
+	Icon      string `json:"icon"`
+	FilterBy  string `json:"filter_by"`
+	GroupId   int    `json:"group_id"`
+	Pinned    bool   `json:"pinned"`
+	Position  int    `json:"position"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Tasks     []*Task
+}
+
+type GroupList struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Position  int    `json:"position"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Lists     []*List
+}
+
 type Total struct {
 	Tasks     int `json:"total_tasks"`
 	Completed int `json:"total_completed"`
