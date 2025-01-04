@@ -1,0 +1,126 @@
+rm-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: var(--sidebar-width);
+    width: var(--sidebar-width);
+    background-color: var(--base-grey);
+    overflow: hidden;
+
+    &:has(.header input:checked) {
+        --sidebar-width: 340px;
+        --lists-visibility: inline;
+        background-color: #fff;
+    }
+    .header {
+        display: flex;
+        align-content: center;
+        border-bottom: 2px solid var(--background);
+        padding: 10px;
+    }
+    .header > label {
+        display: inline-flex;
+    }
+
+    .pinned-lists {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px;
+        border-bottom: 2px solid var(--background);
+
+        .list {
+            flex: 1 0 150px;
+            padding: 10px;
+            border: 2px solid var(--background);
+        }
+    }
+
+    .lists {
+        height: 100%;
+    }
+
+    /* .list:has(input:checked) > .icon {
+        background-color: var(--primary);
+    } */
+
+    .list {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        border-bottom: 2px solid var(--background);
+        cursor: pointer;
+        gap: var(--gap-10);
+
+        .name {
+            flex: 1 1 auto;
+        }
+    }
+    .list span:not(.icon) {
+        font-size: 0.8rem;
+        display: var(--lists-visibility);
+    }
+    .list.hidden {
+        display: none;
+    }
+    .list:hover {
+        background-color: var(--base-grey);
+    }
+    .list .icon {
+        background-color: var(--base-color);
+        width: 20px;
+        height: 20px;
+    }
+
+    .count {
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .lists-label {
+        padding: 10px;
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    footer {
+        padding: 10px;
+        border-top: 2px solid var(--background);
+    }
+
+    .add-list {
+        display: flex;
+        align-items: center;
+        background: transparent;
+        border: transparent;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        letter-spacing: 1px;
+        gap: 10px;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .add-list--icon {
+        width: 20px;
+        height: 20px;
+        /* flex: 0 0 20px; */
+        cursor: pointer;
+        /* text-align: center;
+        line-height: 28px; */
+
+        mask: url("/assets/icons/add-icon.svg");
+        mask-repeat: no-repeat;
+        mask-position: 50%;
+        background-color: var(--base-color);
+
+        &:hover {
+            background-color: var(--primary);
+        }
+    }
+}

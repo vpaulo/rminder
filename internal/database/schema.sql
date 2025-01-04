@@ -41,36 +41,47 @@ CREATE TABLE IF NOT EXISTS task (
 
 -- Initialise default lists
 INSERT INTO
-    list (name, colour, icon, pinned)
+    list (name, colour, icon, pinned, position)
 VALUES
     (
         "Today",
         "--colour-fresh-blue-500",
         "today-icon",
-        true
+        true,
+        1
     ),
     (
         "Scheduled",
         "--colour-dust-red-500",
         "today-icon",
-        true
+        true,
+        2
     ),
-    ("All", "--colour-indigo-500", "icon-tasks", true),
+    (
+        "All",
+        "--colour-indigo-500",
+        "icon-tasks",
+        true,
+        3
+    ),
     (
         "Important",
         "--colour-volcano-400",
         "icon-star",
-        true
+        true,
+        4
     ),
     (
         "Completed",
         "--colour-orange-300",
-        "icon-square",
-        true
+        "icon-check-square",
+        true,
+        5
     ),
     (
         "Inbox",
         "--colour-fresh-blue-500",
         "today-icon",
-        false
+        false,
+        6
     );

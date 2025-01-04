@@ -35,7 +35,12 @@ type Service interface {
 	DeleteTask(ID string) error
 
 	Lists() ([]*List, error)
+	List(ID int) (*List, error)
 	ListTasks(id int) ([]*Task, error)
+
+	Groups() ([]*GroupList, error)
+	Group(ID int) (*GroupList, error)
+	GroupLists(id int) ([]*List, error)
 }
 
 type service struct {
@@ -550,4 +555,150 @@ func (s *service) ListTasks(id int) ([]*Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (s *service) List(id int) (*List, error) {
+	query, err := s.db.Prepare("SELECT * FROM list WHERE id=?")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.List - prepare query failed: %v", err)
+	}
+
+	var tasks []*Task
+
+	list := new(List)
+	err = query.QueryRow(id).Scan(
+		&list.ID,
+		&list.Name,
+		&list.Colour,
+		&list.Icon,
+		&list.FilterBy,
+		&list.GroupId,
+		&list.Pinned,
+		&list.Position,
+		&list.CreatedAt,
+		&list.UpdatedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("DB.List - query result failed: %v", err)
+	}
+
+	tasks, err = s.ListTasks(list.ID)
+	if err != nil {
+		return nil, fmt.Errorf("DB.List - get list tasks failed: %v", err)
+	}
+	list.Tasks = tasks
+
+	return list, nil
+}
+
+func (s *service) Groups() ([]*GroupList, error) {
+	query, err := s.db.Prepare("SELECT * FROM group_list ORDER BY created_at DESC")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
+	}
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Lists - query result failed: %v", err)
+	}
+
+	var lists []*List
+
+	groups := make([]*GroupList, 0)
+	for result.Next() {
+		data := new(GroupList)
+		err := result.Scan(
+			&data.ID,
+			&data.Name,
+			&data.Position,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Lists - result scan failed: %v", err)
+		}
+		lists, err = s.GroupLists(data.ID)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Lists - get list tasks failed: %v", err)
+		}
+		data.Lists = lists
+		groups = append(groups, data)
+	}
+
+	return groups, nil
+}
+
+func (s *service) Group(id int) (*GroupList, error) {
+	query, err := s.db.Prepare("SELECT * FROM group_list WHERE id=?")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Group - prepare query failed: %v", err)
+	}
+
+	var lists []*List
+
+	group := new(GroupList)
+	err = query.QueryRow(id).Scan(
+		&group.ID,
+		&group.Name,
+		&group.Position,
+		&group.CreatedAt,
+		&group.UpdatedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("DB.Group - query result failed: %v", err)
+	}
+
+	lists, err = s.GroupLists(group.ID)
+	if err != nil {
+		return nil, fmt.Errorf("DB.Group - get list tasks failed: %v", err)
+	}
+	group.Lists = lists
+
+	return group, nil
+}
+
+func (s *service) GroupLists(id int) ([]*List, error) {
+	query, err := s.db.Prepare("SELECT * FROM list WHERE group_id=?")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.GroupLists - prepare query failed: %v", err)
+	}
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.GroupLists - query result failed: %v", err)
+	}
+
+	var tasks []*Task
+
+	lists := make([]*List, 0)
+	for result.Next() {
+		data := new(List)
+		err := result.Scan(
+			&data.ID,
+			&data.Name,
+			&data.Colour,
+			&data.Icon,
+			&data.FilterBy,
+			&data.GroupId,
+			&data.Pinned,
+			&data.Position,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.GroupLists - result scan failed: %v", err)
+		}
+		tasks, err = s.ListTasks(data.ID)
+		if err != nil {
+			return nil, fmt.Errorf("DB.GroupLists - get list tasks failed: %v", err)
+		}
+		data.Tasks = tasks
+		lists = append(lists, data)
+	}
+
+	return lists, nil
 }

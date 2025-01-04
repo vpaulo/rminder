@@ -59,6 +59,8 @@
     --base-red: #f46363;
     --primary: #08f;
     --background: #f5f5f5;
+
+    height: 100%;
     overflow: hidden;
 }
 *,
@@ -84,6 +86,7 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: var(--size-40) 1fr;
+    height: 100%;
     background-color: var(--background);
     color: var(--base-color);
 }
@@ -116,34 +119,27 @@ header {
     height: var(--size-40);
     justify-content: center;
 }
-/* #app, */
-rm-tasks-app {
-    display: flex;
-    gap: var(--gap-20);
-}
-rm-tasks-app:not(:has(.tasks__list input:checked)) .details > * {
-    display: none;
-}
-rm-tasks-app:has(.tasks__list input:checked) .details {
-    --details-width: 300px;
-}
-rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #fff;
-}
-.sidebar {
+
+/* .sidebar {
     min-width: var(--sidebar-width);
     width: var(--sidebar-width);
     background-color: var(--base-grey);
     overflow: hidden;
-}
-.sidebar:has(.sidebar__header input:checked) {
+} */
+/* .sidebar:has(.header input:checked) {
     --sidebar-width: 290px;
     --lists-visibility: inline;
     background-color: #fff;
+} */
+/* .sidebar__header {
+    display: flex;
+    align-content: center;
+    border-bottom: 2px solid var(--background);
+    padding: 10px;
 }
+.sidebar__header > label {
+    display: inline-flex;
+} */
 .main {
     min-width: 250px;
     width: var(--main-width);
@@ -170,9 +166,7 @@ rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
     flex-direction: column;
     gap: 10px;
 }
-.list:has(input:checked) > .icon {
-    background-color: var(--primary);
-}
+
 .tasks__list > li {
     display: flex;
     align-items: center;
@@ -315,13 +309,18 @@ rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
     overflow-y: auto;
     height: calc(var(--vh) - (2 * var(--size-40) + 60px));
 }
-.list {
+/* .list {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 10px;
     border-bottom: 2px solid var(--background);
     cursor: pointer;
     gap: var(--gap-10);
+
+    .name {
+        flex: 1 1 auto;
+    }
 }
 .list span:not(.icon) {
     font-size: 0.8rem;
@@ -337,7 +336,7 @@ rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
     background-color: var(--base-color);
     width: 20px;
     height: 20px;
-}
+} */
 .today-icon {
     mask: url("/assets/icons/today-icon.svg");
     mask-repeat: no-repeat;
@@ -362,7 +361,7 @@ rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
     mask-position: 50%;
     mask-size: 20px;
 }
-.count {
+/* .count {
     background-color: var(--primary);
     color: #fff;
     border-radius: 8px;
@@ -371,7 +370,7 @@ rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
     text-align: center;
     padding: 0 5px;
     font-weight: 600;
-}
+} */
 .details__body {
     height: calc(var(--vh) - (2 * var(--size-40)));
 }
@@ -462,15 +461,6 @@ rm-details .ql-container.ql-snow {
 }
 .close:hover .close-icon {
     background-color: var(--primary);
-}
-.sidebar__header {
-    display: flex;
-    align-content: center;
-    border-bottom: 2px solid var(--background);
-    padding: 10px;
-}
-.sidebar__header > label {
-    display: inline-flex;
 }
 .menu {
     width: 20px;

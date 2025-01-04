@@ -30,6 +30,7 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		tasks []*database.Task
+		lists []*database.List
 		err   error
 	)
 
@@ -41,7 +42,7 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 	case "completed":
 		tasks, err = s.db.CompletedTasks()
 	default:
-		tasks, err = s.db.Tasks()
+		lists, err = s.db.Lists()
 	}
 
 	if err != nil {
@@ -58,7 +59,7 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 		// }
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(tasks, nil).Render(r.Context(), w)
+		err = web.Tasks(lists).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in tasksHandler: %e", err)
@@ -219,8 +220,6 @@ func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("error handling lists. Err: %v", err)
 	}
-
-	// slog.Info("MY LISTS: ", "", lists)
 
 	jsonResp, err := json.Marshal(lists)
 

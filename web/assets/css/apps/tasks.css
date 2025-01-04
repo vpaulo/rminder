@@ -1,0 +1,16 @@
+rm-tasks-app {
+    display: flex;
+    gap: var(--gap-20);
+}
+rm-tasks-app:not(:has(.tasks__list input:checked)) .details > * {
+    display: none;
+}
+rm-tasks-app:has(.tasks__list input:checked) .details {
+    --details-width: 300px;
+}
+rm-tasks-app:has(.tasks__list input:checked) .details .details__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+}

@@ -5,11 +5,31 @@ import (
     "strconv"
 )
 
-templ Tasks(tasks []*database.Task, total *database.Total) {
+templ Tasks(lists []*database.List) {
 	@Base() {
 	    <rm-tasks-app>
 			<!-- left colunm -->
-            <aside class="sidebar" aria-label="Lists menu">
+			<rm-sidebar>
+                <!-- Sidebar toggle -->
+                <!-- Search -->
+                <!-- Pinned Lists -->
+                <div class="pinned-lists">
+                    @Lists(lists, true)
+                </div>
+                <!-- Groups/Lists -->
+                <div class="lists">
+                    <p class="lists-label">My lists</p>
+                    @Lists(lists, false)
+                </div>
+                <!-- Add List -->
+                <footer>
+                    <button class="add-list">
+                        <span class="add-list--icon"></span>
+                        <span>Add list</span>
+                    </button>
+                </footer>
+            </rm-sidebar>
+            <!--<aside class="sidebar" aria-label="Lists menu">
                 <div class="sidebar__header">
                     <label>
                         <span class="menu" aria-label="Toggle sidebar"></span>
@@ -18,7 +38,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                 </div>
                 <div class="sidebar__content">
                     <nav aria-label="Lists">
-                        <!-- <label
+                        <label
                             class="list"
                             data-name="my_day"
                             aria-label="My day"
@@ -30,7 +50,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                             <span>My day</span>
                             <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
                             <input class="hidden" type="radio" name="list-group" value="1"/>
-                        </label> -->
+                        </label>
                         <label
                             class="list"
                             data-name="important"
@@ -72,7 +92,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         </label>
                     </nav>
                 </div>
-            </aside>
+            </aside>-->
             <!-- center column -->
             <div class="main" role="main" data-list="">
                 <div class="list-toolbar">
@@ -95,7 +115,7 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
                         <button class="add-task" type="submit">Add</button>
                     </form>
                     <div class="tasks">
-                        @TaskList(tasks)
+                        <!-- @TaskList(tasks) -->
                     </div>
                 </div>
             </div>
@@ -103,6 +123,21 @@ templ Tasks(tasks []*database.Task, total *database.Total) {
             <aside class="details"></aside>
 		</rm-tasks-app>
 	}
+}
+
+templ Lists(lists []*database.List, flag bool) {
+  for _, list := range lists {
+      if list.Pinned == flag {
+          @List(list)
+      }
+  }
+}
+templ List(list *database.List) {
+    <div class="list" data-id={ strconv.Itoa(list.ID) }>
+        <span class={"icon " + list.Icon }></span>
+        <span class="name">{ list.Name }</span>
+        <span class="count">{ strconv.Itoa(len(list.Tasks))}</span>
+    </div>
 }
 
 templ Modal(id int) {
