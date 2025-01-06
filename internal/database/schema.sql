@@ -53,13 +53,13 @@ VALUES
     (
         "Scheduled",
         "--colour-dust-red-500",
-        "today-icon",
+        "days-icon",
         true,
         2
     ),
     (
         "All",
-        "--colour-indigo-500",
+        "--colour-indigo-400",
         "icon-tasks",
         true,
         3
@@ -73,7 +73,7 @@ VALUES
     ),
     (
         "Completed",
-        "--colour-orange-300",
+        "--colour-lime-700",
         "icon-check-square",
         true,
         5

@@ -13,7 +13,7 @@ func (s *Server) TasksRoutes() *http.ServeMux {
 	routes := http.NewServeMux()
 
 	routes.HandleFunc("GET /all", s.getTasks)
-	routes.HandleFunc("GET /my-day", s.getTasks)
+	// routes.HandleFunc("GET /my-day", s.getTasks)
 	routes.HandleFunc("GET /important", s.getTasks)
 	routes.HandleFunc("GET /completed", s.getTasks)
 	routes.HandleFunc("POST /create", s.createTask)

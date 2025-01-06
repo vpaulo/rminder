@@ -45,6 +45,31 @@
         U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 :root {
+    --colour-red-300: hsl(0, 100%, 70%);
+    --colour-cyan-100: hsl(180, 100%, 90%);
+    --colour-cyan-700: hsl(180, 100%, 30%);
+    --colour-magenta-100: hsl(300, 100%, 90%);
+    --colour-fresh-blue-500: hsl(208, 100%, 50%);
+    --colour-dust-red-500: hsl(359, 100%, 65%);
+    --colour-volcano-400: hsl(19, 100%, 72%);
+    --colour-sunrise-yellow-500: hsl(54, 100%, 62%);
+    --colour-lime-700: hsl(79, 95%, 36%);
+    --colour-indigo-400: hsl(269, 73%, 71%);
+
+    --colour-neutral-100: #ffffff;
+    --colour-neutral-200: #fafafa;
+    --colour-neutral-300: #f5f5f5;
+    --colour-neutral-400: #ededed;
+    --colour-neutral-500: #d9d9d9;
+    --colour-neutral-600: #cacfd2;
+    --colour-neutral-700: #8c8c8c;
+    --colour-neutral-800: #595959;
+    --colour-neutral-900: #414141;
+    --colour-neutral-1000: #262626;
+    --colour-neutral-1100: #1f1f1f;
+    --colour-neutral-1200: #141414;
+    --colour-neutral-1300: #000000;
+
     --vh: 100vh;
     --size-40: 40px;
     --gap-10: 10px;
@@ -54,15 +79,16 @@
     --details-width: 0;
     --lists-visibility: none;
     --modal-width: 400px;
-    --base-color: #414141;
-    --base-grey: #ededed;
-    --base-red: #f46363;
-    --primary: #08f;
-    --background: #f5f5f5;
+    --base-colour: var(--colour-neutral-900);
+    --base-grey: var(--colour-neutral-400);
+    --base-red: var(--colour-red-300);
+    --primary: var(--colour-fresh-blue-500);
+    --background: var(--colour-neutral-300);
 
     height: 100%;
     overflow: hidden;
 }
+
 *,
 *:before,
 *::after {
@@ -88,10 +114,10 @@ body {
     grid-template-rows: var(--size-40) 1fr;
     height: 100%;
     background-color: var(--background);
-    color: var(--base-color);
+    color: var(--base-colour);
 }
 button {
-    color: var(--base-color);
+    color: var(--base-colour);
 }
 header {
     display: flex;
@@ -99,6 +125,32 @@ header {
     justify-content: space-between;
     gap: var(--gap-10);
 }
+
+.btn {
+    border: 0;
+    padding: 5px 10px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(130%);
+    }
+
+    &.default {
+        background-color: var(--base-grey);
+    }
+
+    &.primary {
+        background-color: var(--primary);
+        color: #fff;
+    }
+
+    &.warning {
+        background-color: var(--base-red);
+        color: #fff;
+    }
+}
+
 .header__start {
     display: flex;
     align-items: center;
@@ -194,13 +246,13 @@ header {
 }
 #task:focus {
     outline: none;
-    color: var(--base-color);
+    color: var(--base-colour);
 }
 #task:focus ~ .add-task {
     color: var(--primary);
 }
 #task:focus::placeholder {
-    color: var(--base-color);
+    color: var(--base-colour);
 }
 .add-task {
     background: transparent;
@@ -224,7 +276,7 @@ header {
     mask: url("/assets/icons/add-icon.svg");
     mask-repeat: no-repeat;
     mask-position: 50%;
-    background-color: var(--base-color);
+    background-color: var(--base-colour);
 }
 .add-task--label:hover {
     background-color: var(--primary);
@@ -234,7 +286,7 @@ header {
     height: 100%;
     text-align: left;
     font-size: 1.2rem;
-    color: var(--base-color);
+    color: var(--base-colour);
     padding: 8px 0;
     cursor: pointer;
 }
@@ -247,7 +299,7 @@ header {
     width: 20px;
     height: 20px;
     flex: 0 0 auto;
-    background-color: var(--base-color);
+    background-color: var(--base-colour);
     cursor: pointer;
 }
 .completed-ckeck {
@@ -288,7 +340,7 @@ header {
 .title,
 .note {
     width: 100%;
-    color: var(--base-color);
+    color: var(--base-colour);
     font-size: 0.9rem;
     padding: 8px 6px;
 }
@@ -333,7 +385,7 @@ header {
     background-color: var(--base-grey);
 }
 .list .icon {
-    background-color: var(--base-color);
+    background-color: var(--base-colour);
     width: 20px;
     height: 20px;
 } */
@@ -439,7 +491,7 @@ rm-details .ql-container.ql-snow {
     mask-repeat: no-repeat;
     mask-position: 50%;
     mask-size: 16px;
-    background-color: var(--base-color);
+    background-color: var(--base-colour);
     width: 27px;
     height: 27px;
 }
@@ -455,7 +507,7 @@ rm-details .ql-container.ql-snow {
     mask-repeat: no-repeat;
     mask-position: 50%;
     mask-size: 27px 18px;
-    background-color: var(--base-color);
+    background-color: var(--base-colour);
     width: 27px;
     height: 27px;
 }
@@ -509,23 +561,7 @@ rm-task-details .ql-toolbar.ql-snow {
     display: flex;
     justify-content: flex-end;
     padding-top: 10px;
-}
-.modal__actions > button {
-    margin-left: 10px;
-    border: 0;
-    padding: 5px 10px;
-    font-weight: 600;
-    cursor: pointer;
-}
-.modal__actions > button:hover {
-    filter: brightness(130%);
-}
-.modal__actions .warning {
-    background-color: var(--base-red);
-    color: #fff;
-}
-.modal__actions .default {
-    background-color: var(--base-grey);
+    gap: 10px;
 }
 @media (hover: hover) and (pointer: fine) {
     .completed-ckeck:hover,

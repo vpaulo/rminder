@@ -11,6 +11,20 @@ rm-sidebar {
         --sidebar-width: 340px;
         --lists-visibility: inline;
         background-color: #fff;
+
+        .pinned-lists {
+            gap: 10px;
+            padding: 10px;
+
+            .list {
+                flex: 1 0 150px;
+                border: 2px solid var(--background);
+            }
+        }
+
+        .list {
+            padding: 10px 20px;
+        }
     }
     .header {
         display: flex;
@@ -25,19 +39,23 @@ rm-sidebar {
     .pinned-lists {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        padding: 10px;
         border-bottom: 2px solid var(--background);
 
         .list {
-            flex: 1 0 150px;
             padding: 10px;
-            border: 2px solid var(--background);
         }
     }
 
     .lists {
+        display: flex;
+        flex-direction: column;
         height: 100%;
+    }
+
+    .lists-holder {
+        flex-grow: 1;
+        flex-basis: 0;
+        overflow: auto;
     }
 
     /* .list:has(input:checked) > .icon {
@@ -48,7 +66,7 @@ rm-sidebar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 20px;
+        padding: 10px;
         border-bottom: 2px solid var(--background);
         cursor: pointer;
         gap: var(--gap-10);
@@ -68,7 +86,7 @@ rm-sidebar {
         background-color: var(--base-grey);
     }
     .list .icon {
-        background-color: var(--base-color);
+        background-color: var(--base-colour);
         width: 20px;
         height: 20px;
     }
@@ -79,6 +97,7 @@ rm-sidebar {
     }
 
     .lists-label {
+        display: var(--lists-visibility);
         padding: 10px;
         margin: 0;
         font-size: 1rem;
@@ -88,6 +107,26 @@ rm-sidebar {
     footer {
         padding: 10px;
         border-top: 2px solid var(--background);
+    }
+
+    .footer-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 40px;
+    }
+
+    .new-list {
+        width: 100%;
+        color: var(--base-colour);
+        font-size: 0.9rem;
+        padding: 8px 6px;
+        text-overflow: ellipsis;
+        background-color: var(--base-grey);
+
+        &:focus {
+            outline: none;
+        }
     }
 
     .add-list {
@@ -100,27 +139,56 @@ rm-sidebar {
         cursor: pointer;
         letter-spacing: 1px;
         gap: 10px;
+        padding: 0;
 
         &:focus {
             outline: none;
+        }
+
+        span:not(.add-list--icon) {
+            display: var(--lists-visibility);
         }
     }
 
     .add-list--icon {
         width: 20px;
         height: 20px;
-        /* flex: 0 0 20px; */
         cursor: pointer;
-        /* text-align: center;
-        line-height: 28px; */
 
         mask: url("/assets/icons/add-icon.svg");
         mask-repeat: no-repeat;
         mask-position: 50%;
-        background-color: var(--base-color);
+        background-color: var(--base-colour);
 
         &:hover {
             background-color: var(--primary);
         }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+
+        fieldset {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            gap: 10px;
+        }
+
+        input:checked + .swatch {
+            border: 2px solid var(--base-colour);
+        }
+    }
+
+    .swatch {
+        /* border-radius: 4px; */
+        cursor: pointer;
+        width: 25px;
+        height: 25px;
+        border: 2px solid rgba(0, 0, 0, 0);
     }
 }

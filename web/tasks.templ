@@ -19,14 +19,92 @@ templ Tasks(lists []*database.List) {
                 <!-- Groups/Lists -->
                 <div class="lists">
                     <p class="lists-label">My lists</p>
-                    @Lists(lists, false)
+                    <div class="lists-holder">
+                        @Lists(lists, false)
+                    </div>
                 </div>
                 <!-- Add List -->
                 <footer>
-                    <button class="add-list">
-                        <span class="add-list--icon"></span>
-                        <span>Add list</span>
-                    </button>
+                    <div class="list-form-container" id="new-list-popover" popover>
+                        <form
+                        class=""
+                        hx-post={ "/list/create" }
+                        method="POST"
+                        hx-target={ ".lists-holder" }>
+                            <input
+                                class="new-list"
+                                name="new-list"
+                                type="text"
+                                value=""
+                                placeholder="List name"
+                                minlength="3"
+                                maxlength="255"
+                                hx-validate="true"/>
+                            <fieldset>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--base-colour" checked/>
+                         			<div class="swatch" style="background: var(--base-colour)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-cyan-blue-500"/>
+                         			<div class="swatch" style="background: var(--colour-fresh-blue-500)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-cyan-100"/>
+                         			<div class="swatch" style="background: var(--colour-cyan-100)"></div>
+                          		</label>
+                                <label class="radio-button-label">
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-cyan-700"/>
+                         			<div class="swatch" style="background: var(--colour-cyan-700)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-sunrise-yellow-500"/>
+                         			<div class="swatch" style="background: var(--colour-sunrise-yellow-500)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-volcano-400"/>
+                         			<div class="swatch" style="background: var(--colour-volcano-400)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-red-300"/>
+                         			<div class="swatch" style="background: var(--colour-red-300)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-dust-red-500"/>
+                         			<div class="swatch" style="background: var(--colour-dust-red-500)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-lime-700"/>
+                         			<div class="swatch" style="background: var(--colour-lime-700)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-magenta-100"/>
+                         			<div class="swatch" style="background: var(--colour-magenta-100)"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="swatch" class="hidden" value="--colour-indigo-400"/>
+                         			<div class="swatch" style="background: var(--colour-indigo-400)"></div>
+                          		</label>
+                            </fieldset>
+                            <fieldset>
+                                <button
+                                    class="btn default"
+                                    popovertarget="new-list-popover"
+                                    popovertargetaction="hide">Cancel</button>
+                                <button
+                                    class="btn primary"
+                                    type="submit"
+                                    popovertarget="new-list-popover"
+                                    popovertargetaction="hide">Add</button>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="footer-actions">
+                        <button class="add-list" popovertarget="new-list-popover">
+                            <span class="add-list--icon"></span>
+                            <span>Add list</span>
+                        </button>
+                    </div>
                 </footer>
             </rm-sidebar>
             <!--<aside class="sidebar" aria-label="Lists menu">
@@ -145,9 +223,9 @@ templ Modal(id int) {
         <div class="modal__content">
             <span>Task will be permanent deleted, you won't be able to undo this action.</span>
             <div class="modal__actions">
-                <button class="default">Cancel</button>
+                <button class="btn default">Cancel</button>
                 <button
-                  class="warning"
+                  class="btn warning"
                   hx-delete={ "/tasks/" + strconv.Itoa(id) }
                   hx-swap="outerHTML"
                   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(id) + "']" }>Delete task</button>
@@ -182,13 +260,13 @@ templ Task(task *database.Task) {
       <span>{ task.Title }</span>
       <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
     </label>
-    <span
+    <!--<span
       class="my-day"
       title="Set it as todo for today"
       hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/my-day" }
       hx-trigger="click"
       hx-swap="outerHTML"
-      hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }></span>
+      hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }></span>-->
     <span
       class="importance-check"
       title="Set it as important"
