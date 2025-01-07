@@ -28,7 +28,7 @@ templ Tasks(lists []*database.List) {
                     <div class="list-form-container" id="new-list-popover" popover>
                         <form
                         class=""
-                        hx-post={ "/list/create" }
+                        hx-post={ "/lists/create" }
                         method="POST"
                         hx-target={ ".lists-holder" }>
                             <input
@@ -84,6 +84,52 @@ templ Tasks(lists []*database.List) {
                                 <label>
                          			<input type="radio" name="swatch" class="hidden" value="--colour-indigo-400"/>
                          			<div class="swatch" style="background: var(--colour-indigo-400)"></div>
+                          		</label>
+                            </fieldset>
+                            <fieldset>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="list-ul-icon" checked/>
+                         			<div class="icon-selector list-ul-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="file-icon"/>
+                         			<div class="icon-selector file-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="bars-progress-icon"/>
+                         			<div class="icon-selector bars-progress-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="calendar-icon"/>
+                         			<div class="icon-selector calendar-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="clipboard-icon"/>
+                         			<div class="icon-selector clipboard-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="clipboard-list-icon"/>
+                         			<div class="icon-selector clipboard-list-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="folder-icon"/>
+                         			<div class="icon-selector folder-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="folder-open-icon"/>
+                         			<div class="icon-selector folder-open-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="bell-icon"/>
+                         			<div class="icon-selector bell-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="bookmark-icon"/>
+                         			<div class="icon-selector bookmark-icon"></div>
+                          		</label>
+                                <label>
+                         			<input type="radio" name="icon" class="hidden" value="pen-icon"/>
+                         			<div class="icon-selector pen-icon"></div>
                           		</label>
                             </fieldset>
                             <fieldset>

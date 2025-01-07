@@ -1,78 +1,43 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"rminder/internal/database"
 	"rminder/web"
-	"strings"
 )
 
-func (s *Server) TasksRoutes() *http.ServeMux {
+func (s *Server) ListsRoutes() *http.ServeMux {
 	routes := http.NewServeMux()
 
 	routes.HandleFunc("GET /all", s.getTasks)
-	// routes.HandleFunc("GET /my-day", s.getTasks)
-	routes.HandleFunc("GET /important", s.getTasks)
-	routes.HandleFunc("GET /completed", s.getTasks)
-	routes.HandleFunc("POST /create", s.createTask)
-	routes.HandleFunc("GET /{taskID}", s.getTask)
-	routes.HandleFunc("DELETE /{taskID}", s.deleteTask)
-	routes.HandleFunc("PUT /{taskID}/{slug}", s.updateTask)
+	routes.HandleFunc("POST /create", s.createList)
+	routes.HandleFunc("GET /{listID}", s.getList)
+	routes.HandleFunc("DELETE /{listID}", s.deleteList)
+	routes.HandleFunc("PUT /{listID}/{slug}", s.updateList)
 
 	return routes
 }
 
-func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
-	slug := strings.TrimPrefix(r.URL.Path, "/")
-
-	var (
-		tasks []*database.Task
-		lists []*database.List
-		err   error
-	)
-
-	switch slug {
-	case "my-day":
-		// tasks, err = s.db.MyDayTasks()
-	case "important":
-		tasks, err = s.db.ImportantTasks()
-	case "completed":
-		tasks, err = s.db.CompletedTasks()
-	default:
-		lists, err = s.db.Lists()
-	}
+func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
+	lists, err := s.db.Lists()
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatalf("error handling tasks. Err: %v", err)
+		log.Fatalf("error handling lists. Err: %v", err)
 	}
 
-	if slug == "" {
-		// TODO: find better way to update totals of tasks lists
-		// totals, err := s.db.Totals()
-		// if err != nil {
-		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 	log.Fatalf("error handling totals. Err: %v", err)
-		// }
+	jsonResp, err := json.Marshal(lists)
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(lists).Render(r.Context(), w)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Fatalf("Error rendering in tasksHandler: %e", err)
-		}
-	} else {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.TaskList(tasks).Render(r.Context(), w)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Fatalf("Error rendering in TaskList: %e", err)
-		}
+	if err != nil {
+		log.Fatalf("error handling JSON marshal. Err: %v", err)
 	}
+
+	_, _ = w.Write(jsonResp)
 }
 
-func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
+func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
 	taskID := r.PathValue("taskID")
 
 	var (
@@ -98,7 +63,7 @@ func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
+func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -132,7 +97,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
+func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
 	taskID := r.PathValue("taskID")
 
 	var err error
@@ -151,7 +116,7 @@ func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte(""))
 }
 
-func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
+func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
 	taskID := r.PathValue("taskID")
 	slug := r.PathValue("slug")
 

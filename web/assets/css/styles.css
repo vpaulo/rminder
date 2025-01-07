@@ -413,6 +413,72 @@ header {
     mask-position: 50%;
     mask-size: 20px;
 }
+
+.bars-progress-icon {
+    background-image: url("/assets/icons/bars-progress-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.calendar-icon {
+    background-image: url("/assets/icons/calendar-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.clipboard-icon {
+    background-image: url("/assets/icons/clipboard-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.clipboard-list-icon {
+    background-image: url("/assets/icons/clipboard-list-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.list-ul-icon {
+    background-image: url("/assets/icons/list-ul-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.file-icon {
+    background-image: url("/assets/icons/file-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.folder-icon {
+    background-image: url("/assets/icons/folder-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.folder-open-icon {
+    background-image: url("/assets/icons/folder-open-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.bell-icon {
+    background-image: url("/assets/icons/bell-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.bookmark-icon {
+    background-image: url("/assets/icons/bookmark-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.pen-icon {
+    background-image: url("/assets/icons/pen-icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
 /* .count {
     background-color: var(--primary);
     color: #fff;

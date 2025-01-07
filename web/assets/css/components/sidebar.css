@@ -165,6 +165,11 @@ rm-sidebar {
         }
     }
 
+    .list-form-container {
+        border: 0;
+        box-shadow: 1px 2px 3px var(--base-colour);
+    }
+
     form {
         display: flex;
         flex-direction: column;
@@ -179,12 +184,16 @@ rm-sidebar {
             gap: 10px;
         }
 
-        input:checked + .swatch {
-            border: 2px solid var(--base-colour);
+        input:checked {
+            + .swatch,
+            + .icon-selector {
+                border: 2px solid var(--base-colour);
+            }
         }
     }
 
-    .swatch {
+    .swatch,
+    .icon-selector {
         /* border-radius: 4px; */
         cursor: pointer;
         width: 25px;

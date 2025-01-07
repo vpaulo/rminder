@@ -15,6 +15,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	router := http.NewServeMux()
 	router.Handle("/tasks/", http.StripPrefix("/tasks", s.TasksRoutes()))
+	router.Handle("/lists/", http.StripPrefix("/lists", s.ListsRoutes()))
 
 	// Static files
 	fileServer := http.FileServer(http.FS(web.Files))
