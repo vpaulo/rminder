@@ -273,9 +273,7 @@ header {
     text-align: center;
     line-height: 28px;
 
-    mask: url("/assets/icons/add-icon.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
+    mask: url("/assets/icons/add-icon.svg") no-repeat 50%;
     background-color: var(--base-colour);
 }
 .add-task--label:hover {
@@ -303,31 +301,21 @@ header {
     cursor: pointer;
 }
 .completed-ckeck {
-    mask: url("/assets/icons/icon-square.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
+    mask: url("/assets/icons/icon-square.svg") no-repeat 50%;
 }
 .completed .completed-ckeck {
-    mask: url("/assets/icons/icon-check-square.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
+    mask: url("/assets/icons/icon-check-square.svg") no-repeat 50%;
     background-color: var(--primary);
 }
 .importance-check {
-    mask: url("/assets/icons/icon-star.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
+    mask: url("/assets/icons/icon-star.svg") no-repeat 50%;
 }
 .important .importance-check {
-    mask: url("/assets/icons/icon-star-solid.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
+    mask: url("/assets/icons/icon-star-solid.svg") no-repeat 50%;
     background-color: var(--primary);
 }
 .my-day {
-    mask: url("/assets/icons/today-icon.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
+    mask: url("/assets/icons/today-icon.svg") no-repeat 50%;
 }
 .today .my-day {
     background-color: var(--primary);
@@ -390,94 +378,60 @@ header {
     height: 20px;
 } */
 .today-icon {
-    mask: url("/assets/icons/today-icon.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
-    mask-size: 20px;
+    mask: url("/assets/icons/today-icon.svg") no-repeat 50%;
 }
 .icon-star {
-    mask: url("/assets/icons/icon-star.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
-    mask-size: 20px;
+    mask: url("/assets/icons/icon-star.svg") no-repeat 50%;
 }
 .icon-check-square {
-    mask: url("/assets/icons/icon-check-square.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
-    mask-size: 20px;
+    mask: url("/assets/icons/icon-check-square.svg") no-repeat 50%;
 }
 .icon-tasks {
-    mask: url("/assets/icons/icon-tasks.svg");
-    mask-repeat: no-repeat;
-    mask-position: 50%;
-    mask-size: 20px;
+    mask: url("/assets/icons/icon-tasks.svg") no-repeat 50%;
 }
 
 .bars-progress-icon {
-    background-image: url("/assets/icons/bars-progress-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/bars-progress-icon.svg") no-repeat 50%;
 }
 
 .calendar-icon {
-    background-image: url("/assets/icons/calendar-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/calendar-icon.svg") no-repeat 50%;
 }
 
 .clipboard-icon {
-    background-image: url("/assets/icons/clipboard-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/clipboard-icon.svg") no-repeat 50%;
 }
 
 .clipboard-list-icon {
-    background-image: url("/assets/icons/clipboard-list-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/clipboard-list-icon.svg") no-repeat 50%;
 }
 
 .list-ul-icon {
-    background-image: url("/assets/icons/list-ul-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/list-ul-icon.svg") no-repeat 50%;
 }
 
 .file-icon {
-    background-image: url("/assets/icons/file-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/file-icon.svg") no-repeat 50%;
 }
 
 .folder-icon {
-    background-image: url("/assets/icons/folder-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/folder-icon.svg") no-repeat 50%;
 }
 
 .folder-open-icon {
-    background-image: url("/assets/icons/folder-open-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/folder-open-icon.svg") no-repeat 50%;
 }
 
 .bell-icon {
-    background-image: url("/assets/icons/bell-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/bell-icon.svg") no-repeat 50%;
 }
 
 .bookmark-icon {
-    background-image: url("/assets/icons/bookmark-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/bookmark-icon.svg") no-repeat 50%;
 }
 
 .pen-icon {
-    background-image: url("/assets/icons/pen-icon.svg");
-    background-repeat: no-repeat;
-    background-position: 50%;
+    mask: url("/assets/icons/pen-icon.svg") no-repeat 50%;
 }
 /* .count {
     background-color: var(--primary);

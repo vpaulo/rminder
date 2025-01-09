@@ -41,6 +41,8 @@ type Service interface {
 	Groups() ([]*GroupList, error)
 	Group(ID int) (*GroupList, error)
 	GroupLists(id int) ([]*List, error)
+
+	CreateList(name string, swatch string, icon string) error
 }
 
 type service struct {
@@ -701,4 +703,25 @@ func (s *service) GroupLists(id int) ([]*List, error) {
 	}
 
 	return lists, nil
+}
+
+func (s *service) CreateList(name string, swatch string, icon string) error {
+	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon) Values (?, ?, ?)")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.CreateList - prepare create query failed: %v", err)
+	}
+
+	list := &List{
+		Name:   name,
+		Colour: swatch,
+		Icon:   icon,
+	}
+
+	_, err = query.Exec(list.Name, list.Colour, list.Icon)
+	if err != nil {
+		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
+	}
+
+	return nil
 }

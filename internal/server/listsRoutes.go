@@ -71,29 +71,31 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new task
-	title := r.FormValue("task")
-	if title != "" && len(title) >= 3 && len(title) <= 255 {
-		err := s.db.CreateTask(title)
+	list := r.FormValue("new-list")
+	swatch := r.FormValue("swatch")
+	icon := r.FormValue("icon")
+	if list != "" && len(list) >= 3 && len(list) <= 255 && swatch != "" && icon != "" {
+		err := s.db.CreateList(list, swatch, icon)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Fatalf("error creating task. Err: %v", err)
+			log.Fatalf("error creating list. Err: %v", err)
 		}
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		log.Fatalf("error title validation failed. Err: %v", err)
+		log.Fatalf("error form field validation failed. Err: %v", err)
 	}
 
-	tasks, err := s.db.Tasks()
+	lists, err := s.db.Lists()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatalf("error handling tasks. Err: %v", err)
+		log.Fatalf("error handling lists. Err: %v", err)
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.TaskList(tasks).Render(r.Context(), w)
+	err = web.Lists(lists, false).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatalf("Error rendering in TaskList: %e", err)
+		log.Fatalf("Error rendering in Lists: %e", err)
 	}
 }
 

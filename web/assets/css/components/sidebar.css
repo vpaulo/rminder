@@ -184,20 +184,23 @@ rm-sidebar {
             gap: 10px;
         }
 
-        input:checked {
-            + .swatch,
-            + .icon-selector {
-                border: 2px solid var(--base-colour);
-            }
+        label {
+            border: 2px solid rgba(0, 0, 0, 0);
+        }
+
+        label:has(input:checked) {
+            border: 2px solid var(--base-colour);
         }
     }
 
     .swatch,
     .icon-selector {
-        /* border-radius: 4px; */
         cursor: pointer;
         width: 25px;
         height: 25px;
-        border: 2px solid rgba(0, 0, 0, 0);
+    }
+
+    .icon-selector {
+        background: var(--base-colour);
     }
 }
