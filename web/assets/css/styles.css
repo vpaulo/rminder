@@ -84,6 +84,7 @@
     --base-red: var(--colour-red-300);
     --primary: var(--colour-fresh-blue-500);
     --background: var(--colour-neutral-300);
+    --swatch: var(--colour-neutral-900);
 
     height: 100%;
     overflow: hidden;

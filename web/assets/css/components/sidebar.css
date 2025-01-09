@@ -171,6 +171,7 @@ rm-sidebar {
     }
 
     form {
+        --icon-colour: var(--base-colour);
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -191,6 +192,76 @@ rm-sidebar {
         label:has(input:checked) {
             border: 2px solid var(--base-colour);
         }
+
+        &:has(.swatch-fieldset label:nth-of-type(1) input:checked) {
+            --icon-colour: var(--base-colour);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(2) input:checked) {
+            --icon-colour: var(--colour-fresh-blue-500);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(3) input:checked) {
+            --icon-colour: var(--colour-cyan-100);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(4) input:checked) {
+            --icon-colour: var(--colour-cyan-700);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(5) input:checked) {
+            --icon-colour: var(--colour-sunrise-yellow-500);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(6) input:checked) {
+            --icon-colour: var(--colour-volcano-400);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(7) input:checked) {
+            --icon-colour: var(--colour-red-300);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(8) input:checked) {
+            --icon-colour: var(--colour-dust-red-500);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(9) input:checked) {
+            --icon-colour: var(--colour-lime-700);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(10) input:checked) {
+            --icon-colour: var(--colour-magenta-100);
+        }
+        &:has(.swatch-fieldset label:nth-of-type(11) input:checked) {
+            --icon-colour: var(--colour-indigo-400);
+        }
+    }
+
+    .swatch-fieldset {
+        label:nth-of-type(1) {
+            --swatch: var(--base-colour);
+        }
+        label:nth-of-type(2) {
+            --swatch: var(--colour-fresh-blue-500);
+        }
+        label:nth-of-type(3) {
+            --swatch: var(--colour-cyan-100);
+        }
+        label:nth-of-type(4) {
+            --swatch: var(--colour-cyan-700);
+        }
+        label:nth-of-type(5) {
+            --swatch: var(--colour-sunrise-yellow-500);
+        }
+        label:nth-of-type(6) {
+            --swatch: var(--colour-volcano-400);
+        }
+        label:nth-of-type(7) {
+            --swatch: var(--colour-red-300);
+        }
+        label:nth-of-type(8) {
+            --swatch: var(--colour-dust-red-500);
+        }
+        label:nth-of-type(9) {
+            --swatch: var(--colour-lime-700);
+        }
+        label:nth-of-type(10) {
+            --swatch: var(--colour-magenta-100);
+        }
+        label:nth-of-type(11) {
+            --swatch: var(--colour-indigo-400);
+        }
     }
 
     .swatch,
@@ -200,7 +271,11 @@ rm-sidebar {
         height: 25px;
     }
 
+    .swatch {
+        background: var(--swatch);
+    }
+
     .icon-selector {
-        background: var(--base-colour);
+        background: var(--icon-colour);
     }
 }
