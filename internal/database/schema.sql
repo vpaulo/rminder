@@ -52,18 +52,12 @@ VALUES
     ),
     (
         "Scheduled",
-        "--colour-sunset-orange-600",
+        "--colour-cyan-700",
         "days-icon",
         true,
         2
     ),
-    (
-        "All",
-        "--colour-indigo-400",
-        "icon-tasks",
-        true,
-        3
-    ),
+    ("All", "--base-colour", "icon-tasks", true, 3),
     (
         "Important",
         "--colour-volcano-400",
@@ -78,10 +72,4 @@ VALUES
         true,
         5
     ),
-    (
-        "Inbox",
-        "--colour-fresh-blue-500",
-        "today-icon",
-        false,
-        6
-    );
+    ("Inbox", "--base-colour", "today-icon", false, 6);

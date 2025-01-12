@@ -39,15 +39,15 @@ func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
-	taskID := r.PathValue("taskID")
+	listID := r.PathValue("listID")
 
 	var (
-		task *database.Task
+		list *database.List
 		err  error
 	)
 
-	if taskID != "" {
-		task, err = s.db.Task(taskID)
+	if listID != "" {
+		list, err = s.db.List(listID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling task. Err: %v", err)
@@ -57,10 +57,10 @@ func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.TaskDetails(task).Render(r.Context(), w)
+	err = web.ListsContent(list).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Fatalf("Error rendering in TaskList: %e", err)
+		log.Fatalf("Error rendering in ListsContent: %e", err)
 	}
 }
 

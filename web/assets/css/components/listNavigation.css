@@ -1,0 +1,4 @@
+rm-list-nav {
+    --list-colour: var(--base-colour);
+    display: contents;
+}

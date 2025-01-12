@@ -86,7 +86,7 @@ rm-sidebar {
         background-color: var(--base-grey);
     }
     .list .icon {
-        background-color: var(--base-colour);
+        background-color: var(--list-colour);
         width: 20px;
         height: 20px;
     }

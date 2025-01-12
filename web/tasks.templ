@@ -44,98 +44,30 @@ templ Tasks(lists []*database.List) {
                                 maxlength="255"
                                 hx-validate="true"/>
                             <fieldset class="swatch-fieldset">
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--base-colour" checked/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-fresh-blue-500"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-cyan-700"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-cyan-800"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-sunrise-yellow-1000"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-volcano-400"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-red-300"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-sunset-orange-600"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-lime-700"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-pink-500"/>
-                         			<div class="swatch"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="swatch" class="hidden" value="--colour-indigo-400"/>
-                         			<div class="swatch"></div>
-                          		</label>
+                                for i, colour := range swatchColours() {
+                                    <label>
+                                        if i == 0 {
+                                           <input type="radio" name="swatch" class="hidden" value={ colour } checked/>
+                                        } else {
+                                            <input type="radio" name="swatch" class="hidden" value={ colour }/>
+                                        }
+                             			<div class="swatch"></div>
+                              		</label>
+                                }
                             </fieldset>
                             <fieldset class="icon-fieldset">
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="list-ul-icon" checked/>
-                         			<div class="icon-selector list-ul-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="file-icon"/>
-                         			<div class="icon-selector file-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="bars-progress-icon"/>
-                         			<div class="icon-selector bars-progress-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="calendar-icon"/>
-                         			<div class="icon-selector calendar-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="clipboard-icon"/>
-                         			<div class="icon-selector clipboard-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="clipboard-list-icon"/>
-                         			<div class="icon-selector clipboard-list-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="folder-icon"/>
-                         			<div class="icon-selector folder-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="folder-open-icon"/>
-                         			<div class="icon-selector folder-open-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="bell-icon"/>
-                         			<div class="icon-selector bell-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="bookmark-icon"/>
-                         			<div class="icon-selector bookmark-icon"></div>
-                          		</label>
-                                <label>
-                         			<input type="radio" name="icon" class="hidden" value="pen-icon"/>
-                         			<div class="icon-selector pen-icon"></div>
-                          		</label>
+                                for i, icon := range iconsList() {
+                                    <label>
+                                        if i == 0 {
+                                        <input type="radio" name="icon" class="hidden" value={ icon } checked/>
+                                        } else {
+                                            <input type="radio" name="icon" class="hidden" value={ icon }/>
+                                        }
+                                        <div class={ "icon-selector " + icon }></div>
+                              		</label>
+                                }
                             </fieldset>
-                            <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists))}/>
+                            <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists)) }/>
                             <fieldset>
                                 <div class="btn default cancel-new-list">Cancel</div>
                                 <button class="btn primary add-new-list" type="submit">Add</button>
@@ -150,70 +82,6 @@ templ Tasks(lists []*database.List) {
                     </div>
                 </footer>
             </rm-sidebar>
-            <!--<aside class="sidebar" aria-label="Lists menu">
-                <div class="sidebar__header">
-                    <label>
-                        <span class="menu" aria-label="Toggle sidebar"></span>
-                        <input class="hidden" type="checkbox" value="1" checked/>
-                    </label>
-                </div>
-                <div class="sidebar__content">
-                    <nav aria-label="Lists">
-                        <label
-                            class="list"
-                            data-name="my_day"
-                            aria-label="My day"
-                            hx-get="/tasks/my-day"
-                            hx-trigger="change"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon today-icon"></span>
-                            <span>My day</span>
-                            <span class="count count-my-day">{ strconv.Itoa(total.MyDay) }</span>
-                            <input class="hidden" type="radio" name="list-group" value="1"/>
-                        </label>
-                        <label
-                            class="list"
-                            data-name="important"
-                            aria-label="Important"
-                            hx-get="/tasks/important"
-                            hx-trigger="change"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon icon-star"></span>
-                            <span>Important</span>
-                            <span class="count count-important">{ strconv.Itoa(total.Important) }</span>
-                            <input class="hidden" type="radio" name="list-group" value="2"/>
-                        </label>
-                        <label
-                            class="list"
-                            data-name="completed"
-                            aria-label="Completed"
-                            hx-get="/tasks/completed"
-                            hx-trigger="change"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon icon-check-square"></span>
-                            <span>Completed</span>
-                            <span class="count count-completed">{ strconv.Itoa(total.Completed) }</span>
-                            <input class="hidden" type="radio" name="list-group" value="3"/>
-                        </label>
-                        <label
-                            class="list"
-                            data-name="tasks"
-                            aria-label="Tasks"
-                            hx-get="/tasks/all"
-                            hx-trigger="change"
-                            hx-target=".tasks"
-                        >
-                            <span class="icon icon-tasks"></span>
-                            <span>Tasks</span>
-                            <span class="count count-tasks">{ strconv.Itoa(total.Tasks) }</span>
-                            <input class="hidden" type="radio" name="list-group" value="4" checked/>
-                        </label>
-                    </nav>
-                </div>
-            </aside>-->
             <!-- center column -->
             <div class="main" role="main" data-list="">
                 <div class="list-toolbar">
@@ -254,11 +122,19 @@ templ Lists(lists []*database.List, flag bool) {
   }
 }
 templ List(list *database.List) {
-    <div class="list" data-id={ strconv.Itoa(list.ID) } data-colour={list.Colour}>
-        <span class={"icon " + list.Icon }></span>
-        <span class="name">{ list.Name }</span>
-        <span class="count">{ strconv.Itoa(len(list.Tasks))}</span>
-    </div>
+    <rm-list-nav data-id={ strconv.Itoa(list.ID) } data-colour={ list.Colour }>
+        <label
+            class="list"
+            hx-get={ "/lists/" + strconv.Itoa(list.ID)}
+            hx-trigger="change"
+            hx-target=".main"
+        >
+            <span class={"icon " + list.Icon }></span>
+            <span class="name">{ list.Name }</span>
+            <span class="count">{ strconv.Itoa(len(list.Tasks))}</span>
+            <input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) }/>
+        </label>
+    </rm-list-nav>
 }
 
 templ Modal(id int) {
@@ -362,4 +238,31 @@ templ TaskDetails(task *database.Task) {
         </div>
         @Modal(task.ID)
     </rm-task-details>
+}
+
+templ ListsContent(list *database.List) {
+    <div class="list-toolbar">
+        <span class="list-title">{ list.Name }</span>
+    </div>
+    <div class="container">
+        <form class="add-tasks" hx-post="/tasks/create" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
+            <label class="add-task--label" for="task"></label>
+            <input
+                type="text"
+                name="task"
+                id="task"
+                aria-label="Add a task"
+                placeholder="Add a task"
+                required
+                minlength="3"
+                maxlength="255"
+                hx-validate="true"
+            />
+            <input type="text" name="list" class="hidden" value={ strconv.Itoa(list.ID) }/>
+            <button class="add-task" type="submit">Add</button>
+        </form>
+        <div class="tasks">
+            @TaskList(list.Tasks)
+        </div>
+    </div>
 }

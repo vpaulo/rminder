@@ -35,7 +35,7 @@ type Service interface {
 	DeleteTask(ID string) error
 
 	Lists() ([]*List, error)
-	List(ID int) (*List, error)
+	List(ID string) (*List, error)
 	ListTasks(id int) ([]*Task, error)
 
 	Groups() ([]*GroupList, error)
@@ -559,7 +559,7 @@ func (s *service) ListTasks(id int) ([]*Task, error) {
 	return tasks, nil
 }
 
-func (s *service) List(id int) (*List, error) {
+func (s *service) List(id string) (*List, error) {
 	query, err := s.db.Prepare("SELECT * FROM list WHERE id=?")
 	defer query.Close()
 	if err != nil {

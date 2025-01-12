@@ -351,7 +351,7 @@ header {
 }
 .tasks {
     overflow-y: auto;
-    height: calc(var(--vh) - (2 * var(--size-40) + 60px));
+    /* height: calc(var(--vh) - (2 * var(--size-40) + 60px)); */
 }
 /* .list {
     display: flex;
@@ -436,6 +436,10 @@ header {
 
 .pen-icon {
     mask: url("/assets/icons/pen-icon.svg") no-repeat 50%;
+}
+
+.days-icon {
+    mask: url("/assets/icons/days-icon.svg") no-repeat 50%;
 }
 /* .count {
     background-color: var(--primary);
