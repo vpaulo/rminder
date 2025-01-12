@@ -52,7 +52,7 @@ VALUES
     ),
     (
         "Scheduled",
-        "--colour-dust-red-500",
+        "--colour-sunset-orange-600",
         "days-icon",
         true,
         2
