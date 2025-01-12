@@ -84,29 +84,7 @@ templ Tasks(lists []*database.List) {
             </rm-sidebar>
             <!-- center column -->
             <div class="main" role="main" data-list="">
-                <div class="list-toolbar">
-                    <span class="list-title">Tasks</span>
-                </div>
-                <div class="container">
-                    <form class="add-tasks" hx-post="/tasks/create" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
-                        <label class="add-task--label" for="task"></label>
-                        <input
-                            type="text"
-                            name="task"
-                            id="task"
-                            aria-label="Add a task"
-                            placeholder="Add a task"
-                            required
-                            minlength="3"
-                            maxlength="255"
-                            hx-validate="true"
-                        />
-                        <button class="add-task" type="submit">Add</button>
-                    </form>
-                    <div class="tasks">
-                        <!-- @TaskList(tasks) -->
-                    </div>
-                </div>
+                @ListsContent(lists[0])
             </div>
             <!-- right colunm -->
             <aside class="details"></aside>

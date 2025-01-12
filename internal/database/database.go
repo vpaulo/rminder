@@ -26,7 +26,7 @@ type Service interface {
 	Tasks() ([]*Task, error)
 	ImportantTasks() ([]*Task, error)
 	CompletedTasks() ([]*Task, error)
-	CreateTask(title string) error
+	CreateTask(title string, list int) error
 	ToggleComplete(ID string) error
 	ToggleImportant(ID string) error
 	Task(ID string) (*Task, error)
@@ -338,18 +338,19 @@ func (s *service) CompletedTasks() ([]*Task, error) {
 // 	return total, nil
 // }
 
-func (s *service) CreateTask(title string) error {
-	query, err := s.db.Prepare("INSERT INTO task (title) Values (?)")
+func (s *service) CreateTask(title string, list int) error {
+	query, err := s.db.Prepare("INSERT INTO task (title, list_id) Values (?,?)")
 	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.CreateTask - prepare create query failed: %v", err)
 	}
 
 	task := &Task{
-		Title: title,
+		Title:  title,
+		ListId: list,
 	}
 
-	_, err = query.Exec(task.Title)
+	_, err = query.Exec(task.Title, task.ListId)
 	if err != nil {
 		return fmt.Errorf("DB.CreateTask - create query result failed: %v", err)
 	}

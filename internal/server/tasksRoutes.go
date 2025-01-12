@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"rminder/internal/database"
 	"rminder/web"
+	"strconv"
 	"strings"
 )
 
@@ -107,8 +108,14 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 
 	// create new task
 	title := r.FormValue("task")
-	if title != "" && len(title) >= 3 && len(title) <= 255 {
-		err := s.db.CreateTask(title)
+	list, e := strconv.Atoi(r.FormValue("list"))
+
+	if e != nil {
+		list = 0
+	}
+
+	if title != "" && len(title) >= 3 && len(title) <= 255 && list != 0 {
+		err := s.db.CreateTask(title, list)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error creating task. Err: %v", err)
@@ -118,7 +125,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error title validation failed. Err: %v", err)
 	}
 
-	tasks, err := s.db.Tasks()
+	tasks, err := s.db.ListTasks(list)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("error handling tasks. Err: %v", err)
