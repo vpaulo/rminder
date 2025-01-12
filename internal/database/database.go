@@ -42,7 +42,7 @@ type Service interface {
 	Group(ID int) (*GroupList, error)
 	GroupLists(id int) ([]*List, error)
 
-	CreateList(name string, swatch string, icon string) error
+	CreateList(name string, swatch string, icon string, position int) error
 }
 
 type service struct {
@@ -478,7 +478,7 @@ func (s *service) DeleteTask(id string) error {
 }
 
 func (s *service) Lists() ([]*List, error) {
-	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at DESC")
+	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at ASC")
 	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
@@ -705,20 +705,21 @@ func (s *service) GroupLists(id int) ([]*List, error) {
 	return lists, nil
 }
 
-func (s *service) CreateList(name string, swatch string, icon string) error {
-	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon) Values (?, ?, ?)")
+func (s *service) CreateList(name string, swatch string, icon string, position int) error {
+	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon, position) Values (?, ?, ?, ?)")
 	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - prepare create query failed: %v", err)
 	}
 
 	list := &List{
-		Name:   name,
-		Colour: swatch,
-		Icon:   icon,
+		Name:     name,
+		Colour:   swatch,
+		Icon:     icon,
+		Position: position,
 	}
 
-	_, err = query.Exec(list.Name, list.Colour, list.Icon)
+	_, err = query.Exec(list.Name, list.Colour, list.Icon, list.Position)
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
 	}

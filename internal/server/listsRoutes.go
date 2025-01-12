@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"rminder/internal/database"
 	"rminder/web"
+	"strconv"
 )
 
 func (s *Server) ListsRoutes() *http.ServeMux {
@@ -72,10 +73,17 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 
 	// create new task
 	list := r.FormValue("new-list")
+
+	pos, e := strconv.Atoi(r.FormValue("position"))
+
+	if e != nil {
+		pos = 0
+	}
+
 	swatch := r.FormValue("swatch")
 	icon := r.FormValue("icon")
-	if list != "" && len(list) >= 3 && len(list) <= 255 && swatch != "" && icon != "" {
-		err := s.db.CreateList(list, swatch, icon)
+	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
+		err := s.db.CreateList(list, swatch, icon, pos)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error creating list. Err: %v", err)

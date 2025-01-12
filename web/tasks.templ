@@ -25,12 +25,14 @@ templ Tasks(lists []*database.List) {
                 </div>
                 <!-- Add List -->
                 <footer>
-                    <div class="list-form-container" id="new-list-popover" popover>
+                    <dialog class="list-form-container" id="new-list-popover">
                         <form
                         class=""
                         hx-post={ "/lists/create" }
                         method="POST"
-                        hx-target={ ".lists-holder" }>
+                        hx-trigger="submit, keyup[enterKey]"
+                        hx-target={ ".lists-holder" }
+                        hx-on::after-request="this.reset();this.parentElement.close()">
                             <input
                                 class="new-list"
                                 name="new-list"
@@ -133,21 +135,15 @@ templ Tasks(lists []*database.List) {
                          			<div class="icon-selector pen-icon"></div>
                           		</label>
                             </fieldset>
+                            <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists))}/>
                             <fieldset>
-                                <button
-                                    class="btn default"
-                                    popovertarget="new-list-popover"
-                                    popovertargetaction="hide">Cancel</button>
-                                <button
-                                    class="btn primary"
-                                    type="submit"
-                                    popovertarget="new-list-popover"
-                                    popovertargetaction="hide">Add</button>
+                                <div class="btn default cancel-new-list">Cancel</div>
+                                <button class="btn primary add-new-list" type="submit">Add</button>
                             </fieldset>
                         </form>
-                    </div>
+                    </dialog>
                     <div class="footer-actions">
-                        <button class="add-list" popovertarget="new-list-popover">
+                        <button class="add-list">
                             <span class="add-list--icon"></span>
                             <span>Add list</span>
                         </button>
@@ -258,7 +254,7 @@ templ Lists(lists []*database.List, flag bool) {
   }
 }
 templ List(list *database.List) {
-    <div class="list" data-id={ strconv.Itoa(list.ID) }>
+    <div class="list" data-id={ strconv.Itoa(list.ID) } data-colour={list.Colour}>
         <span class={"icon " + list.Icon }></span>
         <span class="name">{ list.Name }</span>
         <span class="count">{ strconv.Itoa(len(list.Tasks))}</span>

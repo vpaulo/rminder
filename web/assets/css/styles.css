@@ -128,9 +128,12 @@ header {
 }
 
 .btn {
+    color: var(--base-colour);
     border: 0;
     padding: 5px 10px;
     font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
     cursor: pointer;
 
     &:hover {
