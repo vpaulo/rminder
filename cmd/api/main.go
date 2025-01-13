@@ -9,8 +9,8 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"rminder/internal/platform/authenticator"
-	"rminder/internal/platform/router"
+	"rminder/internal/authenticator"
+	"rminder/internal/router"
 )
 
 func main() {

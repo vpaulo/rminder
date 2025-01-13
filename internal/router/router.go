@@ -13,8 +13,8 @@ import (
 	"rminder/internal/app/callback"
 	"rminder/internal/app/login"
 	"rminder/internal/app/logout"
-	"rminder/internal/platform/authenticator"
-	"rminder/internal/platform/middleware"
+	"rminder/internal/authenticator"
+	"rminder/internal/middleware"
 	"rminder/web"
 )
 

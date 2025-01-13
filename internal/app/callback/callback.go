@@ -6,7 +6,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"rminder/internal/platform/authenticator"
+	"rminder/internal/authenticator"
 )
 
 // Handler for our callback.
