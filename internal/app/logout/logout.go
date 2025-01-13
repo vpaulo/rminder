@@ -17,8 +17,9 @@ func Handler(ctx *gin.Context) {
 		return
 	}
 
-	sessions.Default(ctx).Clear()
-	ctx.SetCookie("auth-session", "", -1, "/", "localhost:3000", false, true)
+	session := sessions.Default(ctx)
+	session.Clear()
+	session.Save()
 
 	scheme := "http"
 	if ctx.Request.TLS != nil {
