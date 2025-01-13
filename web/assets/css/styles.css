@@ -441,6 +441,22 @@ header {
 .days-icon {
     mask: url("/assets/icons/days-icon.svg") no-repeat 50%;
 }
+
+.logout-icon {
+    mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
+}
+
+.header-end > a {
+    cursor: pointer;
+    width: var(--size-40);
+    height: var(--size-40);
+    display: block;
+    background-color: var(--base-colour);
+
+    &:hover {
+        background-color: var(--primary);
+    }
+}
 /* .count {
     background-color: var(--primary);
     color: #fff;
