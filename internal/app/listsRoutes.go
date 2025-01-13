@@ -1,4 +1,4 @@
-package server
+package app
 
 import (
 	"encoding/json"
@@ -7,21 +7,13 @@ import (
 	"rminder/internal/database"
 	"rminder/web"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) ListsRoutes() *http.ServeMux {
-	routes := http.NewServeMux()
+func (s *App) GetLists(ctx *gin.Context) {
+	w := ctx.Writer
 
-	routes.HandleFunc("GET /all", s.getTasks)
-	routes.HandleFunc("POST /create", s.createList)
-	routes.HandleFunc("GET /{listID}", s.getList)
-	routes.HandleFunc("DELETE /{listID}", s.deleteList)
-	routes.HandleFunc("PUT /{listID}/{slug}", s.updateList)
-
-	return routes
-}
-
-func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 	lists, err := s.db.Lists()
 
 	if err != nil {
@@ -38,8 +30,11 @@ func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(jsonResp)
 }
 
-func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
-	listID := r.PathValue("listID")
+func (s *App) GetList(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
+	listID := ctx.Param("listID")
 
 	var (
 		list *database.List
@@ -64,7 +59,10 @@ func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
+func (s *App) CreateList(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -107,13 +105,15 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
-	taskID := r.PathValue("taskID")
+func (s *App) DeleteList(ctx *gin.Context) {
+	w := ctx.Writer
+
+	listID := ctx.Param("listID")
 
 	var err error
 
-	if taskID != "" {
-		err = s.db.DeleteTask(taskID)
+	if listID != "" {
+		err = s.db.DeleteTask(listID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error deleting task. Err: %v", err)
@@ -126,8 +126,11 @@ func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte(""))
 }
 
-func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
-	taskID := r.PathValue("taskID")
+func (s *App) UpdateList(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
+	listID := ctx.Param("listID")
 	slug := r.PathValue("slug")
 
 	err := r.ParseForm()
@@ -135,27 +138,27 @@ func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 	}
 
-	if taskID != "" {
+	if listID != "" {
 		var err error
 
 		switch slug {
 		case "title":
 			title := r.FormValue("title")
 			if title != "" && len(title) >= 3 && len(title) <= 255 {
-				err = s.db.UpdateTask(taskID, title)
+				err = s.db.UpdateTask(listID, title)
 			} else {
 				// TODO use ApiError here
 				http.Error(w, "Title validation failed", http.StatusInternalServerError)
 				log.Fatalf("error title validation failed. Err: %v", err)
 			}
 		case "description":
-			err = s.db.UpdateTaskDescription(taskID, r.FormValue("description"))
+			err = s.db.UpdateTaskDescription(listID, r.FormValue("description"))
 		case "important":
-			err = s.db.ToggleImportant(taskID)
+			err = s.db.ToggleImportant(listID)
 		case "completed":
-			err = s.db.ToggleComplete(taskID)
+			err = s.db.ToggleComplete(listID)
 		case "my-day":
-			// err = s.db.ToggleMyDay(taskID)
+			// err = s.db.ToggleMyDay(listID)
 		}
 
 		if err != nil {
@@ -171,7 +174,7 @@ func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Updated description"))
 	} else {
 		// get task
-		task, err := s.db.Task(taskID)
+		task, err := s.db.Task(listID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling task. Err: %v", err)

@@ -1,4 +1,4 @@
-package server
+package app
 
 import (
 	"log"
@@ -7,24 +7,14 @@ import (
 	"rminder/web"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) TasksRoutes() *http.ServeMux {
-	routes := http.NewServeMux()
+func (s *App) GetTasks(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
 
-	routes.HandleFunc("GET /all", s.getTasks)
-	// routes.HandleFunc("GET /my-day", s.getTasks)
-	routes.HandleFunc("GET /important", s.getTasks)
-	routes.HandleFunc("GET /completed", s.getTasks)
-	routes.HandleFunc("POST /create", s.createTask)
-	routes.HandleFunc("GET /{taskID}", s.getTask)
-	routes.HandleFunc("DELETE /{taskID}", s.deleteTask)
-	routes.HandleFunc("PUT /{taskID}/{slug}", s.updateTask)
-
-	return routes
-}
-
-func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 	slug := strings.TrimPrefix(r.URL.Path, "/")
 
 	var (
@@ -73,8 +63,11 @@ func (s *Server) getTasks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
-	taskID := r.PathValue("taskID")
+func (s *App) GetTask(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
+	taskID := ctx.Param("taskID")
 
 	var (
 		task *database.Task
@@ -99,7 +92,10 @@ func (s *Server) getTask(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
+func (s *App) CreateTask(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -139,8 +135,10 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
-	taskID := r.PathValue("taskID")
+func (s *App) DeleteTask(ctx *gin.Context) {
+	w := ctx.Writer
+
+	taskID := ctx.Param("taskID")
 
 	var err error
 
@@ -151,16 +149,19 @@ func (s *Server) deleteTask(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("error deleting task. Err: %v", err)
 		}
 	} else {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "Task ID must not be empty", http.StatusBadRequest)
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, _ = w.Write([]byte(""))
 }
 
-func (s *Server) updateTask(w http.ResponseWriter, r *http.Request) {
-	taskID := r.PathValue("taskID")
-	slug := r.PathValue("slug")
+func (s *App) UpdateTask(ctx *gin.Context) {
+	r := ctx.Request
+	w := ctx.Writer
+
+	taskID := ctx.Param("taskID")
+	slug := ctx.Param("slug")
 
 	err := r.ParseForm()
 	if err != nil {
