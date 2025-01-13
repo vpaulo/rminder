@@ -10,9 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/app"
-	"rminder/internal/app/callback"
-	"rminder/internal/app/login"
-	"rminder/internal/app/logout"
 	"rminder/internal/authenticator"
 	"rminder/internal/middleware"
 	"rminder/web"
@@ -31,9 +28,9 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("auth-session", store))
 
-	router.GET("/login", login.Handler(auth))
-	router.GET("/callback", callback.Handler(auth))
-	router.GET("/logout", logout.Handler)
+	router.GET("/login", authenticator.LoginHandler(auth))
+	router.GET("/callback", authenticator.CallbackHandler(auth))
+	router.GET("/logout", authenticator.LogoutHandler)
 
 	router.GET("/", middleware.IsAuthenticated, app.AppLoadHandler)
 

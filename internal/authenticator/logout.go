@@ -1,4 +1,4 @@
-package logout
+package authenticator
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 )
 
 // Handler for our logout.
-func Handler(ctx *gin.Context) {
+func LogoutHandler(ctx *gin.Context) {
 	logoutUrl, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/v2/logout")
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, err.Error())

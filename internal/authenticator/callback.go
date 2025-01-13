@@ -1,16 +1,14 @@
-package callback
+package authenticator
 
 import (
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-
-	"rminder/internal/authenticator"
 )
 
 // Handler for our callback.
-func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
+func CallbackHandler(auth *Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		if ctx.Query("state") != session.Get("state") {
