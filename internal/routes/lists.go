@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"rminder/internal/database"
@@ -13,13 +14,12 @@ import (
 )
 
 func GetLists(ctx *gin.Context) {
-	w := ctx.Writer
 	db := middleware.GetUserDatabase(ctx)
 
 	lists, err := db.Lists()
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("error handling lists. Err: %v", err)
 	}
 
@@ -29,12 +29,10 @@ func GetLists(ctx *gin.Context) {
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 	}
 
-	_, _ = w.Write(jsonResp)
+	_, _ = ctx.Writer.Write(jsonResp)
 }
 
 func GetList(ctx *gin.Context) {
-	r := ctx.Request
-	w := ctx.Writer
 	db := middleware.GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
@@ -47,18 +45,19 @@ func GetList(ctx *gin.Context) {
 	if listID != "" {
 		list, err = db.List(listID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error handling task. Err: %v", err)
 		}
 
 		id, _ := strconv.Atoi(listID)
 		err = db.UpdatePersistence(0, id, 0)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error updating persistence list. Err: %v", err)
 		}
 	} else {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	persistence, err := db.Persistence()
@@ -66,50 +65,48 @@ func GetList(ctx *gin.Context) {
 		log.Fatalf("error handling GetList Persistence. Err: %v", err)
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.ListsContent(list, persistence).Render(r.Context(), w)
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	err = web.ListsContent(list, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in ListsContent: %e", err)
 	}
 }
 
 func CreateList(ctx *gin.Context) {
-	r := ctx.Request
-	w := ctx.Writer
 	db := middleware.GetUserDatabase(ctx)
 
-	err := r.ParseForm()
+	err := ctx.Request.ParseForm()
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("error parsing form. Err: %v", err)
 	}
 
 	// create new task
-	list := r.FormValue("new-list")
+	list := ctx.Request.FormValue("new-list")
 
-	pos, e := strconv.Atoi(r.FormValue("position"))
+	pos, e := strconv.Atoi(ctx.Request.FormValue("position"))
 
 	if e != nil {
 		pos = 0
 	}
 
-	swatch := r.FormValue("swatch")
-	icon := r.FormValue("icon")
+	swatch := ctx.Request.FormValue("swatch")
+	icon := ctx.Request.FormValue("icon")
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
 		err := db.CreateList(list, swatch, icon, pos)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error creating list. Err: %v", err)
 		}
 	} else {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("error form field validation failed. Err: %v", err)
 	}
 
 	lists, err := db.Lists()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("error handling lists. Err: %v", err)
 	}
 
@@ -118,16 +115,15 @@ func CreateList(ctx *gin.Context) {
 		log.Fatalf("error handling CreateList Persistence. Err: %v", err)
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Lists(lists, false, persistence.ListId).Render(r.Context(), w)
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	err = web.Lists(lists, false, persistence.ListId).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in Lists: %e", err)
 	}
 }
 
 func DeleteList(ctx *gin.Context) {
-	w := ctx.Writer
 	db := middleware.GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
@@ -137,29 +133,27 @@ func DeleteList(ctx *gin.Context) {
 	if listID != "" {
 		err = db.DeleteTask(listID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error deleting task. Err: %v", err)
 		}
 	} else {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write([]byte(""))
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = ctx.Writer.Write([]byte(""))
 }
 
 // TODO: update this to work with lists
 func UpdateList(ctx *gin.Context) {
-	r := ctx.Request
-	w := ctx.Writer
 	db := middleware.GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
-	slug := r.PathValue("slug")
+	slug := ctx.Request.PathValue("slug")
 
-	err := r.ParseForm()
+	err := ctx.Request.ParseForm()
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
 
 	if listID != "" {
@@ -167,16 +161,16 @@ func UpdateList(ctx *gin.Context) {
 
 		switch slug {
 		case "title":
-			title := r.FormValue("title")
+			title := ctx.Request.FormValue("title")
 			if title != "" && len(title) >= 3 && len(title) <= 255 {
 				err = db.UpdateTask(listID, title)
 			} else {
 				// TODO use ApiError here
-				http.Error(w, "Title validation failed", http.StatusInternalServerError)
+				ctx.AbortWithError(http.StatusInternalServerError, errors.New("title validation failed"))
 				log.Fatalf("error title validation failed. Err: %v", err)
 			}
 		case "description":
-			err = db.UpdateTaskDescription(listID, r.FormValue("description"))
+			err = db.UpdateTaskDescription(listID, ctx.Request.FormValue("description"))
 		case "important":
 			err = db.ToggleImportant(listID)
 		case "completed":
@@ -186,11 +180,11 @@ func UpdateList(ctx *gin.Context) {
 		}
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error updating task. Err: %v", err)
 		}
 	} else {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
 
 	persistence, err := db.Persistence()
@@ -200,19 +194,19 @@ func UpdateList(ctx *gin.Context) {
 
 	if slug == "description" {
 		// TODO return proper message
-		_, _ = w.Write([]byte("Updated description"))
+		_, _ = ctx.Writer.Write([]byte("Updated description"))
 	} else {
 		// get task
 		task, err := db.Task(listID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error handling task. Err: %v", err)
 		}
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Task(task, persistence.TaskId).Render(r.Context(), w)
+		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+		err = web.Task(task, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in Task: %e", err)
 		}
 	}
