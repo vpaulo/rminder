@@ -1,20 +1,22 @@
-package app
+package routes
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
 	"rminder/internal/database"
+	"rminder/internal/middleware"
 	"rminder/web"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (s *App) GetLists(ctx *gin.Context) {
+func GetLists(ctx *gin.Context) {
 	w := ctx.Writer
+	db := middleware.GetUserDatabase(ctx)
 
-	lists, err := s.db.Lists()
+	lists, err := db.Lists()
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -30,9 +32,10 @@ func (s *App) GetLists(ctx *gin.Context) {
 	_, _ = w.Write(jsonResp)
 }
 
-func (s *App) GetList(ctx *gin.Context) {
+func GetList(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
+	db := middleware.GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
 
@@ -42,14 +45,14 @@ func (s *App) GetList(ctx *gin.Context) {
 	)
 
 	if listID != "" {
-		list, err = s.db.List(listID)
+		list, err = db.List(listID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling task. Err: %v", err)
 		}
 
 		id, _ := strconv.Atoi(listID)
-		err = s.db.UpdatePersistence(0, id, 0)
+		err = db.UpdatePersistence(0, id, 0)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error updating persistence list. Err: %v", err)
@@ -58,7 +61,7 @@ func (s *App) GetList(ctx *gin.Context) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	persistence, err := s.db.Persistence()
+	persistence, err := db.Persistence()
 	if err != nil {
 		log.Fatalf("error handling GetList Persistence. Err: %v", err)
 	}
@@ -71,9 +74,10 @@ func (s *App) GetList(ctx *gin.Context) {
 	}
 }
 
-func (s *App) CreateList(ctx *gin.Context) {
+func CreateList(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
+	db := middleware.GetUserDatabase(ctx)
 
 	err := r.ParseForm()
 	if err != nil {
@@ -93,7 +97,7 @@ func (s *App) CreateList(ctx *gin.Context) {
 	swatch := r.FormValue("swatch")
 	icon := r.FormValue("icon")
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
-		err := s.db.CreateList(list, swatch, icon, pos)
+		err := db.CreateList(list, swatch, icon, pos)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error creating list. Err: %v", err)
@@ -103,13 +107,13 @@ func (s *App) CreateList(ctx *gin.Context) {
 		log.Fatalf("error form field validation failed. Err: %v", err)
 	}
 
-	lists, err := s.db.Lists()
+	lists, err := db.Lists()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("error handling lists. Err: %v", err)
 	}
 
-	persistence, err := s.db.Persistence()
+	persistence, err := db.Persistence()
 	if err != nil {
 		log.Fatalf("error handling CreateList Persistence. Err: %v", err)
 	}
@@ -122,15 +126,16 @@ func (s *App) CreateList(ctx *gin.Context) {
 	}
 }
 
-func (s *App) DeleteList(ctx *gin.Context) {
+func DeleteList(ctx *gin.Context) {
 	w := ctx.Writer
+	db := middleware.GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
 
 	var err error
 
 	if listID != "" {
-		err = s.db.DeleteTask(listID)
+		err = db.DeleteTask(listID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error deleting task. Err: %v", err)
@@ -144,9 +149,10 @@ func (s *App) DeleteList(ctx *gin.Context) {
 }
 
 // TODO: update this to work with lists
-func (s *App) UpdateList(ctx *gin.Context) {
+func UpdateList(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
+	db := middleware.GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
 	slug := r.PathValue("slug")
@@ -163,20 +169,20 @@ func (s *App) UpdateList(ctx *gin.Context) {
 		case "title":
 			title := r.FormValue("title")
 			if title != "" && len(title) >= 3 && len(title) <= 255 {
-				err = s.db.UpdateTask(listID, title)
+				err = db.UpdateTask(listID, title)
 			} else {
 				// TODO use ApiError here
 				http.Error(w, "Title validation failed", http.StatusInternalServerError)
 				log.Fatalf("error title validation failed. Err: %v", err)
 			}
 		case "description":
-			err = s.db.UpdateTaskDescription(listID, r.FormValue("description"))
+			err = db.UpdateTaskDescription(listID, r.FormValue("description"))
 		case "important":
-			err = s.db.ToggleImportant(listID)
+			err = db.ToggleImportant(listID)
 		case "completed":
-			err = s.db.ToggleComplete(listID)
+			err = db.ToggleComplete(listID)
 		case "my-day":
-			// err = s.db.ToggleMyDay(listID)
+			// err = db.ToggleMyDay(listID)
 		}
 
 		if err != nil {
@@ -187,7 +193,7 @@ func (s *App) UpdateList(ctx *gin.Context) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	persistence, err := s.db.Persistence()
+	persistence, err := db.Persistence()
 	if err != nil {
 		log.Fatalf("error handling UpdateList Persistence. Err: %v", err)
 	}
@@ -197,7 +203,7 @@ func (s *App) UpdateList(ctx *gin.Context) {
 		_, _ = w.Write([]byte("Updated description"))
 	} else {
 		// get task
-		task, err := s.db.Task(listID)
+		task, err := db.Task(listID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling task. Err: %v", err)

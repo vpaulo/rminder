@@ -1,4 +1,4 @@
-package authenticator
+package routes
 
 import (
 	"crypto/sha1"
@@ -8,6 +8,9 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+
+	"rminder/internal/authenticator"
+	"rminder/internal/user"
 )
 
 func userIdFromProfile(profile map[string]interface{}) (string, error) {
@@ -22,7 +25,7 @@ func userIdFromProfile(profile map[string]interface{}) (string, error) {
 }
 
 // Handler for our callback.
-func CallbackHandler(auth *Authenticator) gin.HandlerFunc {
+func CallbackHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		if ctx.Query("state") != session.Get("state") {
@@ -54,7 +57,7 @@ func CallbackHandler(auth *Authenticator) gin.HandlerFunc {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
-		session.Set("user_id", user_id)
+		user.SetUserId(session, user_id)
 
 		session.Set("access_token", token.AccessToken)
 		session.Set("profile", profile)
