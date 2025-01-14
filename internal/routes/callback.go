@@ -1,14 +1,31 @@
-package authenticator
+package routes
 
 import (
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+
+	"rminder/internal/authenticator"
+	"rminder/internal/user"
 )
 
+func userIdFromProfile(profile map[string]interface{}) (string, error) {
+	sub := fmt.Sprintf("%v", profile["sub"])
+	hasher := sha1.New()
+	_, err := hasher.Write([]byte(sub))
+	if err != nil {
+		return "", err
+	}
+	user_id := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	return user_id, nil
+}
+
 // Handler for our callback.
-func CallbackHandler(auth *Authenticator) gin.HandlerFunc {
+func CallbackHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		if ctx.Query("state") != session.Get("state") {
@@ -35,8 +52,16 @@ func CallbackHandler(auth *Authenticator) gin.HandlerFunc {
 			return
 		}
 
+		user_id, err := userIdFromProfile(profile)
+		if err != nil {
+			ctx.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+		user.SetUserId(session, user_id)
+
 		session.Set("access_token", token.AccessToken)
 		session.Set("profile", profile)
+
 		if err := session.Save(); err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return

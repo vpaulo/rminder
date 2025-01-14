@@ -1,12 +1,7 @@
 package app
 
 import (
-	"log"
-	"net/http"
 	"rminder/internal/database"
-	"rminder/web"
-
-	"github.com/gin-gonic/gin"
 )
 
 type App struct {
@@ -19,25 +14,7 @@ func New() *App {
 	}
 }
 
-func (s *App) AppLoadHandler(ctx *gin.Context) {
-	r := ctx.Request
-	w := ctx.Writer
-
-	lists, err := s.db.Lists()
-	if err != nil {
-		log.Fatalf("error handling appLoadHandler. Err: %v", err)
-	}
-
-	persistence, err := s.db.Persistence()
-	if err != nil {
-		log.Fatalf("error handling appLoadHandler Persistence. Err: %v", err)
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	err = web.Tasks(lists, persistence).Render(r.Context(), w)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		log.Fatalf("Error rendering in appLoadHandler: %e", err)
-	}
+func (s *App) GetDatabaseForUser(user_id string) (database.Service, error) {
+	// TODO: implement user database cache
+	return s.db, nil
 }

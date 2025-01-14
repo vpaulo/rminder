@@ -1,4 +1,4 @@
-package authenticator
+package routes
 
 import (
 	"crypto/rand"
@@ -7,10 +7,12 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+
+	"rminder/internal/authenticator"
 )
 
 // Handler for our login.
-func LoginHandler(auth *Authenticator) gin.HandlerFunc {
+func LoginHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		state, err := generateRandomState()
 		if err != nil {
