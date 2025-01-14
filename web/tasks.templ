@@ -3,6 +3,7 @@ package web
 import (
     "rminder/internal/database"
     "strconv"
+    "strings"
 )
 
 templ Tasks(lists []*database.List) {
@@ -157,13 +158,7 @@ templ Task(task *database.Task) {
       <span>{ task.Title }</span>
       <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
     </label>
-    <!--<span
-      class="my-day"
-      title="Set it as todo for today"
-      hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/my-day" }
-      hx-trigger="click"
-      hx-swap="outerHTML"
-      hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }></span>-->
+    <span>{ strings.Repeat("!", task.Priority) }</span>
     <span
       class="importance-check"
       title="Set it as important"
@@ -194,6 +189,23 @@ templ TaskDetails(task *database.Task) {
                         hx-validate="true"/>
                     <button class="rename" type="submit">Rename</button>
                 </form>
+            </div>
+            <div class="details__priority">
+                <label for="priority">Priority</label>
+                <select
+                    name="priority"
+                    hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/priority" }
+                    hx-trigger="change"
+                    hx-swap="outerHTML"
+                   	hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
+                    for i, value := range priorityValues() {
+                        if i == task.Priority {
+                            <option value={ strconv.Itoa(i) } selected>{ value }</option>
+                        } else {
+                            <option value={ strconv.Itoa(i) }>{ value }</option>
+                        }
+                    }
+                </select>
             </div>
             <div class="detail__note">
                 <form

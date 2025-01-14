@@ -71,3 +71,15 @@ func iconsList() []string {
 
 	return icons
 }
+
+func priorityValues() []string {
+	// None=0, Low=1, Medium=2, High=3
+	values := []string{
+		"None",
+		"Low",
+		"Medium",
+		"High",
+	}
+
+	return values
+}

@@ -33,6 +33,7 @@ type Service interface {
 	UpdateTask(ID string, title string) error
 	UpdateTaskDescription(ID string, description string) error
 	DeleteTask(ID string) error
+	UpdateTaskPriority(ID string, priority string) error
 
 	Lists() ([]*List, error)
 	List(ID string) (*List, error)
@@ -458,6 +459,21 @@ func (s *service) UpdateTaskDescription(id string, description string) error {
 	_, err = query.Exec(description, id)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskDescription - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdateTaskPriority(id string, priority string) error {
+	query, err := s.db.Prepare("UPDATE task SET priority = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskPriority - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(priority, id)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskPriority - update query result failed: %v", err)
 	}
 
 	return nil

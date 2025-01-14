@@ -187,8 +187,8 @@ func (s *App) UpdateTask(ctx *gin.Context) {
 			err = s.db.ToggleImportant(taskID)
 		case "completed":
 			err = s.db.ToggleComplete(taskID)
-		case "my-day":
-			// err = s.db.ToggleMyDay(taskID)
+		case "priority":
+			err = s.db.UpdateTaskPriority(taskID, r.FormValue("priority"))
 		}
 
 		if err != nil {
