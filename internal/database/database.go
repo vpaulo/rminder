@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
@@ -53,29 +52,21 @@ type Service interface {
 }
 
 type service struct {
-	db *sql.DB
+	database_path string
+	db            *sql.DB
 }
 
-var (
-	dburl      = os.Getenv("DB_URL")
-	dbInstance *service
-)
-
-func New() Service {
-	// Reuse Connection
-	if dbInstance != nil {
-		return dbInstance
-	}
-
-	db, err := sql.Open("sqlite", dburl)
+func New(database_path string) Service {
+	db, err := sql.Open("sqlite", database_path)
 	if err != nil {
 		// This will not be a connection error, but a DSN parse error or
 		// another initialization error.
 		log.Fatal(err)
 	}
 
-	dbInstance = &service{
-		db: db,
+	dbInstance := &service{
+		database_path: database_path,
+		db:            db,
 	}
 
 	err = dbInstance.loadSqlFile()
@@ -165,17 +156,17 @@ func (s *service) Health() map[string]string {
 // If the connection is successfully closed, it returns nil.
 // If an error occurs while closing the connection, it returns the error.
 func (s *service) Close() error {
-	log.Printf("Disconnected from database: %s", dburl)
+	log.Printf("Disconnected from database: %s", s.database_path)
 	return s.db.Close()
 }
 
 func (s *service) Tasks() ([]*Task, error) {
 	// TODO: maybe change the default for order by created_at
 	query, err := s.db.Prepare("SELECT * FROM task ORDER BY updated_at DESC")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Tasks - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -245,10 +236,10 @@ func (s *service) Tasks() ([]*Task, error) {
 
 func (s *service) ImportantTasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY updated_at DESC")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.ImportantTasks - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -284,10 +275,10 @@ func (s *service) ImportantTasks() ([]*Task, error) {
 
 func (s *service) CompletedTasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY updated_at DESC")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.CompletedTasks - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -347,10 +338,10 @@ func (s *service) CompletedTasks() ([]*Task, error) {
 
 func (s *service) CreateTask(title string, list int) error {
 	query, err := s.db.Prepare("INSERT INTO task (title, list_id) Values (?,?)")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.CreateTask - prepare create query failed: %v", err)
 	}
+	defer query.Close()
 
 	task := &Task{
 		Title:  title,
@@ -367,10 +358,10 @@ func (s *service) CreateTask(title string, list int) error {
 
 func (s *service) ToggleComplete(id string) error {
 	query, err := s.db.Prepare("UPDATE task SET completed = NOT completed, updated_at = CURRENT_TIMESTAMP WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.ToggleComplete - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(id)
 	if err != nil {
@@ -382,10 +373,10 @@ func (s *service) ToggleComplete(id string) error {
 
 func (s *service) ToggleImportant(id string) error {
 	query, err := s.db.Prepare("UPDATE task SET important = NOT important, updated_at = CURRENT_TIMESTAMP WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.ToggleImportant - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(id)
 	if err != nil {
@@ -412,10 +403,10 @@ func (s *service) ToggleImportant(id string) error {
 
 func (s *service) Task(id string) (*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Task - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	task := new(Task)
 	err = query.QueryRow(id).Scan(
@@ -442,10 +433,10 @@ func (s *service) Task(id string) (*Task, error) {
 
 func (s *service) UpdateTask(id string, title string) error {
 	query, err := s.db.Prepare("UPDATE task SET title = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTask - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(title, id)
 	if err != nil {
@@ -457,10 +448,10 @@ func (s *service) UpdateTask(id string, title string) error {
 
 func (s *service) UpdateTaskDescription(id string, description string) error {
 	query, err := s.db.Prepare("UPDATE task SET description = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskDescription - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(description, id)
 	if err != nil {
@@ -472,10 +463,10 @@ func (s *service) UpdateTaskDescription(id string, description string) error {
 
 func (s *service) UpdateTaskPriority(id string, priority string) error {
 	query, err := s.db.Prepare("UPDATE task SET priority = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskPriority - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(priority, id)
 	if err != nil {
@@ -487,10 +478,10 @@ func (s *service) UpdateTaskPriority(id string, priority string) error {
 
 func (s *service) DeleteTask(id string) error {
 	query, err := s.db.Prepare("DELETE FROM task WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.DeleteTask - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(id)
 	if err != nil {
@@ -502,10 +493,10 @@ func (s *service) DeleteTask(id string) error {
 
 func (s *service) Lists() ([]*List, error) {
 	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at ASC")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -545,10 +536,10 @@ func (s *service) Lists() ([]*List, error) {
 
 func (s *service) ListTasks(id int) ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE list_id=?")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.ListTasks - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query(id)
 	if err != nil {
@@ -584,10 +575,10 @@ func (s *service) ListTasks(id int) ([]*Task, error) {
 
 func (s *service) List(id string) (*List, error) {
 	query, err := s.db.Prepare("SELECT * FROM list WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.List - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	var tasks []*Task
 
@@ -619,10 +610,10 @@ func (s *service) List(id string) (*List, error) {
 
 func (s *service) Groups() ([]*GroupList, error) {
 	query, err := s.db.Prepare("SELECT * FROM group_list ORDER BY created_at DESC")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -657,10 +648,10 @@ func (s *service) Groups() ([]*GroupList, error) {
 
 func (s *service) Group(id int) (*GroupList, error) {
 	query, err := s.db.Prepare("SELECT * FROM group_list WHERE id=?")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Group - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	var lists []*List
 
@@ -687,10 +678,10 @@ func (s *service) Group(id int) (*GroupList, error) {
 
 func (s *service) GroupLists(id int) ([]*List, error) {
 	query, err := s.db.Prepare("SELECT * FROM list WHERE group_id=?")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.GroupLists - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
@@ -730,10 +721,10 @@ func (s *service) GroupLists(id int) ([]*List, error) {
 
 func (s *service) CreateList(name string, swatch string, icon string, position int) error {
 	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon, position) Values (?, ?, ?, ?)")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - prepare create query failed: %v", err)
 	}
+	defer query.Close()
 
 	list := &List{
 		Name:     name,
