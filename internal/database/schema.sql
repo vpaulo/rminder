@@ -39,6 +39,13 @@ CREATE TABLE IF NOT EXISTS task (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS persistence (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    task_id INTEGER DEFAULT 0,
+    list_id INTEGER DEFAULT 1,
+    group_id INTEGER DEFAULT 0
+);
+
 -- Initialise default lists
 INSERT INTO
     list (name, colour, icon, pinned, position)
@@ -73,3 +80,8 @@ VALUES
         5
     ),
     ("Inbox", "--base-colour", "today-icon", false, 6);
+
+INSERT INTO
+    persistence (list_id)
+VALUES
+    (1);

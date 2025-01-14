@@ -6,7 +6,7 @@ import (
     "strings"
 )
 
-templ Tasks(lists []*database.List) {
+templ Tasks(lists []*database.List, persistence *database.Persistence) {
 	@Base() {
 	    <rm-tasks-app>
 			<!-- left colunm -->
@@ -15,13 +15,13 @@ templ Tasks(lists []*database.List) {
                 <!-- Search -->
                 <!-- Pinned Lists -->
                 <div class="pinned-lists">
-                    @Lists(lists, true)
+                    @Lists(lists, true, persistence.ListId)
                 </div>
                 <!-- Groups/Lists -->
                 <div class="lists">
                     <p class="lists-label">My lists</p>
                     <div class="lists-holder">
-                        @Lists(lists, false)
+                        @Lists(lists, false, persistence.ListId)
                     </div>
                 </div>
                 <!-- Add List -->
@@ -85,22 +85,36 @@ templ Tasks(lists []*database.List) {
             </rm-sidebar>
             <!-- center column -->
             <div class="main" role="main" data-list="">
-                @ListsContent(lists[0])
+	            for _, list := range lists {
+	                if list.ID == persistence.ListId {
+                  		@ListsContent(list, persistence)
+	                }
+	            }
             </div>
             <!-- right colunm -->
-            <aside class="details"></aside>
+            <aside class="details">
+            	for _, list := range lists {
+	                if list.ID == persistence.ListId {
+                 		for _, task := range list.Tasks {
+                   			if task.ID == persistence.TaskId {
+                      			@TaskDetails(task)
+                      		}
+                   		}
+	                }
+	            }
+            </aside>
 		</rm-tasks-app>
 	}
 }
 
-templ Lists(lists []*database.List, flag bool) {
+templ Lists(lists []*database.List, flag bool, selectedList int) {
   for _, list := range lists {
       if list.Pinned == flag {
-          @List(list)
+          @List(list, selectedList)
       }
   }
 }
-templ List(list *database.List) {
+templ List(list *database.List, selectedList int) {
     <rm-list-nav data-id={ strconv.Itoa(list.ID) } data-colour={ list.Colour }>
         <label
             class="list"
@@ -110,8 +124,12 @@ templ List(list *database.List) {
         >
             <span class={"icon " + list.Icon }></span>
             <span class="name">{ list.Name }</span>
-            <span class="count">{ strconv.Itoa(len(list.Tasks))}</span>
-            <input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) }/>
+            <span class="count">{ strconv.Itoa(len(list.Tasks)) }</span>
+            if selectedList == list.ID {
+            	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) } checked/>
+            } else {
+            	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) }/>
+            }
         </label>
     </rm-list-nav>
 }
@@ -132,15 +150,15 @@ templ Modal(id int) {
     </dialog>
 }
 
-templ TaskList(tasks []*database.Task) {
+templ TaskList(tasks []*database.Task, selectedtask int) {
   <ul class="tasks__list">
   for _, task := range tasks {
-    @Task(task)
+    @Task(task, selectedtask)
   }
   </ul>
 }
 
-templ Task(task *database.Task) {
+templ Task(task *database.Task, selectedtask int) {
   <li class={ taskClasses(task.Completed, task.Important, false) } data-id={ strconv.Itoa(task.ID) }>
     <span
       class="completed-ckeck"
@@ -156,7 +174,11 @@ templ Task(task *database.Task) {
       hx-target=".details"
     >
       <span>{ task.Title }</span>
-      <input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
+      if selectedtask == task.ID {
+      	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) } checked/>
+      } else {
+     	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
+      }
     </label>
     <span>{ strings.Repeat("!", task.Priority) }</span>
     <span
@@ -218,7 +240,10 @@ templ TaskDetails(task *database.Task) {
             </div>
         </div>
         <div class="details__footer">
-            <button class="close">
+            <button
+            	class="close"
+            	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/remove-persistence" }
+            	hx-swap="none">
                 <i class="close-icon"></i>
             </button>
             <span class="creation-date" title="Creation date">{ formatDate(task.CreatedAt) }</span>
@@ -230,7 +255,7 @@ templ TaskDetails(task *database.Task) {
     </rm-task-details>
 }
 
-templ ListsContent(list *database.List) {
+templ ListsContent(list *database.List, persistence *database.Persistence) {
     <div class="list-toolbar">
         <span class="list-title">{ list.Name }</span>
     </div>
@@ -252,7 +277,7 @@ templ ListsContent(list *database.List) {
             <button class="add-task" type="submit">Add</button>
         </form>
         <div class="tasks">
-            @TaskList(list.Tasks)
+            @TaskList(list.Tasks, persistence.TaskId)
         </div>
     </div>
 }

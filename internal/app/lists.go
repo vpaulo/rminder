@@ -47,12 +47,24 @@ func (s *App) GetList(ctx *gin.Context) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling task. Err: %v", err)
 		}
+
+		id, _ := strconv.Atoi(listID)
+		err = s.db.UpdatePersistence(0, id, 0)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Fatalf("error updating persistence list. Err: %v", err)
+		}
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling GetList Persistence. Err: %v", err)
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.ListsContent(list).Render(r.Context(), w)
+	err = web.ListsContent(list, persistence).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("Error rendering in ListsContent: %e", err)
@@ -97,8 +109,13 @@ func (s *App) CreateList(ctx *gin.Context) {
 		log.Fatalf("error handling lists. Err: %v", err)
 	}
 
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling CreateList Persistence. Err: %v", err)
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Lists(lists, false).Render(r.Context(), w)
+	err = web.Lists(lists, false, persistence.ListId).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("Error rendering in Lists: %e", err)
@@ -126,6 +143,7 @@ func (s *App) DeleteList(ctx *gin.Context) {
 	_, _ = w.Write([]byte(""))
 }
 
+// TODO: update this to work with lists
 func (s *App) UpdateList(ctx *gin.Context) {
 	r := ctx.Request
 	w := ctx.Writer
@@ -169,6 +187,11 @@ func (s *App) UpdateList(ctx *gin.Context) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling UpdateList Persistence. Err: %v", err)
+	}
+
 	if slug == "description" {
 		// TODO return proper message
 		_, _ = w.Write([]byte("Updated description"))
@@ -181,7 +204,7 @@ func (s *App) UpdateList(ctx *gin.Context) {
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Task(task).Render(r.Context(), w)
+		err = web.Task(task, persistence.TaskId).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in Task: %e", err)

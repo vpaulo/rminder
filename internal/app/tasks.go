@@ -24,8 +24,6 @@ func (s *App) GetTasks(ctx *gin.Context) {
 	)
 
 	switch slug {
-	case "my-day":
-		// tasks, err = s.db.MyDayTasks()
 	case "important":
 		tasks, err = s.db.ImportantTasks()
 	case "completed":
@@ -39,23 +37,21 @@ func (s *App) GetTasks(ctx *gin.Context) {
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
-	if slug == "" {
-		// TODO: find better way to update totals of tasks lists
-		// totals, err := s.db.Totals()
-		// if err != nil {
-		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 	log.Fatalf("error handling totals. Err: %v", err)
-		// }
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling GetTasks Persistence. Err: %v", err)
+	}
 
+	if slug == "" {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(lists).Render(r.Context(), w)
+		err = web.Tasks(lists, persistence).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in tasksHandler: %e", err)
 		}
 	} else {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.TaskList(tasks).Render(r.Context(), w)
+		err = web.TaskList(tasks, persistence.TaskId).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in TaskList: %e", err)
@@ -79,6 +75,13 @@ func (s *App) GetTask(ctx *gin.Context) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("error handling task. Err: %v", err)
+		}
+
+		id, _ := strconv.Atoi(taskID)
+		err = s.db.UpdatePersistenceTask(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Fatalf("error updating persistence task. Err: %v", err)
 		}
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -127,8 +130,13 @@ func (s *App) CreateTask(ctx *gin.Context) {
 		log.Fatalf("error handling tasks. Err: %v", err)
 	}
 
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling CreateTask Persistence. Err: %v", err)
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.TaskList(tasks).Render(r.Context(), w)
+	err = web.TaskList(tasks, persistence.TaskId).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Fatalf("Error rendering in TaskList: %e", err)
@@ -189,6 +197,8 @@ func (s *App) UpdateTask(ctx *gin.Context) {
 			err = s.db.ToggleComplete(taskID)
 		case "priority":
 			err = s.db.UpdateTaskPriority(taskID, r.FormValue("priority"))
+		case "remove-persistence":
+			err = s.db.UpdatePersistenceTask(0)
 		}
 
 		if err != nil {
@@ -197,6 +207,11 @@ func (s *App) UpdateTask(ctx *gin.Context) {
 		}
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling UpdateTask Persistence. Err: %v", err)
 	}
 
 	if slug == "description" {
@@ -211,7 +226,7 @@ func (s *App) UpdateTask(ctx *gin.Context) {
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Task(task).Render(r.Context(), w)
+		err = web.Task(task, persistence.TaskId).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Fatalf("Error rendering in Task: %e", err)

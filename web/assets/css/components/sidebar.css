@@ -58,10 +58,6 @@ rm-sidebar {
         overflow: auto;
     }
 
-    /* .list:has(input:checked) > .icon {
-        background-color: var(--primary);
-    } */
-
     .list {
         display: flex;
         align-items: center;
@@ -70,6 +66,15 @@ rm-sidebar {
         border-bottom: 2px solid var(--background);
         cursor: pointer;
         gap: var(--gap-10);
+
+        &:has(input:checked) {
+            background-color: var(--list-colour);
+            color: var(--colour-neutral-100);
+
+            > .icon {
+                --list-colour: var(--colour-neutral-100);
+            }
+        }
 
         .name {
             flex: 1 1 auto;

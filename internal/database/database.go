@@ -44,6 +44,12 @@ type Service interface {
 	GroupLists(id int) ([]*List, error)
 
 	CreateList(name string, swatch string, icon string, position int) error
+
+	Persistence() (*Persistence, error)
+	UpdatePersistence(task int, list int, group int) error
+	UpdatePersistenceTask(task int) error
+	UpdatePersistenceList(list int) error
+	UpdatePersistenceGroup(group int) error
 }
 
 type service struct {
@@ -739,6 +745,87 @@ func (s *service) CreateList(name string, swatch string, icon string, position i
 	_, err = query.Exec(list.Name, list.Colour, list.Icon, list.Position)
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) Persistence() (*Persistence, error) {
+	query, err := s.db.Prepare("SELECT * FROM persistence WHERE id=1")
+	defer query.Close()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Persistence - prepare query failed: %v", err)
+	}
+
+	data := new(Persistence)
+	err = query.QueryRow().Scan(
+		&data.ID,
+		&data.TaskId,
+		&data.ListId,
+		&data.GroupId)
+
+	if err != nil {
+		return nil, fmt.Errorf("DB.Persistence - query result failed: %v", err)
+	}
+
+	return data, nil
+}
+
+func (s *service) UpdatePersistence(task int, list int, group int) error {
+	query, err := s.db.Prepare("UPDATE persistence SET task_id = ?, list_id = ?, group_id = ? WHERE id=1")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistence - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(task, list, group)
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistence - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdatePersistenceTask(task int) error {
+	query, err := s.db.Prepare("UPDATE persistence SET task_id = ? WHERE id=1")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistenceTask - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(task)
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistenceTask - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdatePersistenceList(list int) error {
+	query, err := s.db.Prepare("UPDATE persistence SET list_id = ? WHERE id=1")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistenceList - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(list)
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistenceList - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdatePersistenceGroup(group int) error {
+	query, err := s.db.Prepare("UPDATE persistence SET group_id = ? WHERE id=1")
+	defer query.Close()
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistenceGroup - prepare update query failed: %v", err)
+	}
+
+	_, err = query.Exec(group)
+	if err != nil {
+		return fmt.Errorf("DB.UpdatePersistenceGroup - update query result failed: %v", err)
 	}
 
 	return nil

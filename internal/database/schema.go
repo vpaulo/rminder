@@ -49,3 +49,10 @@ type Total struct {
 	Completed int `json:"total_completed"`
 	Important int `json:"total_important"`
 }
+
+type Persistence struct {
+	ID      int `json:"id"`
+	TaskId  int `json:"task_id"`
+	ListId  int `json:"list_id"`
+	GroupId int `json:"group_id"`
+}

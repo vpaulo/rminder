@@ -28,9 +28,14 @@ func (s *App) AppLoadHandler(ctx *gin.Context) {
 		log.Fatalf("error handling appLoadHandler. Err: %v", err)
 	}
 
+	persistence, err := s.db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling appLoadHandler Persistence. Err: %v", err)
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Tasks(lists).Render(r.Context(), w)
+	err = web.Tasks(lists, persistence).Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Fatalf("Error rendering in appLoadHandler: %e", err)
