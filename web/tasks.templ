@@ -14,15 +14,8 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
                 <!-- Sidebar toggle -->
                 <!-- Search -->
                 <!-- Pinned Lists -->
-                <div class="pinned-lists">
-                    @Lists(lists, true, persistence.ListId)
-                </div>
-                <!-- Groups/Lists -->
-                <div class="lists">
-                    <p class="lists-label">My lists</p>
-                    <div class="lists-holder">
-                        @Lists(lists, false, persistence.ListId)
-                    </div>
+                <div class="lists__container">
+                	@ListsContainer(lists, persistence)
                 </div>
                 <!-- Add List -->
                 <footer>
@@ -105,6 +98,20 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
             </aside>
 		</rm-tasks-app>
 	}
+}
+
+templ ListsContainer(lists []*database.List, persistence *database.Persistence) {
+	<!-- Pinned Lists -->
+	<div class="pinned-lists">
+     	@Lists(lists, true, persistence.ListId)
+	</div>
+	<!-- Groups/Lists -->
+	<div class="lists">
+	    <p class="lists-label">My lists</p>
+	    <div class="lists-holder">
+	        @Lists(lists, false, persistence.ListId)
+	    </div>
+	</div>
 }
 
 templ Lists(lists []*database.List, flag bool, selectedList int) {
@@ -259,8 +266,17 @@ templ ListsContent(list *database.List, persistence *database.Persistence) {
     <div class="list-toolbar">
         <span class="list-title">{ list.Name }</span>
     </div>
-    <div class="container">
-        <form class="add-tasks" hx-post="/tasks/create" method="POST" hx-target=".tasks" hx-on::after-request="this.reset()">
+    <div
+    	class="container"
+    	hx-get="/lists/all"
+     	hx-target=".lists__container"
+     	hx-trigger="submit delay:20ms">
+        <form
+        	class="add-tasks"
+         	hx-post="/tasks/create"
+          	method="POST"
+           	hx-target=".tasks"
+            hx-on::after-request="this.reset()">
             <label class="add-task--label" for="task"></label>
             <input
                 type="text"

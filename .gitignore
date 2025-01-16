@@ -33,3 +33,6 @@ main
 *.db
 *.db-shm
 *.db-wal
+
+# Database folder
+rm_data/

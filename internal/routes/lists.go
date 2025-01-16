@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -17,19 +16,22 @@ func GetLists(ctx *gin.Context) {
 	db := middleware.GetUserDatabase(ctx)
 
 	lists, err := db.Lists()
-
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("error handling lists. Err: %v", err)
+		log.Fatalf("error handling GetLists. Err: %v", err)
 	}
 
-	jsonResp, err := json.Marshal(lists)
-
+	persistence, err := db.Persistence()
 	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
+		log.Fatalf("error handling GetLists Persistence. Err: %v", err)
 	}
 
-	_, _ = ctx.Writer.Write(jsonResp)
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	err = web.ListsContainer(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in GetLists: %e", err)
+	}
 }
 
 func GetList(ctx *gin.Context) {

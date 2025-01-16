@@ -36,6 +36,12 @@ rm-sidebar {
         display: inline-flex;
     }
 
+    .lists__container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     .pinned-lists {
         display: flex;
         flex-wrap: wrap;
