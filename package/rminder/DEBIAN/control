@@ -1,0 +1,8 @@
+Package: rminder
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Vitor Rodrigues <vitorpaulorodrigues@gmail.com>
+Description: Task manager
+

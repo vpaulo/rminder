@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+USER=rminder
+if ! id -u ${USER} > /dev/null 2>&1; then 
+    echo "User ${USER} does not exist."
+    exit 1
+fi
+
+# Create directory
+mkdir -p /var/lib/rminder
+chown $USER:nogroup /var/lib/rminder
+
+echo "Directory /var/lib/rminder created and permissions set."
