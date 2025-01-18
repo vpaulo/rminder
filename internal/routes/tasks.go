@@ -198,6 +198,10 @@ func UpdateTask(ctx *gin.Context) {
 			err = db.ToggleComplete(taskID)
 		case "priority":
 			err = db.UpdateTaskPriority(taskID, ctx.Request.FormValue("priority"))
+		case "date-start":
+			err = db.UpdateTaskStartDate(taskID, ctx.Request.FormValue("from"))
+		case "date-end":
+			err = db.UpdateTaskEndDate(taskID, ctx.Request.FormValue("to"))
 		case "remove-persistence":
 			err = db.UpdatePersistenceTask(0)
 		}
