@@ -25,7 +25,7 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
                         hx-post={ "/lists/create" }
                         method="POST"
                         hx-trigger="submit, keyup[enterKey]"
-                        hx-target={ ".lists-holder" }
+                        hx-target={ ".lists__container" }
                         hx-on::after-request="this.reset();this.parentElement.close()">
                             <input
                                 class="new-list"
@@ -37,6 +37,11 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
                                 minlength="3"
                                 maxlength="255"
                                 hx-validate="true"/>
+                            <label class="checkbox__container">
+                            	<span>Pin</span>
+                            	<input class="hidden" name="pin" type="checkbox" value="1"/>
+                             	<span class="checkmark"></span>
+                            </label>
                             <fieldset class="swatch-fieldset">
                                 for i, colour := range swatchColours() {
                                     <label>
@@ -237,7 +242,7 @@ templ TaskDetails(task *database.Task) {
                 </select>
             </div>
             <div class="details__schedule">
-            	<label for="from">
+            	<label>
              		<span>Start Date</span>
              		<input
                			name="from"
@@ -247,7 +252,7 @@ templ TaskDetails(task *database.Task) {
                        	hx-trigger="change"
                         hx-swap="none">
              	</label>
-             	<label for="to">
+             	<label>
               		<span>Due Date</span>
               		<input
                 		name="to"
