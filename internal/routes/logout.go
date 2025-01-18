@@ -21,19 +21,10 @@ func LogoutHandler(ctx *gin.Context) {
 	session.Clear()
 	session.Save()
 
-	scheme := "http"
-	if ctx.Request.TLS != nil {
-		scheme = "https"
-	}
-
-	returnTo, err := url.Parse(scheme + "://" + ctx.Request.Host)
-	if err != nil {
-		ctx.String(http.StatusInternalServerError, err.Error())
-		return
-	}
+	returnTo := os.Getenv("AUTH0_RETURN_TO_URL")
 
 	parameters := url.Values{}
-	parameters.Add("returnTo", returnTo.String())
+	parameters.Add("returnTo", returnTo)
 	parameters.Add("client_id", os.Getenv("AUTH0_CLIENT_ID"))
 	logoutUrl.RawQuery = parameters.Encode()
 

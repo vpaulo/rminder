@@ -7,8 +7,10 @@ if ! id -u ${USER} > /dev/null 2>&1; then
     exit 1
 fi
 
-# Create directory
-mkdir -p /var/lib/rminder
-chown $USER:nogroup /var/lib/rminder
+APPLICATION_DIR="/var/lib/rminder"
+mkdir -p "$APPLICATION_DIR"
+chown $USER:nogroup -R "$APPLICATION_DIR"
+chmod 600 -R "$APPLICATION_DIR"
+chmod +x "$APPLICATION_DIR"
 
-echo "Directory /var/lib/rminder created and permissions set."
+echo "Directory $APPLICATION_DIR created and permissions set."
