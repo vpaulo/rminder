@@ -7,19 +7,19 @@ build:
 	@echo "Building..."
 	@templ generate
 
-	@go build -o bin/main cmd/api/main.go
+	@go build -o bin/rminder cmd/rminder/main.go
 
 build-prod:
 	@echo "Building PROD..."
 	@templ generate
 
-	@go build -a -ldflags "-s -w" -o bin/main cmd/api/main.go
-	#upx --best --lzma bin/main
-	#upx --ultra-brute bin/main
+	@go build -a -ldflags "-s -w" -o bin/rminder cmd/rminder/main.go
+	#upx --best --lzma bin/rminder
+	#upx --ultra-brute bin/rminder
 
 # Run the application
 run:
-	@go run cmd/api/main.go
+	@go run cmd/rminder/main.go
 
 
 
@@ -36,7 +36,7 @@ lint:
 # Clean the binary
 clean:
 	@echo "Cleaning..."
-	@rm -f bin/main
+	@rm -f bin/rminder
 
 # Live Reload
 watch:

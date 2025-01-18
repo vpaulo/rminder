@@ -33,6 +33,8 @@ type Service interface {
 	UpdateTaskDescription(ID string, description string) error
 	DeleteTask(ID string) error
 	UpdateTaskPriority(ID string, priority string) error
+	UpdateTaskStartDate(id string, date string) error
+	UpdateTaskEndDate(id string, date string) error
 
 	Lists() ([]*List, error)
 	List(ID string) (*List, error)
@@ -471,6 +473,50 @@ func (s *service) UpdateTaskPriority(id string, priority string) error {
 	_, err = query.Exec(priority, id)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskPriority - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdateTaskStartDate(id string, date string) error {
+	query, err := s.db.Prepare("UPDATE task SET start_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskStartDate - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	// TODO: create date formating helpers to be used across application
+	tm, err := time.Parse("2006-01-02", date)
+
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskStartDate - format date failed: %v", err)
+	}
+
+	_, err = query.Exec(tm.Format(time.DateTime), id)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskStartDate - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdateTaskEndDate(id string, date string) error {
+	query, err := s.db.Prepare("UPDATE task SET end_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskEndDate - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	// TODO: create date formating helpers to be used across application
+	tm, err := time.Parse("2006-01-02", date)
+
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskEndDate - format date failed: %v", err)
+	}
+
+	_, err = query.Exec(tm.Format(time.DateTime), id)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateTaskEndDate - update query result failed: %v", err)
 	}
 
 	return nil
