@@ -30,10 +30,20 @@ func formatDate(date string) string {
 	tm, err := time.Parse(time.RFC3339, date)
 
 	if err != nil {
-		return "NA"
+		return ""
 	}
 
 	return tm.Format(time.DateTime)
+}
+
+func formatDateOnly(date string) string {
+	tm, err := time.Parse(time.RFC3339, date)
+
+	if err != nil {
+		return ""
+	}
+
+	return tm.Format(time.DateOnly)
 }
 
 func swatchColours() []string {

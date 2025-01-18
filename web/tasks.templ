@@ -236,6 +236,28 @@ templ TaskDetails(task *database.Task) {
                     }
                 </select>
             </div>
+            <div class="details__schedule">
+            	<label for="from">
+             		<span>Start Date</span>
+             		<input
+               			name="from"
+                  		type="date"
+                    	value={ formatDateOnly(task.StartAt) }
+                      	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
+                       	hx-trigger="change"
+                        hx-swap="none">
+             	</label>
+             	<label for="to">
+              		<span>Due Date</span>
+              		<input
+                		name="to"
+                  		type="date"
+                    	value={ formatDateOnly(task.EndAt) }
+                     	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
+                     	hx-trigger="change"
+                      	hx-swap="none">
+              	</label>
+            </div>
             <div class="detail__note">
                 <form
                     hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/description" }
