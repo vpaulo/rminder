@@ -86,8 +86,8 @@ func CreateList(ctx *gin.Context) {
 
 	// create new task
 	list := ctx.Request.FormValue("new-list")
-
 	pos, e := strconv.Atoi(ctx.Request.FormValue("position"))
+	pinned := ctx.Request.FormValue("pin")
 
 	if e != nil {
 		pos = 0
@@ -96,7 +96,7 @@ func CreateList(ctx *gin.Context) {
 	swatch := ctx.Request.FormValue("swatch")
 	icon := ctx.Request.FormValue("icon")
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
-		err := db.CreateList(list, swatch, icon, pos)
+		err := db.CreateList(list, swatch, icon, pos, pinned == "1")
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error creating list. Err: %v", err)
@@ -118,7 +118,7 @@ func CreateList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Lists(lists, false, persistence.ListId).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.ListsContainer(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in Lists: %e", err)
