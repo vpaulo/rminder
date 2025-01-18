@@ -24,6 +24,7 @@ tmp/
 
 # .env file
 .env
+.env.production
 
 # Project build
 bin/

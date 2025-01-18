@@ -1,12 +1,20 @@
 [Unit]
-Description=Rminder Service
-After=network.target
+Description=Rminder Caddy Service
+Documentation=https://caddyserver.com/docs/
+After=network.target network-online.target
+Requires=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/rminder-caddy
-WorkingDirectory=/var/lib/rminder-caddy
-Restart=always
+Type=notify
 User=rminder
+ExecStart=/usr/local/bin/rminder-caddy run --environ --config /var/lib/rminder-caddy/Caddyfile
+ExecReload=/usr/local/bin/rminder-caddy reload --config /var/lib/rminder-caddy/Caddyfile --force
+TimeoutStopSec=5s
+LimitNOFILE=1048576
+PrivateTmp=true
+ProtectSystem=full
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+Environment="XDG_CONFIG_HOME=/var/lib/rminder-caddy" "HOME=/var/lib/rminder-caddy"
 
 [Install]
 WantedBy=multi-user.target

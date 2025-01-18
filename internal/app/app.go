@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log"
 	"os"
 	"path"
 	"rminder/internal/database"
@@ -29,7 +30,10 @@ func (s *App) GetDatabaseForUser(user_id string) (database.Service, error) {
 	if db, ok := s.user_databases[user_id]; !ok {
 		user_database_root_directory := os.Getenv("USER_DATABASE_ROOT_DIRECTORY")
 		user_database_directory := path.Join(user_database_root_directory, user_id)
-		ensureDirectoryExists(user_database_directory)
+		err := ensureDirectoryExists(user_database_directory)
+		if err != nil {
+			log.Fatalf("Failed to create directory: %s error: %v", user_database_directory, err)
+		}
 
 		user_database_path := path.Join(user_database_directory, "db.sqlite")
 		db := database.New(user_database_path)

@@ -63,7 +63,7 @@ func New(database_path string) Service {
 	if err != nil {
 		// This will not be a connection error, but a DSN parse error or
 		// another initialization error.
-		log.Fatal(err)
+		log.Fatalf("%s: %v", database_path, err)
 	}
 
 	dbInstance := &service{
@@ -74,7 +74,7 @@ func New(database_path string) Service {
 	err = dbInstance.loadSqlFile()
 	if err != nil {
 		// Failed to create tables.
-		log.Fatal(err)
+		log.Fatalf("%s: %v", database_path, err)
 	}
 
 	return dbInstance

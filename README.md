@@ -68,6 +68,8 @@ deb -i rminder-caddy.deb
 
 Enable systemd services:
 ```
+systemctl daemon-reload
+
 systemctl enable rminder
 systemctl enable rminder-caddy
 ```
@@ -79,4 +81,10 @@ systemctl status rminder
 
 systemctl start rminder-caddy
 systemctl status rminder-caddy
+```
+
+Check the logs:
+```
+journalctl -u rminder.service -f
+journalctl -u rminder-caddy.service -f
 ```
