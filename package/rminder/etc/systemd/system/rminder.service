@@ -1,0 +1,12 @@
+[Unit]
+Description=Rminder Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/rminder
+WorkingDirectory=/var/lib/rminder
+Restart=always
+User=rminder
+
+[Install]
+WantedBy=multi-user.target

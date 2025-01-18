@@ -1,0 +1,12 @@
+[Unit]
+Description=Rminder Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/rminder-caddy
+WorkingDirectory=/var/lib/rminder-caddy
+Restart=always
+User=rminder
+
+[Install]
+WantedBy=multi-user.target

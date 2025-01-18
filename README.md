@@ -47,3 +47,36 @@ clean up binary from the last build
 ```bash
 make clean
 ```
+
+# Deploy
+
+Build debian packages for rminder and rminder-caddy:
+```
+make package
+```
+
+Create `rminder` user on the host:
+```
+adduser --system --no-create-home --disabled-password --disabled-login rminder
+```
+
+Install packages on the host:
+```
+deb -i rminder.deb
+deb -i rminder-caddy.deb
+``` 
+
+Enable systemd services:
+```
+systemctl enable rminder
+systemctl enable rminder-caddy
+```
+
+Start the services:
+```
+systemctl start rminder
+systemctl status rminder
+
+systemctl start rminder-caddy
+systemctl status rminder-caddy
+```
