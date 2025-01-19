@@ -1,6 +1,10 @@
 class TasksAppElement extends HTMLElement {
   connectedCallback() {
-    console.log("Hello tasks app");
+    const observer = new ResizeObserver((entries) => {
+      document.body.style.setProperty("--vh", `${document.body.clientHeight}px`);
+    });
+
+    observer.observe(document.body);
   }
 }
 

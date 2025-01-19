@@ -25,6 +25,10 @@ rm-sidebar {
         .list {
             padding: 10px 20px;
         }
+
+        .searchbox__container {
+            display: block;
+        }
     }
     .header {
         display: flex;
@@ -98,9 +102,6 @@ rm-sidebar {
     }
     .list .icon {
         background-color: var(--list-colour);
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
     }
 
     .count {
@@ -136,6 +137,7 @@ rm-sidebar {
 
     .new-list {
         width: 100%;
+        height: 40px;
         color: var(--base-colour);
         font-size: 0.9rem;
         padding: 8px 6px;
@@ -344,5 +346,50 @@ rm-sidebar {
         &:after {
             display: block;
         }
+    }
+}
+
+.searchbox__container {
+    display: none;
+
+    .searchbox__form {
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+        padding: 10px;
+    }
+
+    .searchbox {
+        width: 100%;
+        height: 40px;
+        color: var(--base-colour);
+        font-size: 0.9rem;
+        padding: 8px 6px;
+        text-overflow: ellipsis;
+        background-color: var(--base-grey);
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .searchbox__button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: var(--base-grey);
+        border: transparent;
+        cursor: pointer;
+        padding: 0;
+
+        &:hover {
+            background: var(--colour-neutral-600);
+        }
+    }
+
+    .search-icon {
+        display: block;
     }
 }

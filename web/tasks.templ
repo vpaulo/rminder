@@ -13,6 +13,30 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
 			<rm-sidebar>
                 <!-- Sidebar toggle -->
                 <!-- Search -->
+                <div
+                	class="searchbox__container"
+                 	hx-get="/lists/all"
+                  	hx-target=".lists__container"
+                   	hx-trigger="submit delay:20ms">
+					<form
+						class="searchbox__form"
+						hx-post={ "/lists/search" }
+	                    method="POST"
+	                    hx-trigger="submit, keyup[enterKey]"
+	                    hx-target={ ".main" }>
+				      	<input
+							type="search"
+							class="searchbox"
+							name="query"
+							autocomplete="off"
+							placeholder="Search"
+							minlength="3"
+							hx-validate="true"/>
+					    <button type="submit" class="searchbox__button">
+							<i class="icon search-icon"></i>
+						</button>
+				  	</form>
+                </div>
                 <!-- Pinned Lists -->
                 <div class="lists__container">
                 	@ListsContainer(lists, persistence)
@@ -83,11 +107,11 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
             </rm-sidebar>
             <!-- center column -->
             <div class="main" role="main" data-list="">
-	            for _, list := range lists {
-	                if list.ID == persistence.ListId {
-                  		@ListsContent(list, persistence)
-	                }
-	            }
+            	if persistence.ListId == 0 {
+             		No List Selected
+             	} else {
+              		@PersistedListContent(lists, persistence)
+              	}
             </div>
             <!-- right colunm -->
             <aside class="details">
@@ -289,39 +313,68 @@ templ TaskDetails(task *database.Task) {
     </rm-task-details>
 }
 
-templ ListsContent(list *database.List, persistence *database.Persistence) {
-    <div class="list-toolbar">
-        <span class="list-title">{ list.Name }</span>
-        <span class="icon ellipsis-vertical-icon"></span>
-    </div>
-    <div
-    	class="container"
-    	hx-get="/lists/all"
-     	hx-target=".lists__container"
-     	hx-trigger="submit delay:20ms">
-        <form
-        	class="add-tasks"
-         	hx-post="/tasks/create"
-          	method="POST"
-           	hx-target=".tasks"
-            hx-on::after-request="this.reset()">
-            <label class="add-task--label" for="task"></label>
-            <input
-                type="text"
-                name="task"
-                id="task"
-                aria-label="Add a task"
-                placeholder="Add a task"
-                required
-                minlength="3"
-                maxlength="255"
-                hx-validate="true"
-            />
-            <input type="text" name="list" class="hidden" value={ strconv.Itoa(list.ID) }/>
-            <button class="add-task" type="submit">Add</button>
-        </form>
-        <div class="tasks">
-            @TaskList(list.Tasks, persistence.TaskId)
-        </div>
-    </div>
+templ PersistedListContent(lists []*database.List, persistence *database.Persistence) {
+	for _, list := range lists {
+	    if list.ID == persistence.ListId {
+	        @ListsContent(list, persistence, false)
+	    }
+ 	}
+}
+
+templ SearchListContent(lists []*database.List, persistence *database.Persistence) {
+	if len(lists) == 0 {
+		No Search Results
+	} else {
+		<div>
+			<div class="search-toolbar">
+		      	<span class="search-title">Search Results</span>
+		   	</div>
+		for _, list := range lists {
+		    @ListsContent(list, persistence, true)
+ 		}
+		</div>
+	}
+}
+
+templ ListsContent(list *database.List, persistence *database.Persistence, isMultilist bool) {
+	<div class={templ.KV("multi", isMultilist)}>
+	    <div class="list-toolbar">
+	        <span class="list-title">{ list.Name }</span>
+			if !isMultilist {
+				<span class="icon ellipsis-vertical-icon"></span>
+			}
+	    </div>
+	    <div
+	    	class="container"
+	    	hx-get="/lists/all"
+	     	hx-target=".lists__container"
+	     	hx-trigger="submit delay:20ms">
+			if !isMultilist {
+		        <form
+		        	class="add-tasks"
+		         	hx-post="/tasks/create"
+		          	method="POST"
+		           	hx-target=".tasks"
+		            hx-on::after-request="this.reset()">
+		            <label class="add-task--label" for="task"></label>
+		            <input
+		                type="text"
+		                name="task"
+		                id="task"
+		                aria-label="Add a task"
+		                placeholder="Add a task"
+		                required
+		                minlength="3"
+		                maxlength="255"
+		                hx-validate="true"
+		            />
+		            <input type="text" name="list" class="hidden" value={ strconv.Itoa(list.ID) }/>
+		            <button class="add-task" type="submit">Add</button>
+		        </form>
+			}
+	        <div class="tasks">
+	            @TaskList(list.Tasks, persistence.TaskId)
+	        </div>
+	    </div>
+	</div>
 }

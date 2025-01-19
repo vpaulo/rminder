@@ -48,6 +48,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	lists := router.Group("/lists", middleware.Authentication(application))
 	lists.GET("/all", routes.GetLists)
 	lists.POST("/create", routes.CreateList)
+	lists.POST("/search", routes.SearchLists)
 	lists.GET("/:listID", routes.GetList)
 	lists.DELETE("/:listID", routes.DeleteList)
 	lists.PUT("/:listID/:slug", routes.UpdateList)
