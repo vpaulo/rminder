@@ -51,6 +51,9 @@ type Service interface {
 	UpdatePersistenceTask(task int) error
 	UpdatePersistenceList(list int) error
 	UpdatePersistenceGroup(group int) error
+
+	SearchLists(searchQuery string) ([]*List, error)
+	ListTasksSearch(id int, searchQuery string) ([]*Task, error)
 }
 
 type service struct {
@@ -201,40 +204,6 @@ func (s *service) Tasks() ([]*Task, error) {
 
 	return tasks, nil
 }
-
-// func (s *service) MyDayTasks() ([]*Task, error) {
-// 	query, err := s.db.Prepare("SELECT * FROM task WHERE my_day = true ORDER BY updated_at DESC")
-// 	defer query.Close()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("DB.MyDayTasks - prepare query failed: %v", err)
-// 	}
-
-// 	result, err := query.Query()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("DB.MyDayTasks - query result failed: %v", err)
-// 	}
-
-// 	tasks := make([]*Task, 0)
-// 	for result.Next() {
-// 		data := new(Task)
-// 		err := result.Scan(
-// 			&data.ID,
-// 			&data.Title,
-// 			&data.Description,
-// 			&data.Completed,
-// 			&data.Important,
-// 			&data.MyDay,
-// 			&data.CreatedAt,
-// 			&data.UpdatedAt,
-// 		)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("DB.MyDayTasks - result scan failed: %v", err)
-// 		}
-// 		tasks = append(tasks, data)
-// 	}
-
-// 	return tasks, nil
-// }
 
 func (s *service) ImportantTasks() ([]*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY updated_at DESC")
@@ -387,21 +356,6 @@ func (s *service) ToggleImportant(id string) error {
 
 	return nil
 }
-
-// func (s *service) ToggleMyDay(id string) error {
-// 	query, err := s.db.Prepare("UPDATE task SET my_day = NOT my_day, updated_at = CURRENT_TIMESTAMP WHERE id=?")
-// 	defer query.Close()
-// 	if err != nil {
-// 		return fmt.Errorf("DB.ToggleMyDay - prepare update query failed: %v", err)
-// 	}
-
-// 	_, err = query.Exec(id)
-// 	if err != nil {
-// 		return fmt.Errorf("DB.ToggleMyDay - update query result failed: %v", err)
-// 	}
-
-// 	return nil
-// }
 
 func (s *service) Task(id string) (*Task, error) {
 	query, err := s.db.Prepare("SELECT * FROM task WHERE id=?")
@@ -867,4 +821,89 @@ func (s *service) UpdatePersistenceGroup(group int) error {
 	}
 
 	return nil
+}
+
+func (s *service) SearchLists(searchQuery string) ([]*List, error) {
+	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at ASC")
+	if err != nil {
+		return nil, fmt.Errorf("DB.SearchLists - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.SearchLists - query result failed: %v", err)
+	}
+
+	var tasks []*Task
+
+	lists := make([]*List, 0)
+	for result.Next() {
+		data := new(List)
+		err := result.Scan(
+			&data.ID,
+			&data.Name,
+			&data.Colour,
+			&data.Icon,
+			&data.FilterBy,
+			&data.GroupId,
+			&data.Pinned,
+			&data.Position,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.SearchLists - result scan failed: %v", err)
+		}
+		tasks, err = s.ListTasksSearch(data.ID, searchQuery)
+		if err != nil {
+			return nil, fmt.Errorf("DB.SearchLists - get list tasks failed: %v", err)
+		}
+		data.Tasks = tasks
+
+		if len(tasks) > 0 {
+			lists = append(lists, data)
+		}
+	}
+
+	return lists, nil
+}
+
+func (s *service) ListTasksSearch(id int, searchQuery string) ([]*Task, error) {
+	query, err := s.db.Prepare("SELECT * FROM task WHERE list_id=? AND (title || description) LIKE ?")
+	if err != nil {
+		return nil, fmt.Errorf("DB.ListTasksSearch - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query(id, searchQuery+"%")
+	if err != nil {
+		return nil, fmt.Errorf("DB.ListTasksSearch - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.Priority,
+			&data.Position,
+			&data.StartAt,
+			&data.EndAt,
+			&data.ListId,
+			&data.ParentId,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.ListTasksSearch - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	return tasks, nil
 }

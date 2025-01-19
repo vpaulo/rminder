@@ -68,7 +68,7 @@ func GetList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.ListsContent(list, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.ListsContent(list, persistence, false).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in ListsContent: %e", err)
@@ -211,5 +211,51 @@ func UpdateList(ctx *gin.Context) {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in Task: %e", err)
 		}
+	}
+}
+
+func SearchLists(ctx *gin.Context) {
+	db := middleware.GetUserDatabase(ctx)
+
+	var (
+		lists []*database.List
+		err   error
+	)
+
+	err = ctx.Request.ParseForm()
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	query := ctx.Request.FormValue("query")
+
+	if query != "" && len(query) >= 3 {
+		lists, err = db.SearchLists(query)
+
+		err = db.UpdatePersistence(0, 0, 0)
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error updating persistence list. Err: %v", err)
+		}
+	} else {
+		ctx.AbortWithError(http.StatusInternalServerError, errors.New("Search query validation failed"))
+		log.Fatalf("Search query validation failed. Err: %v", err)
+	}
+
+	if err != nil {
+		log.Fatalf("error handling SearchLists. Err: %v", err)
+	}
+
+	persistence, err := db.Persistence()
+	if err != nil {
+		log.Fatalf("error handling SearchLists Persistence. Err: %v", err)
+	}
+
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	err = web.SearchListContent(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in SearchLists: %e", err)
 	}
 }
