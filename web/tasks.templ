@@ -292,6 +292,7 @@ templ TaskDetails(task *database.Task) {
 templ ListsContent(list *database.List, persistence *database.Persistence) {
     <div class="list-toolbar">
         <span class="list-title">{ list.Name }</span>
+        <span class="icon ellipsis-vertical-icon"></span>
     </div>
     <div
     	class="container"

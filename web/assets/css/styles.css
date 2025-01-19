@@ -446,6 +446,10 @@ header {
     mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
 }
 
+.ellipsis-vertical-icon {
+    mask: url("/assets/icons/ellipsis-vertical-icon.svg") no-repeat 50%;
+}
+
 .header-end > a {
     cursor: pointer;
     width: var(--size-40);

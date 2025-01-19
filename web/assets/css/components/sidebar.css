@@ -17,7 +17,7 @@ rm-sidebar {
             padding: 10px;
 
             .list {
-                flex: 1 0 150px;
+                flex: 1 1 auto;
                 border: 2px solid var(--background);
             }
         }
@@ -66,7 +66,7 @@ rm-sidebar {
 
     .list {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
         padding: 10px;
         border-bottom: 2px solid var(--background);
@@ -100,6 +100,7 @@ rm-sidebar {
         background-color: var(--list-colour);
         width: 20px;
         height: 20px;
+        min-width: 20px;
     }
 
     .count {
