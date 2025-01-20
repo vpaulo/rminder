@@ -4,109 +4,16 @@ import (
     "rminder/internal/database"
     "strconv"
     "strings"
+    "rminder/web/components"
 )
 
 templ Tasks(lists []*database.List, persistence *database.Persistence) {
 	@Base() {
 	    <rm-tasks-app>
 			<!-- left colunm -->
-			<rm-sidebar>
-                <!-- Sidebar toggle -->
-                <!-- Search -->
-                <div
-                	class="searchbox__container"
-                 	hx-get="/lists/all"
-                  	hx-target=".lists__container"
-                   	hx-trigger="submit delay:20ms">
-					<form
-						class="searchbox__form"
-						hx-post={ "/lists/search" }
-	                    method="POST"
-	                    hx-trigger="submit, keyup[enterKey]"
-	                    hx-target={ ".main" }>
-				      	<input
-							type="search"
-							class="searchbox"
-							name="query"
-							autocomplete="off"
-							placeholder="Search"
-							minlength="3"
-							hx-validate="true"/>
-					    <button type="submit" class="searchbox__button">
-							<i class="icon search-icon"></i>
-						</button>
-				  	</form>
-                </div>
-                <!-- Pinned Lists -->
-                <div class="lists__container">
-                	@ListsContainer(lists, persistence)
-                </div>
-                <!-- Add List -->
-                <footer>
-                    <dialog class="list-form-container" id="new-list-popover">
-                        <form
-                        class=""
-                        hx-post={ "/lists/create" }
-                        method="POST"
-                        hx-trigger="submit, keyup[enterKey]"
-                        hx-target={ ".lists__container" }
-                        hx-on::after-request="this.reset();this.parentElement.close()">
-                            <input
-                                class="new-list"
-                                name="new-list"
-                                type="text"
-                                value=""
-                                placeholder="List name"
-                                required
-                                minlength="3"
-                                maxlength="255"
-                                hx-validate="true"/>
-                            <label class="checkbox__container">
-                            	<span>Pin</span>
-                            	<input class="hidden" name="pin" type="checkbox" value="1"/>
-                             	<span class="checkmark"></span>
-                            </label>
-                            <fieldset class="swatch-fieldset">
-                                for i, colour := range swatchColours() {
-                                    <label>
-                                        if i == 0 {
-                                           <input type="radio" name="swatch" class="hidden" value={ colour } checked/>
-                                        } else {
-                                            <input type="radio" name="swatch" class="hidden" value={ colour }/>
-                                        }
-                             			<div class="swatch"></div>
-                              		</label>
-                                }
-                            </fieldset>
-                            <fieldset class="icon-fieldset">
-                                for i, icon := range iconsList() {
-                                    <label>
-                                        if i == 0 {
-                                        <input type="radio" name="icon" class="hidden" value={ icon } checked/>
-                                        } else {
-                                            <input type="radio" name="icon" class="hidden" value={ icon }/>
-                                        }
-                                        <div class={ "icon-selector " + icon }></div>
-                              		</label>
-                                }
-                            </fieldset>
-                            <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists)) }/>
-                            <fieldset>
-                                <div class="btn default cancel-new-list">Cancel</div>
-                                <button class="btn primary add-new-list" type="submit">Add</button>
-                            </fieldset>
-                        </form>
-                    </dialog>
-                    <div class="footer-actions">
-                        <button class="add-list">
-                            <span class="add-list--icon"></span>
-                            <span>Add list</span>
-                        </button>
-                    </div>
-                </footer>
-            </rm-sidebar>
+			@components.Sidebar(lists, persistence)
             <!-- center column -->
-            <div class="main" role="main" data-list="">
+            <div class="main" role="main">
             	if persistence.ListId == 0 {
              		No List Selected
              	} else {
@@ -114,76 +21,9 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
               	}
             </div>
             <!-- right colunm -->
-            <aside class="details">
-            	for _, list := range lists {
-	                if list.ID == persistence.ListId {
-                 		for _, task := range list.Tasks {
-                   			if task.ID == persistence.TaskId {
-                      			@TaskDetails(task)
-                      		}
-                   		}
-	                }
-	            }
-            </aside>
+            <aside class="details"></aside>
 		</rm-tasks-app>
 	}
-}
-
-templ ListsContainer(lists []*database.List, persistence *database.Persistence) {
-	<!-- Pinned Lists -->
-	<div class="pinned-lists">
-     	@Lists(lists, true, persistence.ListId)
-	</div>
-	<!-- Groups/Lists -->
-	<div class="lists">
-	    <p class="lists-label">My lists</p>
-	    <div class="lists-holder">
-	        @Lists(lists, false, persistence.ListId)
-	    </div>
-	</div>
-}
-
-templ Lists(lists []*database.List, flag bool, selectedList int) {
-  for _, list := range lists {
-      if list.Pinned == flag {
-          @List(list, selectedList)
-      }
-  }
-}
-templ List(list *database.List, selectedList int) {
-    <rm-list-nav data-id={ strconv.Itoa(list.ID) } data-colour={ list.Colour }>
-        <label
-            class="list"
-            hx-get={ "/lists/" + strconv.Itoa(list.ID)}
-            hx-trigger="change"
-            hx-target=".main"
-        >
-            <span class={"icon " + list.Icon }></span>
-            <span class="name">{ list.Name }</span>
-            <span class="count">{ strconv.Itoa(len(list.Tasks)) }</span>
-            if selectedList == list.ID {
-            	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) } checked/>
-            } else {
-            	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) }/>
-            }
-        </label>
-    </rm-list-nav>
-}
-
-templ Modal(id int) {
-    <dialog class="modal">
-        <div class="modal__content">
-            <span>Task will be permanent deleted, you won't be able to undo this action.</span>
-            <div class="modal__actions">
-                <button class="btn default">Cancel</button>
-                <button
-                  class="btn warning"
-                  hx-delete={ "/tasks/" + strconv.Itoa(id) }
-                  hx-swap="outerHTML"
-                  hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(id) + "']" }>Delete task</button>
-            </div>
-        </div>
-    </dialog>
 }
 
 templ TaskList(tasks []*database.Task, selectedtask int) {
@@ -227,92 +67,6 @@ templ Task(task *database.Task, selectedtask int) {
   </li>
 }
 
-templ TaskDetails(task *database.Task) {
-    <rm-task-details task-id={ strconv.Itoa(task.ID) }>
-        <div class="details__body">
-            <div class="detail__title">
-                <form
-                  class="add-tasks"
-                  hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/title" }
-                  method="POST"
-                  hx-swap="outerHTML"
-                  hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }>
-                    <input
-                        class="title"
-                        name="title"
-                        type="text"
-                        value={ task.Title }
-                        minlength="3"
-                        maxlength="255"
-                        hx-validate="true"/>
-                    <button class="rename" type="submit">Rename</button>
-                </form>
-            </div>
-            <div class="details__priority">
-                <label for="priority">Priority</label>
-                <select
-                    name="priority"
-                    hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/priority" }
-                    hx-trigger="change"
-                    hx-swap="outerHTML"
-                   	hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
-                    for i, value := range priorityValues() {
-                        if i == task.Priority {
-                            <option value={ strconv.Itoa(i) } selected>{ value }</option>
-                        } else {
-                            <option value={ strconv.Itoa(i) }>{ value }</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="details__schedule">
-            	<label>
-             		<span>Start Date</span>
-             		<input
-               			name="from"
-                  		type="date"
-                    	value={ formatDateOnly(task.StartAt) }
-                      	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
-                       	hx-trigger="change"
-                        hx-swap="none">
-             	</label>
-             	<label>
-              		<span>Due Date</span>
-              		<input
-                		name="to"
-                  		type="date"
-                    	value={ formatDateOnly(task.EndAt) }
-                     	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
-                     	hx-trigger="change"
-                      	hx-swap="none">
-              	</label>
-            </div>
-            <div class="detail__note">
-                <form
-                    hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/description" }
-                    hx-vals='js:{description: getDescription()}'
-                    hx-swap="none" method="POST">
-                    <div id="note-editor" class="ql-container ql-snow">@templ.Raw(task.Description)</div>
-                    <button class="add-note" type="submit">Add</button>
-                </form>
-            </div>
-        </div>
-        <div class="details__footer">
-            <button
-            	class="close"
-            	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/remove-persistence" }
-            	hx-swap="none">
-                <i class="close-icon"></i>
-            </button>
-            <span class="creation-date" title="Creation date">{ formatDate(task.CreatedAt) }</span>
-            <button class="remove">
-                <i class="trash-icon"></i>
-            </button>
-        </div>
-        @Modal(task.ID)
-    </rm-task-details>
-}
-
 templ PersistedListContent(lists []*database.List, persistence *database.Persistence) {
 	for _, list := range lists {
 	    if list.ID == persistence.ListId {
@@ -340,9 +94,6 @@ templ ListsContent(list *database.List, persistence *database.Persistence, isMul
 	<div class={templ.KV("multi", isMultilist)}>
 	    <div class="list-toolbar">
 	        <span class="list-title">{ list.Name }</span>
-			if !isMultilist {
-				<span class="icon ellipsis-vertical-icon"></span>
-			}
 	    </div>
 	    <div
 	    	class="container"
@@ -373,7 +124,7 @@ templ ListsContent(list *database.List, persistence *database.Persistence, isMul
 		        </form>
 			}
 	        <div class="tasks">
-	            @TaskList(list.Tasks, persistence.TaskId)
+	            @TaskList(list.Tasks, 0)
 	        </div>
 	    </div>
 	</div>

@@ -509,9 +509,18 @@ header {
 }
 
 /* TODO: Check new CSS features as nesting */
-rm-details .ql-toolbar.ql-snow,
-rm-details .ql-container.ql-snow {
+rm-task-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+rm-task-details .ql-toolbar.ql-snow,
+rm-task-details .ql-container.ql-snow {
     border: 1px solid var(--base-grey);
+}
+rm-task-details .ql-toolbar.ql-snow {
+    width: 100%;
 }
 .add-note {
     margin-top: 10px;
@@ -605,17 +614,6 @@ rm-details .ql-container.ql-snow {
     font-size: 0.8rem;
 }
 
-rm-task-details {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-}
-
-rm-task-details .ql-toolbar.ql-snow {
-    width: 100%;
-}
-
 .modal {
     border: none;
 }
@@ -632,8 +630,7 @@ rm-task-details .ql-toolbar.ql-snow {
 }
 @media (hover: hover) and (pointer: fine) {
     .completed-ckeck:hover,
-    .importance-check:hover,
-    .my-day:hover {
+    .importance-check:hover {
         background-color: var(--primary);
     }
 }

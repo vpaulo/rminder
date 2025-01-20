@@ -1,0 +1,168 @@
+package components
+
+import (
+    "rminder/internal/database"
+    "strconv"
+    "strings"
+)
+
+templ Sidebar(lists []*database.List, persistence *database.Persistence) {
+	<rm-sidebar>
+        @SidebarHeader()
+        @Search()
+        @SidebarLists(lists, persistence)
+        @SidebarFooter(lists)
+    </rm-sidebar>
+}
+
+templ SidebarHeader() {
+	<div class="header">
+        <label>
+        <span class="menu" aria-label="Toggle sidebar"></span>
+        <input class="hidden" type="checkbox" value="1" checked/>
+        </label>
+    </div>
+}
+
+templ Search() {
+	<div
+       	class="searchbox__container"
+       	hx-get="/lists/all"
+       	hx-target=".lists__container"
+       	hx-trigger="submit delay:20ms">
+		<form
+			class="searchbox__form"
+			hx-post={ "/lists/search" }
+	       	method="POST"
+		    hx-trigger="submit, keyup[enterKey]"
+		    hx-target={ ".main" }>
+		 	<input
+				type="search"
+				class="searchbox"
+				name="query"
+				autocomplete="off"
+				placeholder="Search"
+				required
+				minlength="3"
+				hx-validate="true"/>
+			<button type="submit" class="searchbox__button">
+				<i class="icon search-icon"></i>
+			</button>
+		</form>
+    </div>
+}
+
+templ SidebarLists(lists []*database.List, persistence *database.Persistence) {
+	<div class="lists__container">
+		<!-- Pinned Lists -->
+		<div class="pinned-lists">
+	     	@Lists(lists, true, persistence.ListId)
+		</div>
+		<!-- Groups/Lists -->
+		<div class="lists">
+		    <p class="lists-label">My lists</p>
+		    <div class="lists-holder">
+		        @Lists(lists, false, persistence.ListId)
+		    </div>
+		</div>
+	</div>
+}
+
+templ Lists(lists []*database.List, flag bool, selectedList int) {
+  for _, list := range lists {
+      if list.Pinned == flag {
+          @List(list, selectedList)
+      }
+  }
+}
+templ List(list *database.List, selectedList int) {
+    <rm-list-nav data-id={ strconv.Itoa(list.ID) } data-colour={ list.Colour }>
+        <label
+            class="list"
+            hx-get={ "/lists/" + strconv.Itoa(list.ID)}
+            hx-trigger="change"
+            hx-target=".main"
+        >
+            <span class={"icon " + list.Icon }></span>
+            <span class="name">{ list.Name }</span>
+	        <span class="count">{ strconv.Itoa(len(list.Tasks)) }</span>
+			<div class="settings">
+	            <span class="icon ellipsis-vertical-icon"></span>
+            </div>
+            if selectedList == list.ID {
+            	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) } checked/>
+            } else {
+            	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) }/>
+            }
+        </label>
+    </rm-list-nav>
+}
+
+templ SidebarFooter(lists []*database.List) {
+	<footer>
+        @ListModal(lists)
+        <div class="footer-actions">
+            <button class="add-list">
+                <span class="add-list--icon"></span>
+                <span>Add list</span>
+            </button>
+        </div>
+    </footer>
+}
+
+templ ListModal(lists []*database.List) {
+	<dialog class="list-form-container">
+        <form
+        class=""
+        hx-post={ "/lists/create" }
+        method="POST"
+        hx-trigger="submit, keyup[enterKey]"
+        hx-target={ ".lists__container" }
+        hx-on::after-request="this.reset();this.parentElement.close()">
+            <input
+                class="new-list"
+                name="new-list"
+                type="text"
+                value=""
+                placeholder="List name"
+                required
+                minlength="3"
+                maxlength="255"
+                hx-validate="true"/>
+            <label class="checkbox__container">
+               	<span>Pin</span>
+               	<input class="hidden" name="pin" type="checkbox" value="1"/>
+               	<span class="checkmark"></span>
+            </label>
+            <fieldset class="swatch-fieldset">
+                for i, colour := range swatchColours() {
+                    <label>
+                        if i == 0 {
+                            <input type="radio" name="swatch" class="hidden" value={ colour } checked/>
+                        } else {
+                            <input type="radio" name="swatch" class="hidden" value={ colour }/>
+                        }
+             			<div class="swatch"></div>
+              		</label>
+                }
+            </fieldset>
+            <fieldset class="icon-fieldset">
+                for i, icon := range iconsList() {
+                    <label>
+                        if i == 0 {
+                        <input type="radio" name="icon" class="hidden" value={ icon } checked/>
+                        } else {
+                            <input type="radio" name="icon" class="hidden" value={ icon }/>
+                        }
+                        <div class={ "icon-selector " + icon }></div>
+              		</label>
+                }
+            </fieldset>
+            <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists)) }/>
+            <fieldset>
+                <div class="btn default cancel-new-list">Cancel</div>
+                <button class="btn primary add-new-list" type="submit">Add</button>
+            </fieldset>
+        </form>
+    </dialog>
+}

@@ -23,7 +23,7 @@ rm-sidebar {
         }
 
         .list {
-            padding: 10px 20px;
+            /* padding: 10px 20px; */
         }
 
         .searchbox__container {
@@ -52,7 +52,7 @@ rm-sidebar {
         border-bottom: 2px solid var(--background);
 
         .list {
-            padding: 10px;
+            /* padding: 10px; */
         }
     }
 
@@ -81,7 +81,7 @@ rm-sidebar {
             background-color: var(--list-colour);
             color: var(--colour-neutral-100);
 
-            > .icon {
+            .icon {
                 --list-colour: var(--colour-neutral-100);
             }
         }
@@ -391,5 +391,15 @@ rm-sidebar {
 
     .search-icon {
         display: block;
+    }
+}
+
+rm-list-nav {
+    .settings {
+        display: flex;
+
+        &:hover .icon {
+            background-color: var(--colour-neutral-600);
+        }
     }
 }
