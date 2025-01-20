@@ -7,6 +7,7 @@ import (
 	"rminder/internal/database"
 	"rminder/internal/middleware"
 	"rminder/web"
+	"rminder/web/components"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ func GetLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.ListsContainer(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in GetLists: %e", err)
@@ -118,7 +119,7 @@ func CreateList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.ListsContainer(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in Lists: %e", err)

@@ -7,6 +7,7 @@ import (
 	"rminder/internal/database"
 	"rminder/internal/middleware"
 	"rminder/web"
+	"rminder/web/components"
 	"strconv"
 	"strings"
 
@@ -89,7 +90,7 @@ func GetTask(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.TaskDetails(task).Render(ctx.Request.Context(), ctx.Writer)
+	err = components.Details(task).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in TaskList: %e", err)

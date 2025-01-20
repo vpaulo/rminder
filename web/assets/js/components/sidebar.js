@@ -9,19 +9,6 @@ class SidebarElement extends HTMLElement {
   #closePopoverHandler;
   #formFocusHandler;
 
-  init() {
-    this.insertAdjacentHTML(
-      "afterbegin",
-      `
-    <div class="header">
-      <label>
-        <span class="menu" aria-label="Toggle sidebar"></span>
-        <input class="hidden" type="checkbox" value="1" checked/>
-      </label>
-    </div>`,
-    );
-  }
-
   addEvents() {
     this.#closePopoverHandler = () => this.closePopover();
     this.#formFocusHandler = () => this.formFocus();
@@ -41,8 +28,6 @@ class SidebarElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.init();
-
     this.cancelBtn = this.querySelector(".cancel-new-list");
     this.addList = this.querySelector(".add-list");
     this.formContainer = this.querySelector(".list-form-container");
