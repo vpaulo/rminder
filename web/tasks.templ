@@ -35,7 +35,7 @@ templ TaskList(tasks []*database.Task, selectedtask int) {
 }
 
 templ Task(task *database.Task, selectedtask int) {
-  <li class={ taskClasses(task.Completed, task.Important, false) } data-id={ strconv.Itoa(task.ID) }>
+  <li class={ templ.KV("completed", task.Completed), templ.KV("important", task.Important) } data-id={ strconv.Itoa(task.ID) }>
     <span
       class="completed-ckeck"
       title="Set it as complete"
@@ -91,7 +91,7 @@ templ SearchListContent(lists []*database.List, persistence *database.Persistenc
 }
 
 templ ListsContent(list *database.List, persistence *database.Persistence, isMultilist bool) {
-	<div class={templ.KV("multi", isMultilist)}>
+	<div class={ templ.KV("multi", isMultilist) }>
 	    <div class="list-toolbar">
 	        <span class="list-title">{ list.Name }</span>
 	    </div>

@@ -3,7 +3,6 @@ package components
 import (
     "rminder/internal/database"
     "strconv"
-    "strings"
 )
 
 templ Sidebar(lists []*database.List, persistence *database.Persistence) {
@@ -76,7 +75,11 @@ templ Lists(lists []*database.List, flag bool, selectedList int) {
   }
 }
 templ List(list *database.List, selectedList int) {
-    <rm-list-nav data-id={ strconv.Itoa(list.ID) } data-colour={ list.Colour }>
+	<rm-list-nav
+		data-id={ strconv.Itoa(list.ID) }
+		data-colour={ list.Colour }
+		data-icon={ list.Icon }
+		data-position={ strconv.Itoa(list.Position) }>
         <label
             class="list"
             hx-get={ "/lists/" + strconv.Itoa(list.ID)}
