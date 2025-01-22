@@ -39,6 +39,8 @@ type Service interface {
 	Lists() ([]*List, error)
 	List(ID string) (*List, error)
 	ListTasks(id int) ([]*Task, error)
+	UpdateList(id int, name string, colour string, icon string, pinned bool) error
+	DeleteList(id int) error
 
 	Groups() ([]*GroupList, error)
 	Group(ID int) (*GroupList, error)
@@ -516,6 +518,7 @@ func (s *service) Lists() ([]*List, error) {
 			&data.FilterBy,
 			&data.GroupId,
 			&data.Pinned,
+			&data.Base,
 			&data.Position,
 			&data.CreatedAt,
 			&data.UpdatedAt,
@@ -591,6 +594,7 @@ func (s *service) List(id string) (*List, error) {
 		&list.FilterBy,
 		&list.GroupId,
 		&list.Pinned,
+		&list.Base,
 		&list.Position,
 		&list.CreatedAt,
 		&list.UpdatedAt)
@@ -611,13 +615,13 @@ func (s *service) List(id string) (*List, error) {
 func (s *service) Groups() ([]*GroupList, error) {
 	query, err := s.db.Prepare("SELECT * FROM group_list ORDER BY created_at DESC")
 	if err != nil {
-		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
+		return nil, fmt.Errorf("DB.Groups - prepare query failed: %v", err)
 	}
 	defer query.Close()
 
 	result, err := query.Query()
 	if err != nil {
-		return nil, fmt.Errorf("DB.Lists - query result failed: %v", err)
+		return nil, fmt.Errorf("DB.Groups - query result failed: %v", err)
 	}
 
 	var lists []*List
@@ -633,11 +637,11 @@ func (s *service) Groups() ([]*GroupList, error) {
 			&data.UpdatedAt,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("DB.Lists - result scan failed: %v", err)
+			return nil, fmt.Errorf("DB.Groups - result scan failed: %v", err)
 		}
 		lists, err = s.GroupLists(data.ID)
 		if err != nil {
-			return nil, fmt.Errorf("DB.Lists - get list tasks failed: %v", err)
+			return nil, fmt.Errorf("DB.Groups - get list tasks failed: %v", err)
 		}
 		data.Lists = lists
 		groups = append(groups, data)
@@ -737,6 +741,36 @@ func (s *service) CreateList(name string, swatch string, icon string, position i
 	_, err = query.Exec(list.Name, list.Colour, list.Icon, list.Position, list.Pinned)
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) UpdateList(id int, name string, colour string, icon string, pinned bool) error {
+	query, err := s.db.Prepare("UPDATE list SET name = ?, colour = ?, icon = ?, pinned = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("DB.UpdateList - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(name, colour, icon, pinned, id)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateList - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) DeleteList(id int) error {
+	query, err := s.db.Prepare("DELETE FROM list WHERE id=?")
+	if err != nil {
+		return fmt.Errorf("DB.DeleteList - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(id)
+	if err != nil {
+		return fmt.Errorf("DB.DeleteList - update query result failed: %v", err)
 	}
 
 	return nil

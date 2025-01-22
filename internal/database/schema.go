@@ -29,6 +29,7 @@ type List struct {
 	FilterBy  string `json:"filter_by"`
 	GroupId   int    `json:"group_id"`
 	Pinned    bool   `json:"pinned"`
+	Base      bool   `json:"base"`
 	Position  int    `json:"position"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`

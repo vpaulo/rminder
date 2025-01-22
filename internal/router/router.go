@@ -51,7 +51,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	lists.POST("/search", routes.SearchLists)
 	lists.GET("/:listID", routes.GetList)
 	lists.DELETE("/:listID", routes.DeleteList)
-	lists.PUT("/:listID/:slug", routes.UpdateList)
+	lists.PUT("/:listID", routes.UpdateList)
 
 	// Static files
 	staticFiles, err := fs.Sub(web.Files, "assets")

@@ -415,10 +415,6 @@ header {
     mask: url("/assets/icons/pen-icon.svg") no-repeat 50%;
 }
 
-.days-icon {
-    mask: url("/assets/icons/days-icon.svg") no-repeat 50%;
-}
-
 .logout-icon {
     mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
 }
