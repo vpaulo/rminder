@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS list (
     filter_by TEXT DEFAULT "", -- if filter exists the list becomes a smart list, where filter dictates which tasks to show
     group_id INTEGER DEFAULT 0, -- REFERENCES group_list (id) ON UPDATE CASCADE ON DELETE SET DEFAULT,
     pinned BOOLEAN DEFAULT false, -- show list in highlighted lists area
+    base BOOLEAN DEFAULT false, -- base lists won't be able to be updated
     position INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -42,33 +43,43 @@ CREATE TABLE IF NOT EXISTS task (
 CREATE TABLE IF NOT EXISTS persistence (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     task_id INTEGER DEFAULT 0,
-    list_id INTEGER DEFAULT 1,
+    list_id INTEGER DEFAULT 0,
     group_id INTEGER DEFAULT 0
 );
 
 -- Initialise default lists
 INSERT INTO
-    list (name, colour, icon, pinned, position)
+    list (name, colour, icon, pinned, base, position)
 VALUES
     (
         "Today",
         "--colour-fresh-blue-500",
         "today-icon",
         true,
+        true,
         1
     ),
     (
         "Scheduled",
         "--colour-cyan-700",
-        "days-icon",
+        "calendar-icon",
+        true,
         true,
         2
     ),
-    ("All", "--base-colour", "icon-tasks", true, 3),
+    (
+        "All",
+        "--base-colour",
+        "icon-tasks",
+        true,
+        true,
+        3
+    ),
     (
         "Important",
         "--colour-volcano-400",
         "icon-star",
+        true,
         true,
         4
     ),
@@ -77,11 +88,19 @@ VALUES
         "--colour-lime-700",
         "icon-check-square",
         true,
+        true,
         5
     ),
-    ("Inbox", "--base-colour", "today-icon", false, 6);
+    (
+        "Inbox",
+        "--base-colour",
+        "list-ul-icon",
+        false,
+        false,
+        6
+    );
 
 INSERT INTO
     persistence (list_id)
 VALUES
-    (1);
+    (0);

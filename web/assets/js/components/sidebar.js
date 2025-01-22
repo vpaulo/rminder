@@ -19,7 +19,25 @@ class SidebarElement extends HTMLElement {
 
   closePopover() {
     this.formContainer.close();
-    this.formContainer.querySelector("form").reset();
+    const form = this.formContainer.querySelector("form");
+    const btn = form.querySelector(".btn.add-new-list");
+    const removeBtn = form.querySelector(".remove-list");
+    form.reset();
+
+    form.removeAttribute("hx-put");
+    form.setAttribute("hx-post", "/lists/create");
+
+    form.querySelectorAll("input:checked")?.forEach((el) => {
+      el.removeAttribute("checked");
+    });
+    form.querySelector('input[name="swatch"]')?.setAttribute("checked", "");
+    form.querySelector('input[name="icon"]')?.setAttribute("checked", "");
+    btn.innerHTML = "Add";
+    removeBtn?.classList.add("hidden");
+    removeBtn?.removeAttribute("hx-delete");
+
+    // if you edit htmx attributes through js you need to run this
+    htmx.process(form);
   }
 
   formFocus() {

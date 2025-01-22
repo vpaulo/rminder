@@ -77,8 +77,10 @@ templ Lists(lists []*database.List, flag bool, selectedList int) {
 templ List(list *database.List, selectedList int) {
 	<rm-list-nav
 		data-id={ strconv.Itoa(list.ID) }
+		data-name={ list.Name }
 		data-colour={ list.Colour }
 		data-icon={ list.Icon }
+		data-pinned?={ list.Pinned }
 		data-position={ strconv.Itoa(list.Position) }>
         <label
             class="list"
@@ -89,9 +91,11 @@ templ List(list *database.List, selectedList int) {
             <span class={"icon " + list.Icon }></span>
             <span class="name">{ list.Name }</span>
 	        <span class="count">{ strconv.Itoa(len(list.Tasks)) }</span>
+			if !list.Base {
 			<div class="settings">
 	            <span class="icon ellipsis-vertical-icon"></span>
             </div>
+			}
             if selectedList == list.ID {
             	<input class="hidden" type="radio" name="list-nav" value={ strconv.Itoa(list.ID) } checked/>
             } else {
@@ -116,8 +120,7 @@ templ SidebarFooter(lists []*database.List) {
 templ ListModal(lists []*database.List) {
 	<dialog class="list-form-container">
         <form
-        class=""
-        hx-post={ "/lists/create" }
+        hx-post="/lists/create"
         method="POST"
         hx-trigger="submit, keyup[enterKey]"
         hx-target={ ".lists__container" }
@@ -162,9 +165,15 @@ templ ListModal(lists []*database.List) {
                 }
             </fieldset>
             <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists)) }/>
-            <fieldset>
-                <div class="btn default cancel-new-list">Cancel</div>
-                <button class="btn primary add-new-list" type="submit">Add</button>
+            <fieldset class="form-actions">
+            	<div class="main-actions">
+	               	<div class="btn default cancel-new-list">Cancel</div>
+	                <button class="btn primary add-new-list" type="submit">Add</button>
+	            </div>
+				<button
+					class="btn warning remove-list hidden"
+					hx-params="none"
+                   	hx-target={ ".lists__container" }>Delete</button>
             </fieldset>
         </form>
     </dialog>
