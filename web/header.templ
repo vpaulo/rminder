@@ -8,8 +8,25 @@ templ Header() {
             <!-- app name -->
             <span class="app__name">RMINDER</span>
         </div>
+        <rm-get-premium>
+            <button class="btn primary">Get Premium</button>
+            @GetPremiumModal()
+        </rm-get-premium>
         <div class="header-end">
             <a class="icon logout-icon" href="/logout"></a>
-        </div>
+        </div>        
     </header>
+}
+
+templ GetPremiumModal() {
+    <dialog class="modal">
+        <div class="modal__content">
+            <span>Upgrade to unlock our most powerful features for work and collaboration.</span>
+            <p>Get Premium for $9.99/month</p>
+            <div class="modal__actions">
+                <button class="btn primary">Get</button>
+                <button class="btn default">Cancel</button>
+            </div>
+        </div>
+    </dialog>
 }
