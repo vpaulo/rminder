@@ -15,7 +15,7 @@ templ Tasks(lists []*database.List, persistence *database.Persistence) {
             <!-- center column -->
             <div class="main" role="main">
             	if persistence.ListId == 0 {
-             		No List Selected
+             		@components.LandingScreen()
              	} else {
               		@PersistedListContent(lists, persistence)
               	}
@@ -77,7 +77,7 @@ templ PersistedListContent(lists []*database.List, persistence *database.Persist
 
 templ SearchListContent(lists []*database.List, persistence *database.Persistence) {
 	if len(lists) == 0 {
-		No Search Results
+		@components.NoSearchResultsScreen()
 	} else {
 		<div>
 			<div class="search-toolbar">

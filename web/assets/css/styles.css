@@ -189,6 +189,71 @@ header {
         }
     }
 }
+
+.key {
+    display: block;
+    height: 32px;
+    width: 32px;
+
+    &.ctrl {
+        background: url("/assets/icons/keyboardKeyCtrl.svg") no-repeat 50%;
+    }
+    &.n {
+        background: url("/assets/icons/keyboardKeyN.svg") no-repeat 50%;
+    }
+    &.f {
+        background: url("/assets/icons/keyboardKeyF.svg") no-repeat 50%;
+    }
+    &.numbers {
+        background: url("/assets/icons/keyboardKeyNumbers.svg") no-repeat 50%;
+    }
+}
+
+.search-screen,
+.landing-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.landing-screen {
+    .instructions {
+        width: 100%;
+
+        p {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+
+            > span {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                width: 100%;
+                font-size: 1rem;
+                letter-spacing: 1px;
+
+                &:first-child {
+                    justify-content: flex-end;
+                }
+
+                &:last-child {
+                    justify-content: flex-start;
+                }
+            }
+        }
+    }
+}
+
+.search-screen {
+    .message p {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+}
+
 .details {
     display: flex;
     flex-direction: column;
