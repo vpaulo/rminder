@@ -32,14 +32,14 @@ func ensureDirectoryExists(path string) error {
 
 func (s *App) GetDatabaseForUser(user_id string) (database.Service, error) {
 	if db, ok := s.user_databases[user_id]; !ok {
-		user_database_root_directory := os.Getenv("USER_DATABASE_ROOT_DIRECTORY")
-		user_database_directory := path.Join(user_database_root_directory, user_id)
-		err := ensureDirectoryExists(user_database_directory)
+		user_root_directory := os.Getenv("USER_ROOT_DIRECTORY")
+		user_directory := path.Join(user_root_directory, user_id)
+		err := ensureDirectoryExists(user_directory)
 		if err != nil {
-			log.Fatalf("Failed to create directory: %s error: %v", user_database_directory, err)
+			log.Fatalf("Failed to create directory: %s error: %v", user_directory, err)
 		}
 
-		user_database_path := path.Join(user_database_directory, "db.sqlite")
+		user_database_path := path.Join(user_directory, "db.sqlite")
 		db := database.New(user_database_path)
 		s.user_databases[user_id] = db
 		return db, nil
@@ -49,9 +49,9 @@ func (s *App) GetDatabaseForUser(user_id string) (database.Service, error) {
 }
 
 func (s *App) loadUserFromFile(user_id string) (*user.User, error) {
-	user_database_root_directory := os.Getenv("USER_DATABASE_ROOT_DIRECTORY")
-	user_database_directory := path.Join(user_database_root_directory, user_id)
-	user_file_path := path.Join(user_database_directory, "user.json")
+	user_root_directory := os.Getenv("USER_ROOT_DIRECTORY")
+	user_directory := path.Join(user_root_directory, user_id)
+	user_file_path := path.Join(user_directory, "user.json")
 
 	file, err := os.Open(user_file_path)
 	if err != nil {
@@ -83,11 +83,11 @@ func (s *App) GetUser(user_id string) (*user.User, error) {
 }
 
 func (s *App) SaveUser(user *user.User) error {
-	user_database_root_directory := os.Getenv("USER_DATABASE_ROOT_DIRECTORY")
-	user_database_directory := path.Join(user_database_root_directory, user.Id)
-	user_file_path := path.Join(user_database_directory, "user.json")
+	user_database_root_directory := os.Getenv("USER_ROOT_DIRECTORY")
+	user_directory := path.Join(user_database_root_directory, user.Id)
+	user_file_path := path.Join(user_directory, "user.json")
 
-	err := ensureDirectoryExists(user_database_directory)
+	err := ensureDirectoryExists(user_directory)
 	if err != nil {
 		return err
 	}
