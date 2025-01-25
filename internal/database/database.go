@@ -22,9 +22,6 @@ type Service interface {
 	// It returns an error if the connection cannot be closed.
 	Close() error
 
-	EnablePremium()
-	IsPremium() bool
-
 	Tasks() ([]*Task, error)
 	ImportantTasks() ([]*Task, error)
 	CompletedTasks() ([]*Task, error)
@@ -168,35 +165,6 @@ func (s *service) Health() map[string]string {
 func (s *service) Close() error {
 	log.Printf("Disconnected from database: %s", s.database_path)
 	return s.db.Close()
-}
-
-func (s *service) EnablePremium() {
-	query, err := s.db.Prepare("UPDATE user SET premium = true")
-	if err != nil {
-		log.Fatalf("DB.EnablePremium - prepare query failed: %v", err)
-	}
-	defer query.Close()
-
-	_, err = query.Exec()
-	if err != nil {
-		log.Fatalf("DB.EnablePremium - query result failed: %v", err)
-	}
-}
-
-func (s *service) IsPremium() bool {
-	query, err := s.db.Prepare("SELECT premium FROM user")
-	if err != nil {
-		log.Fatalf("DB.IsPremium - prepare query failed: %v", err)
-	}
-	defer query.Close()
-
-	var premium bool
-	err = query.QueryRow().Scan(&premium)
-	if err != nil {
-		log.Fatalf("DB.IsPremium - query result failed: %v", err)
-	}
-
-	return premium
 }
 
 func (s *service) Tasks() ([]*Task, error) {

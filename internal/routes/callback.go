@@ -64,6 +64,10 @@ func CallbackHandler(s *app.App, auth *authenticator.Authenticator) gin.HandlerF
 		if err != nil {
 			user_obj = &user.User{
 				Id:         user_id,
+				Name:       fmt.Sprintf("%v", profile["name"]),
+				GivenName:  fmt.Sprintf("%v", profile["given_name"]),
+				FamilyName: fmt.Sprintf("%v", profile["family_name"]),
+				PictureUrl: fmt.Sprintf("%v", profile["picture"]),
 				HasPremium: false,
 			}
 		}

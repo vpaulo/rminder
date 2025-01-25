@@ -47,17 +47,6 @@ CREATE TABLE IF NOT EXISTS persistence (
     group_id INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS user (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    premium BOOLEAN DEFAULT false
-);
-
--- Initialise default user
-INSERT INTO
-    user (premium)
-VALUES
-    (false);
-
 -- Initialise default lists
 INSERT INTO
     list (name, colour, icon, pinned, base, position)

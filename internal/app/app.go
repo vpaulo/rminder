@@ -73,15 +73,7 @@ func (s *App) GetUser(user_id string) (*user.User, error) {
 	if user_obj, ok := s.users[user_id]; !ok {
 		user_obj, err := s.loadUserFromFile(user_id)
 		if err != nil {
-			user_obj = &user.User{
-				Id:         user_id,
-				HasPremium: false,
-			}
-			err = s.SaveUser(user_obj)
-			if err != nil {
-				return nil, err
-			}
-			return user_obj, err
+			return nil, err
 		}
 		s.users[user_id] = user_obj
 		return user_obj, nil

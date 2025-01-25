@@ -39,14 +39,14 @@ func Authentication(s *app.App) gin.HandlerFunc {
 
 		user, err := s.GetUser(user_id)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			ctx.Redirect(http.StatusSeeOther, "/logout")
 			return
 		}
 		SetUser(ctx, user)
 
 		db, err := s.GetDatabaseForUser(user_id)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			ctx.Redirect(http.StatusSeeOther, "/logout")
 			return
 		}
 		SetUserDatabase(ctx, db)

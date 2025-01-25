@@ -6,6 +6,10 @@ import (
 
 type User struct {
 	Id         string `json:"id"`
+	Name       string `json:"name"`
+	GivenName  string `json:"given_name"`
+	FamilyName string `json:"family_name"`
+	PictureUrl string `json:"picture_url"`
 	HasPremium bool   `json:"has_premium"`
 }
 
