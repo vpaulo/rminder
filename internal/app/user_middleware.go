@@ -1,14 +1,13 @@
-package middleware
+package app
 
 import (
 	"net/http"
 
+	"rminder/internal/app/database"
+	"rminder/internal/app/user"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-
-	"rminder/internal/app"
-	"rminder/internal/database"
-	"rminder/internal/user"
 )
 
 func SetUserDatabase(ctx *gin.Context, db database.Service) {
@@ -27,7 +26,7 @@ func GetUser(ctx *gin.Context) *user.User {
 	return ctx.MustGet("user").(*user.User)
 }
 
-func Authentication(s *app.App) gin.HandlerFunc {
+func UserMiddleware(s *App) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 

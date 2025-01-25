@@ -1,11 +1,10 @@
-package routes
+package app
 
 import (
 	"errors"
 	"log"
 	"net/http"
-	"rminder/internal/database"
-	"rminder/internal/middleware"
+	"rminder/internal/app/database"
 	"rminder/web"
 	"rminder/web/components"
 	"strconv"
@@ -15,8 +14,8 @@ import (
 )
 
 func GetTasks(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
-	user := middleware.GetUser(ctx)
+	db := GetUserDatabase(ctx)
+	user := GetUser(ctx)
 
 	slug := strings.TrimPrefix(ctx.Request.URL.Path, "/")
 
@@ -63,7 +62,7 @@ func GetTasks(ctx *gin.Context) {
 }
 
 func GetTask(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	taskID := ctx.Param("taskID")
 
@@ -99,7 +98,7 @@ func GetTask(ctx *gin.Context) {
 }
 
 func CreateTask(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
@@ -146,7 +145,7 @@ func CreateTask(ctx *gin.Context) {
 }
 
 func DeleteTask(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	taskID := ctx.Param("taskID")
 
@@ -168,7 +167,7 @@ func DeleteTask(ctx *gin.Context) {
 }
 
 func UpdateTask(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	taskID := ctx.Param("taskID")
 	slug := ctx.Param("slug")

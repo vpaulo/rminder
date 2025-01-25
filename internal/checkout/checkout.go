@@ -1,4 +1,4 @@
-package routes
+package checkout
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"rminder/internal/app"
-	"rminder/internal/middleware"
 	"rminder/web"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +31,7 @@ func CreatePremiumCheckoutSession(ctx *gin.Context) {
 	}
 
 	params.PaymentIntentData = &stripe.CheckoutSessionPaymentIntentDataParams{}
-	params.PaymentIntentData.AddMetadata("user_id", middleware.GetUser(ctx).Id)
+	params.PaymentIntentData.AddMetadata("user_id", app.GetUser(ctx).Id)
 
 	s, err := session.New(params)
 

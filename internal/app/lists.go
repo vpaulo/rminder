@@ -1,11 +1,10 @@
-package routes
+package app
 
 import (
 	"errors"
 	"log"
 	"net/http"
-	"rminder/internal/database"
-	"rminder/internal/middleware"
+	"rminder/internal/app/database"
 	"rminder/web"
 	"rminder/web/components"
 	"strconv"
@@ -14,7 +13,7 @@ import (
 )
 
 func GetLists(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	lists, err := db.Lists()
 	if err != nil {
@@ -36,7 +35,7 @@ func GetLists(ctx *gin.Context) {
 }
 
 func GetList(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
 
@@ -77,7 +76,7 @@ func GetList(ctx *gin.Context) {
 }
 
 func CreateList(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
@@ -127,7 +126,7 @@ func CreateList(ctx *gin.Context) {
 }
 
 func DeleteList(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
 
@@ -165,7 +164,7 @@ func DeleteList(ctx *gin.Context) {
 
 // TODO: update this to work with lists
 func UpdateList(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	listID := ctx.Param("listID")
 
@@ -212,7 +211,7 @@ func UpdateList(ctx *gin.Context) {
 }
 
 func SearchLists(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
+	db := GetUserDatabase(ctx)
 
 	var (
 		lists []*database.List
