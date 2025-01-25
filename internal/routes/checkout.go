@@ -28,7 +28,7 @@ func CreatePremiumCheckoutSession(ctx *gin.Context) {
 		},
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
 		SuccessURL: stripe.String(domain + "/checkout/success"),
-		CancelURL:  stripe.String(domain + "/checkout/cancel"),
+		CancelURL:  stripe.String(domain + "/"),
 	}
 
 	params.PaymentIntentData = &stripe.CheckoutSessionPaymentIntentDataParams{}
@@ -47,16 +47,6 @@ func PremiumCheckoutSuccessHandler(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	err := web.PremiumPaymentSuccessful().Render(ctx.Request.Context(), ctx.Writer)
-	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in CreatePremiumCheckoutSession: %e", err)
-	}
-}
-
-func PremiumCheckoutCancelHandler(ctx *gin.Context) {
-	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	err := web.PremiumPaymentCancelled().Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in CreatePremiumCheckoutSession: %e", err)
