@@ -4,6 +4,15 @@ import (
 	"github.com/gin-contrib/sessions"
 )
 
+type User struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	GivenName  string `json:"given_name"`
+	FamilyName string `json:"family_name"`
+	PictureUrl string `json:"picture_url"`
+	HasPremium bool   `json:"has_premium"`
+}
+
 func GetUserId(session sessions.Session) string {
 	user_id := session.Get("user_id")
 	if user_id == nil {

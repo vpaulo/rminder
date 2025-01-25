@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"io/fs"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -26,14 +27,20 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	// we must first register them using gob.Register
 	gob.Register(map[string]interface{}{})
 
-	store := cookie.NewStore([]byte("secret"))
+	store := cookie.NewStore([]byte(os.Getenv("COOKIE_AUTHENTICATION_KEY")))
 	router.Use(sessions.Sessions("auth-session", store))
 
 	router.GET("/login", routes.LoginHandler(auth))
-	router.GET("/callback", routes.CallbackHandler(auth))
+	router.GET("/callback", routes.CallbackHandler(application, auth))
 	router.GET("/logout", routes.LogoutHandler)
 
 	router.GET("/", middleware.Authentication(application), routes.AppLoadHandler)
+
+	checkout := router.Group("/checkout", middleware.Authentication(application))
+	checkout.POST("/create-checkout-session", routes.CreatePremiumCheckoutSession)
+	checkout.GET("/success", routes.PremiumCheckoutSuccessHandler)
+
+	router.POST("/post-checkout/webhook", routes.CheckoutWebhookHandler(application))
 
 	tasks := router.Group("/tasks", middleware.Authentication(application))
 	tasks.GET("/all", routes.GetTasks)

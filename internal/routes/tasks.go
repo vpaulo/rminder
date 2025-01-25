@@ -16,6 +16,7 @@ import (
 
 func GetTasks(ctx *gin.Context) {
 	db := middleware.GetUserDatabase(ctx)
+	user := middleware.GetUser(ctx)
 
 	slug := strings.TrimPrefix(ctx.Request.URL.Path, "/")
 
@@ -46,7 +47,7 @@ func GetTasks(ctx *gin.Context) {
 
 	if slug == "" {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+		err = web.Tasks(lists, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in tasksHandler: %e", err)

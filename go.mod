@@ -10,6 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/oauth2 v0.21.0
 	modernc.org/sqlite v1.31.1
+	github.com/stripe/stripe-go/v81 v81.2.0
 )
 
 require (
@@ -41,6 +42,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	github.com/stripe/stripe-go/v81 v81.2.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
