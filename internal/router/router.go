@@ -35,6 +35,13 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 
 	router.GET("/", middleware.Authentication(application), routes.AppLoadHandler)
 
+	checkout := router.Group("/checkout", middleware.Authentication(application))
+	checkout.POST("/create-checkout-session", routes.CreatePremiumCheckoutSession)
+	checkout.GET("/success", routes.PremiumCheckoutSuccessHandler)
+	checkout.GET("/cancel", routes.PremiumCheckoutSuccessHandler)
+
+	router.POST("/post-checkout/webhook", routes.CheckoutWebhookHandler(application))
+
 	tasks := router.Group("/tasks", middleware.Authentication(application))
 	tasks.GET("/all", routes.GetTasks)
 	tasks.GET("/my-day", routes.GetTasks)

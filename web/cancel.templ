@@ -1,0 +1,16 @@
+
+package web
+
+templ PremiumPaymentCancelled(premium bool) {
+	@Base(premium) {
+	    <rm-tasks-app>
+            <div class="main" role="main">
+                <h1>Payment Cancelled</h1>
+                <p>You can still use the free version of Reminder.</p>
+                <p>
+                    <a href="/" class="btn btn-primary">Go back to Reminder</a>
+                </p>
+            </div>
+		</rm-tasks-app>
+	}
+}

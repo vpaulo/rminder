@@ -1,0 +1,16 @@
+package web
+
+templ PremiumPaymentSuccessful(premium bool) {
+	@Base(premium) {
+	    <rm-tasks-app>
+            <div class="main" role="main">
+				<h1>Thank you for your payment!</h1>
+				<p>You are now a premium user.</p>
+				<p>Enjoy the premium features.</p>
+				<p>
+					<a href="/" class="btn btn-primary">Go back to Reminder</a>
+				</p>
+            </div>
+		</rm-tasks-app>
+	}
+}

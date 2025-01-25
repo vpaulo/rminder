@@ -1,6 +1,6 @@
 package web
 
-templ Base() {
+templ Base(premium bool) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -113,7 +113,7 @@ templ Base() {
 			<script type="module" src="/assets/js/apps/tasks/tasks.js"></script>
 		</head>
 		<body>
-		    @Header()
+		    @Header(premium)
 			<!--<main id="app">-->
 				{ children... }
 			<!--</main>-->

@@ -10,6 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/oauth2 v0.21.0
 	modernc.org/sqlite v1.31.1
+	github.com/stripe/stripe-go/v81 v81.2.0
 )
 
 require (

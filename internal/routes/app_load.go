@@ -24,7 +24,7 @@ func AppLoadHandler(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Tasks(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Tasks(lists, persistence, db.IsPremium()).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in appLoadHandler: %e", err)

@@ -7,8 +7,8 @@ import (
     "rminder/web/components"
 )
 
-templ Tasks(lists []*database.List, persistence *database.Persistence) {
-	@Base() {
+templ Tasks(lists []*database.List, persistence *database.Persistence, premium bool) {
+	@Base(premium) {
 	    <rm-tasks-app>
 			<!-- left colunm -->
 			@components.Sidebar(lists, persistence)
