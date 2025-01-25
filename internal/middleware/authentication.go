@@ -19,12 +19,12 @@ func GetUserDatabase(ctx *gin.Context) database.Service {
 	return ctx.MustGet("user_database").(database.Service)
 }
 
-func SetUserId(ctx *gin.Context, user_id string) {
-	ctx.Set("user_id", user_id)
+func SetUser(ctx *gin.Context, user *user.User) {
+	ctx.Set("user", user)
 }
 
-func GetUserId(ctx *gin.Context) string {
-	return ctx.MustGet("user_id").(string)
+func GetUser(ctx *gin.Context) *user.User {
+	return ctx.MustGet("user").(*user.User)
 }
 
 func Authentication(s *app.App) gin.HandlerFunc {
@@ -36,7 +36,13 @@ func Authentication(s *app.App) gin.HandlerFunc {
 			ctx.Redirect(http.StatusSeeOther, "/login")
 			return
 		}
-		SetUserId(ctx, user_id)
+
+		user, err := s.GetUser(user_id)
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		SetUser(ctx, user)
 
 		db, err := s.GetDatabaseForUser(user_id)
 		if err != nil {

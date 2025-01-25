@@ -1,0 +1,11 @@
+package web
+import (
+    "rminder/internal/user"
+)
+
+templ App(user *user.User) {
+	@Base() {
+	    @Header(user)
+        { children... }
+	}
+}

@@ -11,6 +11,7 @@ import (
 
 func AppLoadHandler(ctx *gin.Context) {
 	db := middleware.GetUserDatabase(ctx)
+	user := middleware.GetUser(ctx)
 
 	lists, err := db.Lists()
 	if err != nil {
@@ -24,7 +25,7 @@ func AppLoadHandler(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Tasks(lists, persistence, db.IsPremium()).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Tasks(lists, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in appLoadHandler: %e", err)

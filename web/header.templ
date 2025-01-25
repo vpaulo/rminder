@@ -1,6 +1,10 @@
 package web
 
-templ Header(premium bool) {
+import (
+    "rminder/internal/user"
+)
+
+templ Header(user *user.User) {
     <header>
         <div class="header__start">
             <!-- logo -->
@@ -8,13 +12,13 @@ templ Header(premium bool) {
             <!-- app name -->
             <span class="app__name">RMINDER</span>
         </div>
-        if !premium {
+        if !user.HasPremium {
             <rm-get-premium>
                 <button class="btn primary">Get Premium</button>
                 @GetPremiumModal()
             </rm-get-premium>
         } else {
-           <p>👑</p>
+           <p>👑 You have premium!</p>
         }
         <div class="header-end">
             <a class="icon logout-icon" href="/logout"></a>

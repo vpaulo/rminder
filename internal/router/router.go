@@ -30,7 +30,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.Use(sessions.Sessions("auth-session", store))
 
 	router.GET("/login", routes.LoginHandler(auth))
-	router.GET("/callback", routes.CallbackHandler(auth))
+	router.GET("/callback", routes.CallbackHandler(application, auth))
 	router.GET("/logout", routes.LogoutHandler)
 
 	router.GET("/", middleware.Authentication(application), routes.AppLoadHandler)

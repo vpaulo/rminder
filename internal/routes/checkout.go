@@ -32,7 +32,7 @@ func CreatePremiumCheckoutSession(ctx *gin.Context) {
 	}
 
 	params.PaymentIntentData = &stripe.CheckoutSessionPaymentIntentDataParams{}
-	params.PaymentIntentData.AddMetadata("user_id", middleware.GetUserId(ctx))
+	params.PaymentIntentData.AddMetadata("user_id", middleware.GetUser(ctx).Id)
 
 	s, err := session.New(params)
 
@@ -46,7 +46,7 @@ func CreatePremiumCheckoutSession(ctx *gin.Context) {
 func PremiumCheckoutSuccessHandler(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err := web.PremiumPaymentSuccessful(true).Render(ctx.Request.Context(), ctx.Writer)
+	err := web.PremiumPaymentSuccessful().Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in CreatePremiumCheckoutSession: %e", err)
@@ -54,11 +54,9 @@ func PremiumCheckoutSuccessHandler(ctx *gin.Context) {
 }
 
 func PremiumCheckoutCancelHandler(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
-
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err := web.PremiumPaymentCancelled(db.IsPremium()).Render(ctx.Request.Context(), ctx.Writer)
+	err := web.PremiumPaymentCancelled().Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in CreatePremiumCheckoutSession: %e", err)
@@ -124,11 +122,17 @@ func handlePaymentIntentSucceeded(s *app.App, paymentIntent stripe.PaymentIntent
 		return
 	}
 
-	db, err := s.GetDatabaseForUser(user_id)
+	user, err := s.GetUser(user_id)
 	if err != nil {
-		log.Printf("Error getting database for user: %v", err)
+		log.Printf("Error getting user: %v", err)
 		return
 	}
 
-	db.EnablePremium()
+	user.HasPremium = true
+
+	err = s.SaveUser(user)
+	if err != nil {
+		log.Printf("Error saving user: %v", err)
+		return
+	}
 }

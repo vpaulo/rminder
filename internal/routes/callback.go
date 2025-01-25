@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
+	"rminder/internal/app"
 	"rminder/internal/authenticator"
 	"rminder/internal/user"
 )
@@ -25,7 +26,7 @@ func userIdFromProfile(profile map[string]interface{}) (string, error) {
 }
 
 // Handler for our callback.
-func CallbackHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
+func CallbackHandler(s *app.App, auth *authenticator.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		if ctx.Query("state") != session.Get("state") {
@@ -58,6 +59,20 @@ func CallbackHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
 			return
 		}
 		user.SetUserId(session, user_id)
+
+		user_obj, err := s.GetUser(user_id)
+		if err != nil {
+			user_obj = &user.User{
+				Id:         user_id,
+				HasPremium: false,
+			}
+		}
+
+		err = s.SaveUser(user_obj)
+		if err != nil {
+			ctx.String(http.StatusInternalServerError, "Failed to save user.")
+			return
+		}
 
 		session.Set("access_token", token.AccessToken)
 		session.Set("profile", profile)

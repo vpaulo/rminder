@@ -5,10 +5,11 @@ import (
     "strconv"
     "strings"
     "rminder/web/components"
+	"rminder/internal/user"
 )
 
-templ Tasks(lists []*database.List, persistence *database.Persistence, premium bool) {
-	@Base(premium) {
+templ Tasks(lists []*database.List, persistence *database.Persistence, user *user.User) {
+	@App(user) {
 	    <rm-tasks-app>
 			<!-- left colunm -->
 			@components.Sidebar(lists, persistence)
