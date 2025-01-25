@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"io/fs"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -26,7 +27,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	// we must first register them using gob.Register
 	gob.Register(map[string]interface{}{})
 
-	store := cookie.NewStore([]byte("secret"))
+	store := cookie.NewStore([]byte(os.Getenv("COOKIE_AUTHENTICATION_KEY")))
 	router.Use(sessions.Sessions("auth-session", store))
 
 	router.GET("/login", routes.LoginHandler(auth))
