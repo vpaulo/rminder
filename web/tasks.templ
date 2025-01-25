@@ -1,11 +1,11 @@
 package web
 
 import (
-    "rminder/internal/database"
+    "rminder/internal/app/database"
     "strconv"
     "strings"
     "rminder/web/components"
-	"rminder/internal/user"
+	"rminder/internal/app/user"
 )
 
 templ Tasks(lists []*database.List, persistence *database.Persistence, user *user.User) {

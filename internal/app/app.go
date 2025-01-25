@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 	"path"
-	"rminder/internal/database"
-	"rminder/internal/user"
+	"rminder/internal/app/database"
+	"rminder/internal/app/user"
 )
 
 type App struct {

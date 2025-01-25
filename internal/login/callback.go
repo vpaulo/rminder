@@ -1,4 +1,4 @@
-package routes
+package login
 
 import (
 	"crypto/sha1"
@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/app"
-	"rminder/internal/authenticator"
-	"rminder/internal/user"
+	"rminder/internal/app/user"
+	"rminder/internal/login/authenticator"
 )
 
 func userIdFromProfile(profile map[string]interface{}) (string, error) {

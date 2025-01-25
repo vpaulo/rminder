@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stripe/stripe-go/v81"
 
-	"rminder/internal/authenticator"
+	"rminder/internal/login/authenticator"
 	"rminder/internal/router"
 )
 

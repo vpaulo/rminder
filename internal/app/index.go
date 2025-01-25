@@ -1,17 +1,16 @@
-package routes
+package app
 
 import (
 	"log"
 	"net/http"
-	"rminder/internal/middleware"
 	"rminder/web"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AppLoadHandler(ctx *gin.Context) {
-	db := middleware.GetUserDatabase(ctx)
-	user := middleware.GetUser(ctx)
+	db := GetUserDatabase(ctx)
+	user := GetUser(ctx)
 
 	lists, err := db.Lists()
 	if err != nil {
