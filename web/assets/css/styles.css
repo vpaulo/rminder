@@ -492,6 +492,10 @@ header {
     mask: url("/assets/icons/search-icon.svg") no-repeat 50%;
 }
 
+.clear-icon {
+    mask: url("/assets/icons/clear-icon.svg") no-repeat 50%;
+}
+
 .header-end > a {
     cursor: pointer;
     width: var(--size-40);

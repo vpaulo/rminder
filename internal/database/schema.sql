@@ -34,10 +34,11 @@ CREATE TABLE IF NOT EXISTS task (
     position INTEGER DEFAULT 0,
     start_at TIMESTAMP DEFAULT "",
     end_at TIMESTAMP DEFAULT "",
-    list_id INTEGER DEFAULT 0 REFERENCES list (id) ON UPDATE CASCADE ON DELETE SET DEFAULT,
+    list_id INTEGER DEFAULT 0,
     parent_id INTEGER DEFAULT 0, -- if value exist it means that this task is a sub-task of another
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (list_id) REFERENCES list (id) ON UPDATE CASCADE ON DELETE SET DEFAULT
 );
 
 CREATE TABLE IF NOT EXISTS persistence (
