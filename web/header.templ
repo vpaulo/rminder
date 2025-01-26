@@ -1,6 +1,10 @@
 package web
 
-templ Header() {
+import (
+    "rminder/internal/app/user"
+)
+
+templ Header(user *user.User) {
     <header>
         <div class="header__start">
             <!-- logo -->
@@ -8,8 +12,31 @@ templ Header() {
             <!-- app name -->
             <span class="app__name">RMINDER</span>
         </div>
+        if !user.HasPremium {
+            <rm-get-premium>
+                <button class="btn primary">Get Premium</button>
+                @GetPremiumModal()
+            </rm-get-premium>
+        } else {
+           <p>👑 You have premium!</p>
+        }
         <div class="header-end">
             <a class="icon logout-icon" href="/logout"></a>
-        </div>
+        </div>        
     </header>
+}
+
+templ GetPremiumModal() {
+    <dialog class="modal">
+        <div class="modal__content">
+            <span>Upgrade to unlock our most powerful features for work and collaboration.</span>
+            <p>Get Premium for $9.99/month</p>
+            <div class="modal__actions">
+                <form action="/checkout/create-checkout-session" method="POST">
+                    <button class="btn primary" >Get</button>
+                </form>
+                <button class="btn default">Cancel</button>
+            </div>
+        </div>
+    </dialog>
 }

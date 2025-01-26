@@ -1,4 +1,4 @@
-package routes
+package login
 
 import (
 	"crypto/rand"
@@ -8,7 +8,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"rminder/internal/authenticator"
+	"rminder/internal/login/authenticator"
 )
 
 // Handler for our login.

@@ -8,8 +8,9 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
+	"github.com/stripe/stripe-go/v81"
 
-	"rminder/internal/authenticator"
+	"rminder/internal/login/authenticator"
 	"rminder/internal/router"
 )
 
@@ -17,6 +18,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Failed to load the env vars: %v", err)
 	}
+
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
 	auth, err := authenticator.New()
 	if err != nil {

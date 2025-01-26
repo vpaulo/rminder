@@ -4,15 +4,16 @@ import (
 	"encoding/gob"
 	"io/fs"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/app"
-	"rminder/internal/authenticator"
-	"rminder/internal/middleware"
-	"rminder/internal/routes"
+	"rminder/internal/checkout"
+	"rminder/internal/login"
+	"rminder/internal/login/authenticator"
 	"rminder/web"
 )
 
@@ -26,32 +27,38 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	// we must first register them using gob.Register
 	gob.Register(map[string]interface{}{})
 
-	store := cookie.NewStore([]byte("secret"))
+	store := cookie.NewStore([]byte(os.Getenv("COOKIE_AUTHENTICATION_KEY")))
 	router.Use(sessions.Sessions("auth-session", store))
 
-	router.GET("/login", routes.LoginHandler(auth))
-	router.GET("/callback", routes.CallbackHandler(auth))
-	router.GET("/logout", routes.LogoutHandler)
+	router.GET("/login", login.LoginHandler(auth))
+	router.GET("/callback", login.CallbackHandler(application, auth))
+	router.GET("/logout", login.LogoutHandler)
 
-	router.GET("/", middleware.Authentication(application), routes.AppLoadHandler)
+	router.GET("/", app.UserMiddleware(application), app.AppLoadHandler)
 
-	tasks := router.Group("/tasks", middleware.Authentication(application))
-	tasks.GET("/all", routes.GetTasks)
-	tasks.GET("/my-day", routes.GetTasks)
-	tasks.GET("/important", routes.GetTasks)
-	tasks.GET("/completed", routes.GetTasks)
-	tasks.POST("/create", routes.CreateTask)
-	tasks.GET("/:taskID", routes.GetTask)
-	tasks.DELETE("/:taskID", routes.DeleteTask)
-	tasks.PUT("/:taskID/:slug", routes.UpdateTask)
+	checkout_group := router.Group("/checkout", app.UserMiddleware(application))
+	checkout_group.POST("/create-checkout-session", checkout.CreatePremiumCheckoutSession)
+	checkout_group.GET("/success", checkout.PremiumCheckoutSuccessHandler)
 
-	lists := router.Group("/lists", middleware.Authentication(application))
-	lists.GET("/all", routes.GetLists)
-	lists.POST("/create", routes.CreateList)
-	lists.POST("/search", routes.SearchLists)
-	lists.GET("/:listID", routes.GetList)
-	lists.DELETE("/:listID", routes.DeleteList)
-	lists.PUT("/:listID", routes.UpdateList)
+	router.POST("/post-checkout/webhook", checkout.CheckoutWebhookHandler(application))
+
+	tasks := router.Group("/tasks", app.UserMiddleware(application))
+	tasks.GET("/all", app.GetTasks)
+	tasks.GET("/my-day", app.GetTasks)
+	tasks.GET("/important", app.GetTasks)
+	tasks.GET("/completed", app.GetTasks)
+	tasks.POST("/create", app.CreateTask)
+	tasks.GET("/:taskID", app.GetTask)
+	tasks.DELETE("/:taskID", app.DeleteTask)
+	tasks.PUT("/:taskID/:slug", app.UpdateTask)
+
+	lists := router.Group("/lists", app.UserMiddleware(application))
+	lists.GET("/all", app.GetLists)
+	lists.POST("/create", app.CreateList)
+	lists.POST("/search", app.SearchLists)
+	lists.GET("/:listID", app.GetList)
+	lists.DELETE("/:listID", app.DeleteList)
+	lists.PUT("/:listID", app.UpdateList)
 
 	// Static files
 	staticFiles, err := fs.Sub(web.Files, "assets")
