@@ -5,16 +5,23 @@ class SidebarElement extends HTMLElement {
   addList;
   /** @type HTMLDivElement */
   formContainer;
+  /** @type HTMLIElement */
+  clearIcon;
+  /** @type HTMLInputElement */
+  searchInput;
 
   #closePopoverHandler;
   #formFocusHandler;
+  #searchClearHandler;
 
   addEvents() {
     this.#closePopoverHandler = () => this.closePopover();
     this.#formFocusHandler = () => this.formFocus();
+    this.#searchClearHandler = () => this.clearSearch();
 
     this.addList.addEventListener("click", this.#formFocusHandler);
     this.cancelBtn.addEventListener("click", this.#closePopoverHandler);
+    this.clearIcon.addEventListener("click", this.#searchClearHandler);
   }
 
   closePopover() {
@@ -45,10 +52,16 @@ class SidebarElement extends HTMLElement {
     this.formContainer.querySelector(".new-list").focus();
   }
 
+  clearSearch() {
+    this.searchInput.value = "";
+  }
+
   connectedCallback() {
     this.cancelBtn = this.querySelector(".cancel-new-list");
     this.addList = this.querySelector(".add-list");
     this.formContainer = this.querySelector(".list-form-container");
+    this.clearIcon = this.querySelector(".searchbox__container i.clear-icon");
+    this.searchInput = this.querySelector(".searchbox");
 
     this.addEvents();
   }
@@ -56,6 +69,7 @@ class SidebarElement extends HTMLElement {
   disconnectedCallback() {
     this.addList.removeEventListener("click", this.#formFocusHandler);
     this.cancelBtn.removeEventListener("click", this.#closePopoverHandler);
+    this.clearIcon.removeEventListener("click", this.#searchClearHandler);
   }
 }
 

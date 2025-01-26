@@ -320,43 +320,6 @@ rm-sidebar {
     user-select: none;
     outline: none;
     border: 0;
-
-    &:has(input:checked) {
-        border: 0;
-    }
-
-    &:hover input ~ .checkmark {
-        background-color: var(--colour-neutral-600);
-    }
-
-    .checkmark {
-        height: 25px;
-        width: 25px;
-        background-color: var(--base-grey);
-
-        &:after {
-            content: "";
-            position: absolute;
-            display: none;
-            right: 9px;
-            top: 7px;
-            width: 5px;
-            height: 10px;
-            border: solid var(--colour-neutral-100);
-            border-width: 0 3px 3px 0;
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
-        }
-    }
-
-    input:checked ~ .checkmark {
-        background-color: var(--primary);
-
-        &:after {
-            display: block;
-        }
-    }
 }
 
 .searchbox__container {
@@ -365,8 +328,10 @@ rm-sidebar {
     .searchbox__form {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 0;
         padding: 10px;
+        position: relative;
     }
 
     .searchbox {
@@ -374,7 +339,7 @@ rm-sidebar {
         height: 40px;
         color: var(--base-colour);
         font-size: 0.9rem;
-        padding: 8px 6px;
+        padding: 8px 20px 8px 6px;
         text-overflow: ellipsis;
         background-color: var(--base-grey);
 
@@ -393,6 +358,7 @@ rm-sidebar {
         border: transparent;
         cursor: pointer;
         padding: 0;
+        outline: none;
 
         &:hover {
             background: var(--colour-neutral-600);
@@ -401,6 +367,17 @@ rm-sidebar {
 
     .search-icon {
         display: block;
+    }
+
+    .clear-icon {
+        position: absolute;
+        right: 45px;
+        cursor: pointer;
+        background-color: var(--colour-neutral-600);
+
+        &:hover {
+            background-color: var(--base-colour);
+        }
     }
 }
 

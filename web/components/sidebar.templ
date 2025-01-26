@@ -36,7 +36,7 @@ templ Search() {
 		    hx-trigger="submit, keyup[enterKey]"
 		    hx-target={ ".main" }>
 		 	<input
-				type="search"
+				type="text"
 				class="searchbox"
 				name="query"
 				autocomplete="off"
@@ -44,6 +44,7 @@ templ Search() {
 				required
 				minlength="3"
 				hx-validate="true"/>
+			<i class="icon clear-icon"></i>
 			<button type="submit" class="searchbox__button">
 				<i class="icon search-icon"></i>
 			</button>
