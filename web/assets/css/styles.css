@@ -699,33 +699,3 @@ rm-task-details .ql-toolbar.ql-snow {
         background-color: var(--primary);
     }
 }
-@media only screen and (max-width: 880px) {
-    #app:has(.tasks__list input:checked):has(.sidebar__header input:checked) .sidebar {
-        --sidebar-width: 40px;
-        --lists-visibility: none;
-        background-color: var(--base-grey);
-    }
-}
-@media only screen and (max-width: 630px) {
-    #app:has(.tasks__list input:checked) .main {
-        visibility: hidden;
-        min-width: 0;
-        margin-left: -20px;
-        --main-width: 0;
-    }
-
-    #app:has(.tasks__list input:checked) .details {
-        --details-width: calc(100% - var(--size-40) - var(--gap-20));
-    }
-
-    .modal {
-        --modal-width: 320px;
-    }
-}
-@media only screen and (max-width: 580px) {
-    #app:has(.sidebar__header input:checked) .sidebar {
-        --sidebar-width: 40px;
-        --lists-visibility: none;
-        background-color: var(--base-grey);
-    }
-}

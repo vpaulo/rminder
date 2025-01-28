@@ -12,7 +12,6 @@ class DetailsElement extends HTMLElement {
     const dialog = this.querySelector("dialog.modal");
     const cancel_btn = this.querySelector("dialog button.default");
     const delete_btn = this.querySelector("dialog button.warning");
-    console.log("task id : ", task_id);
 
     this.quill = new Quill("#note-editor", {
       modules: {

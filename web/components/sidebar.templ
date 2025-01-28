@@ -89,7 +89,7 @@ templ List(list *database.List, selectedList int) {
             hx-trigger="change"
             hx-target=".main"
         >
-            <span class={"icon " + list.Icon }></span>
+            <span class={"ident icon " + list.Icon }></span>
             <span class="name">{ list.Name }</span>
 	        <span class="count">{ strconv.Itoa(len(list.Tasks)) }</span>
 			if !list.Base {
