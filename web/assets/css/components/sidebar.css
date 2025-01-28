@@ -8,7 +8,7 @@ rm-sidebar {
     overflow: hidden;
 
     &:has(.header input:checked) {
-        --sidebar-width: 340px;
+        --sidebar-width: 320px;
         --lists-visibility: inline;
         background-color: #fff;
 
@@ -20,10 +20,6 @@ rm-sidebar {
                 flex: 1 1 auto;
                 border: 2px solid var(--background);
             }
-        }
-
-        .list {
-            /* padding: 10px 20px; */
         }
 
         .searchbox__container {
@@ -50,10 +46,6 @@ rm-sidebar {
         display: flex;
         flex-wrap: wrap;
         border-bottom: 2px solid var(--background);
-
-        .list {
-            /* padding: 10px; */
-        }
     }
 
     .lists {
@@ -90,7 +82,7 @@ rm-sidebar {
             flex: 1 1 auto;
         }
     }
-    .list span:not(.icon) {
+    .list span:not(.ident.icon) {
         font-size: 0.8rem;
         display: var(--lists-visibility);
     }
