@@ -107,6 +107,16 @@ input {
     box-shadow: none;
     border-radius: 0;
 }
+input[type="date"] {
+    display: block;
+    width: 100%;
+    height: 40px;
+    border: 2px solid var(--base-grey);
+    outline: 0;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    background-color: transparent;
+}
 body {
     margin: 0;
     padding: 0;
@@ -119,6 +129,16 @@ body {
 }
 button {
     color: var(--base-colour);
+}
+select {
+    display: block;
+    width: 100%;
+    height: 40px;
+    border: 2px solid var(--base-grey);
+    outline: 0;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    background-color: transparent;
 }
 header {
     display: flex;
@@ -496,6 +516,10 @@ header {
     mask: url("/assets/icons/clear-icon.svg") no-repeat 50%;
 }
 
+.filter-icon {
+    mask: url("/assets/icons/filter-icon.svg") no-repeat 50%;
+}
+
 .header-end > a {
     cursor: pointer;
     width: var(--size-40);
@@ -537,17 +561,6 @@ header {
     label {
         font-size: 0.9rem;
     }
-
-    select {
-        display: block;
-        width: 100%;
-        height: 40px;
-        border: 2px solid var(--base-grey);
-        outline: 0;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        background-color: transparent;
-    }
 }
 
 .details__schedule {
@@ -559,17 +572,6 @@ header {
         display: flex;
         flex-direction: column;
         font-size: 0.9rem;
-    }
-
-    input[type="date"] {
-        display: block;
-        width: 100%;
-        height: 40px;
-        border: 2px solid var(--base-grey);
-        outline: 0;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        background-color: transparent;
     }
 }
 
