@@ -165,6 +165,49 @@ templ ListModal(lists []*database.List) {
               		</label>
                 }
             </fieldset>
+           	<details>
+          		<summary>
+            		<div class="summary">
+              			<span class="icon filter-icon"></span>
+                 		<span>Filters</span>
+              		</div>
+            	</summary>
+               	<fieldset class="filters-fieldset">
+	                <div>
+			            <label for="completed">Completed</label>
+			            <select name="completed">
+							<option value="">Any</option>
+							<option value="y">Yes</option>
+							<option value="n">No</option>
+			            </select>
+	               	</div>
+					<div>
+			            <label for="important">Important</label>
+			            <select name="important">
+							<option value="">Any</option>
+							<option value="y">Yes</option>
+							<option value="n">No</option>
+			            </select>
+					</div>
+	          		<div>
+			            <label for="priority">Priority</label>
+			            <select name="priority">
+							<option value="">Any</option>
+			                for i, value := range priorityValues() {
+			                    <option value={ strconv.Itoa(i) }>{ value }</option>
+			                }
+			            </select>
+	          		</div>
+					<div>
+		            	<label for="from">Start Date</label>
+						<input name="from" type="date">
+		            </div>
+					<div>
+		            	<label for="to">Due Date</label>
+						<input name="to" type="date">
+		            </div>
+               	</fieldset>
+           	</details>
             <input type="text" name="position" class="hidden" value={ strconv.Itoa(len(lists)) }/>
             <fieldset class="form-actions">
             	<div class="main-actions">
