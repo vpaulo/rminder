@@ -173,10 +173,18 @@ templ ListModal(lists []*database.List) {
               		</div>
             	</summary>
                	<fieldset class="filters-fieldset">
+                	<div>
+			            <label for="include">Include</label>
+			            <select name="include">
+							<option value="" selected>No Filter</option>
+							<option value="any">Any</option>
+							<option value="all">All</option>
+			            </select>
+	               	</div>
 	                <div>
 			            <label for="completed">Completed</label>
 			            <select name="completed">
-							<option value="">Any</option>
+							<option value="" selected>Any</option>
 							<option value="y">Yes</option>
 							<option value="n">No</option>
 			            </select>
@@ -184,7 +192,7 @@ templ ListModal(lists []*database.List) {
 					<div>
 			            <label for="important">Important</label>
 			            <select name="important">
-							<option value="">Any</option>
+							<option value="" selected>Any</option>
 							<option value="y">Yes</option>
 							<option value="n">No</option>
 			            </select>
@@ -192,18 +200,30 @@ templ ListModal(lists []*database.List) {
 	          		<div>
 			            <label for="priority">Priority</label>
 			            <select name="priority">
-							<option value="">Any</option>
+							<option value="" selected>Any</option>
 			                for i, value := range priorityValues() {
 			                    <option value={ strconv.Itoa(i) }>{ value }</option>
 			                }
 			            </select>
 	          		</div>
 					<div>
-		            	<label for="from">Start Date</label>
+      					<label for="date">Date</label>
+			            <select name="date">
+							<option value="" selected>No Date</option>
+							<option value="td">Today</option>
+							<option value="wd">With Date</option>
+							<option value="od">On Date</option>
+							<option value="bd">Before a Date</option>
+							<option value="af">After a Date</option>
+							<option value="rg">On Range</option>
+			            </select>
+					</div>
+					<div>
+		            	<label for="from">Start Range</label>
 						<input name="from" type="date">
 		            </div>
 					<div>
-		            	<label for="to">Due Date</label>
+		            	<label for="to">End Range</label>
 						<input name="to" type="date">
 		            </div>
                	</fieldset>
