@@ -89,6 +89,14 @@ func CreateList(ctx *gin.Context) {
 	list := ctx.Request.FormValue("new-list")
 	pos, e := strconv.Atoi(ctx.Request.FormValue("position"))
 	pinned := ctx.Request.FormValue("pin")
+
+	if e != nil {
+		pos = 0
+	}
+
+	swatch := ctx.Request.FormValue("swatch")
+	icon := ctx.Request.FormValue("icon")
+
 	// Filters
 	var filter = ""
 	include := ctx.Request.FormValue("include")
@@ -99,16 +107,10 @@ func CreateList(ctx *gin.Context) {
 	from := ctx.Request.FormValue("from")
 	to := ctx.Request.FormValue("to")
 
-	if e != nil {
-		pos = 0
-	}
-
 	if include != "" {
 		filter = fmt.Sprintf("include=%s;completed=%s;important=%s;priority=%s;date=%s;from=%s;to=%s", include, completed, important, priority, date, from, to)
 	}
 
-	swatch := ctx.Request.FormValue("swatch")
-	icon := ctx.Request.FormValue("icon")
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
 		err := db.CreateList(list, swatch, icon, pos, pinned == "1", filter)
 		if err != nil {
@@ -176,7 +178,6 @@ func DeleteList(ctx *gin.Context) {
 	}
 }
 
-// TODO: update this to work with lists
 func UpdateList(ctx *gin.Context) {
 	db := GetUserDatabase(ctx)
 
@@ -194,8 +195,23 @@ func UpdateList(ctx *gin.Context) {
 	pinned := ctx.Request.FormValue("pin")
 	swatch := ctx.Request.FormValue("swatch")
 	icon := ctx.Request.FormValue("icon")
+
+	// Filters
+	var filter = ""
+	include := ctx.Request.FormValue("include")
+	completed := ctx.Request.FormValue("completed")
+	important := ctx.Request.FormValue("important")
+	priority := ctx.Request.FormValue("priority")
+	date := ctx.Request.FormValue("date")
+	from := ctx.Request.FormValue("from")
+	to := ctx.Request.FormValue("to")
+
+	if include != "" {
+		filter = fmt.Sprintf("include=%s;completed=%s;important=%s;priority=%s;date=%s;from=%s;to=%s", include, completed, important, priority, date, from, to)
+	}
+
 	if name != "" && len(name) >= 3 && len(name) <= 255 && swatch != "" && icon != "" {
-		err := db.UpdateList(id, name, swatch, icon, pinned == "1")
+		err := db.UpdateList(id, name, swatch, icon, pinned == "1", filter)
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error creating list. Err: %v", err)

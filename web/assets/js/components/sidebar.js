@@ -37,6 +37,9 @@ class SidebarElement extends HTMLElement {
     form.querySelectorAll("input:checked")?.forEach((el) => {
       el.removeAttribute("checked");
     });
+    form.querySelectorAll("option")?.forEach((el) => {
+      el.removeAttribute("selected");
+    });
     form.querySelector('input[name="swatch"]')?.setAttribute("checked", "");
     form.querySelector('input[name="icon"]')?.setAttribute("checked", "");
     btn.innerHTML = "Add";
