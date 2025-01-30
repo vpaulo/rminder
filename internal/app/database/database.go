@@ -39,14 +39,13 @@ type Service interface {
 	Lists() ([]*List, error)
 	List(ID string) (*List, error)
 	ListTasks(id int) ([]*Task, error)
-	UpdateList(id int, name string, colour string, icon string, pinned bool) error
+	CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error
+	UpdateList(id int, name string, colour string, icon string, pinned bool, filter string) error
 	DeleteList(id int) error
 
 	Groups() ([]*GroupList, error)
 	Group(ID int) (*GroupList, error)
 	GroupLists(id int) ([]*List, error)
-
-	CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error
 
 	Persistence() (*Persistence, error)
 	UpdatePersistence(task int, list int, group int) error
@@ -748,14 +747,14 @@ func (s *service) CreateList(name string, swatch string, icon string, position i
 	return nil
 }
 
-func (s *service) UpdateList(id int, name string, colour string, icon string, pinned bool) error {
-	query, err := s.db.Prepare("UPDATE list SET name = ?, colour = ?, icon = ?, pinned = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+func (s *service) UpdateList(id int, name string, colour string, icon string, pinned bool, filter string) error {
+	query, err := s.db.Prepare("UPDATE list SET name = ?, colour = ?, icon = ?, pinned = ?, filter_by = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
 	if err != nil {
 		return fmt.Errorf("DB.UpdateList - prepare update query failed: %v", err)
 	}
 	defer query.Close()
 
-	_, err = query.Exec(name, colour, icon, pinned, id)
+	_, err = query.Exec(name, colour, icon, pinned, filter, id)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateList - update query result failed: %v", err)
 	}

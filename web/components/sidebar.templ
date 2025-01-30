@@ -82,7 +82,8 @@ templ List(list *database.List, selectedList int) {
 		data-colour={ list.Colour }
 		data-icon={ list.Icon }
 		data-pinned?={ list.Pinned }
-		data-position={ strconv.Itoa(list.Position) }>
+		data-position={ strconv.Itoa(list.Position) }
+		data-filter={ list.FilterBy }>
         <label
             class="list"
             hx-get={ "/lists/" + strconv.Itoa(list.ID)}
