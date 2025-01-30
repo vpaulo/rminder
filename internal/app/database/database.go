@@ -46,7 +46,7 @@ type Service interface {
 	Group(ID int) (*GroupList, error)
 	GroupLists(id int) ([]*List, error)
 
-	CreateList(name string, swatch string, icon string, position int, pinned bool) error
+	CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error
 
 	Persistence() (*Persistence, error)
 	UpdatePersistence(task int, list int, group int) error
@@ -724,8 +724,8 @@ func (s *service) GroupLists(id int) ([]*List, error) {
 	return lists, nil
 }
 
-func (s *service) CreateList(name string, swatch string, icon string, position int, pinned bool) error {
-	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon, position, pinned) Values (?, ?, ?, ?, ?)")
+func (s *service) CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error {
+	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon, position, pinned, filter_by) Values (?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - prepare create query failed: %v", err)
 	}
@@ -737,9 +737,10 @@ func (s *service) CreateList(name string, swatch string, icon string, position i
 		Icon:     icon,
 		Position: position,
 		Pinned:   pinned,
+		FilterBy: filter,
 	}
 
-	_, err = query.Exec(list.Name, list.Colour, list.Icon, list.Position, list.Pinned)
+	_, err = query.Exec(list.Name, list.Colour, list.Icon, list.Position, list.Pinned, list.FilterBy)
 	if err != nil {
 		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
 	}

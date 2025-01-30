@@ -50,7 +50,15 @@ CREATE TABLE IF NOT EXISTS persistence (
 
 -- Initialise default lists
 INSERT INTO
-    list (name, colour, icon, pinned, base, position)
+    list (
+        name,
+        colour,
+        icon,
+        pinned,
+        base,
+        position,
+        filter_by
+    )
 VALUES
     (
         "Today",
@@ -58,7 +66,8 @@ VALUES
         "today-icon",
         true,
         true,
-        1
+        1,
+        "include=all;completed=;important=;priority=;date=td;from=;to="
     ),
     (
         "Scheduled",
@@ -66,7 +75,8 @@ VALUES
         "calendar-icon",
         true,
         true,
-        2
+        2,
+        "include=all;completed=;important=;priority=;date=wd;from=;to="
     ),
     (
         "All",
@@ -74,7 +84,8 @@ VALUES
         "icon-tasks",
         true,
         true,
-        3
+        3,
+        "include=all;completed=;important=;priority=;date=;from=;to="
     ),
     (
         "Important",
@@ -82,7 +93,8 @@ VALUES
         "icon-star",
         true,
         true,
-        4
+        4,
+        "include=all;completed=;important=y;priority=;date=wd;from=;to="
     ),
     (
         "Completed",
@@ -90,7 +102,8 @@ VALUES
         "icon-check-square",
         true,
         true,
-        5
+        5,
+        "include=all;completed=y;important=;priority=;date=wd;from=;to="
     ),
     (
         "Inbox",
@@ -98,7 +111,8 @@ VALUES
         "list-ul-icon",
         false,
         false,
-        6
+        6,
+        ""
     );
 
 INSERT INTO
