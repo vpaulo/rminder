@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -38,7 +39,7 @@ type Service interface {
 
 	Lists() ([]*List, error)
 	List(ID string) (*List, error)
-	ListTasks(id int) ([]*Task, error)
+	ListTasks(id int, filter string) ([]*Task, error)
 	CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error
 	UpdateList(id int, name string, colour string, icon string, pinned bool, filter string) error
 	DeleteList(id int) error
@@ -525,7 +526,7 @@ func (s *service) Lists() ([]*List, error) {
 		if err != nil {
 			return nil, fmt.Errorf("DB.Lists - result scan failed: %v", err)
 		}
-		tasks, err = s.ListTasks(data.ID)
+		tasks, err = s.ListTasks(data.ID, data.FilterBy)
 		if err != nil {
 			return nil, fmt.Errorf("DB.Lists - get list tasks failed: %v", err)
 		}
@@ -536,8 +537,121 @@ func (s *service) Lists() ([]*List, error) {
 	return lists, nil
 }
 
-func (s *service) ListTasks(id int) ([]*Task, error) {
-	query, err := s.db.Prepare("SELECT * FROM task WHERE list_id=?")
+func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
+	var (
+		query *sql.Stmt
+		err   error
+	)
+
+	if filter == "" {
+		query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=?")
+	} else {
+		// TODO: find better way for this, do not like it
+		fl := make([]string, 0)
+		op := ""
+		date := ""
+		from := ""
+		to := ""
+
+		for i, value := range strings.Split(filter, ";") {
+			f := strings.Split(value, "=")[1]
+			q := ""
+
+			switch i {
+			case 0:
+				op = f
+			case 1, 2, 3:
+				if f != "" {
+					q = value
+				}
+			case 4:
+				if f != "" {
+					date = f
+				}
+			case 5:
+				if f != "" {
+					tm, _ := time.Parse("2006-01-02", f)
+					from = tm.Format(time.DateTime)
+				}
+			case 6:
+				if f != "" {
+					tm, _ := time.Parse("2006-01-02", f)
+					to = tm.Format(time.DateTime)
+				}
+
+				switch date {
+				// Today
+				case "td":
+					today := time.Now().Format(time.DateOnly)
+
+					// Adding 00:00:00 to normalise how dates are saved
+					str := fmt.Sprintf("start_at >= '%s 00:00:00' OR end_at = '%s 00:00:00' OR ('%s 00:00:00' BETWEEN start_at AND end_at)", today, today, today)
+
+					if q == "" {
+						q = str
+					} else {
+						q = fmt.Sprintf("(%s)", str)
+					}
+				// With Date
+				case "wd":
+					str := "NOT start_at = '' OR NOT end_at = ''"
+
+					if q == "" {
+						q = str
+					} else {
+						q = fmt.Sprintf("(%s)", str)
+					}
+				// On Date
+				case "od":
+					str := fmt.Sprintf("start_at = '%s'", from)
+
+					if q == "" {
+						q = str
+					} else {
+						q = fmt.Sprintf("(%s)", str)
+					}
+				// Before a Date
+				case "bd":
+					str := fmt.Sprintf("NOT start_at = '' AND start_at < '%s'", from)
+
+					if q == "" {
+						q = str
+					} else {
+						q = fmt.Sprintf("(%s)", str)
+					}
+				// After a Date
+				case "ad":
+					str := fmt.Sprintf("NOT start_at = '' AND start_at > '%s'", from)
+
+					if q == "" {
+						q = str
+					} else {
+						q = fmt.Sprintf("(%s)", str)
+					}
+				// On Range
+				case "rg":
+					str := fmt.Sprintf("start_at BETWEEN %s AND %s OR end_at BETWEEN %s AND %s", from, to, from, to)
+
+					if q == "" {
+						q = str
+					} else {
+						q = fmt.Sprintf("(%s)", str)
+					}
+				}
+			}
+
+			if q != "" {
+				fl = append(fl, q)
+			}
+		}
+
+		if len(fl) > 0 {
+			query, err = s.db.Prepare("SELECT * FROM task WHERE " + strings.Join(fl, fmt.Sprintf(" %s ", op)))
+		} else {
+			query, err = s.db.Prepare("SELECT * FROM task")
+		}
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("DB.ListTasks - prepare query failed: %v", err)
 	}
@@ -602,7 +716,7 @@ func (s *service) List(id string) (*List, error) {
 		return nil, fmt.Errorf("DB.List - query result failed: %v", err)
 	}
 
-	tasks, err = s.ListTasks(list.ID)
+	tasks, err = s.ListTasks(list.ID, list.FilterBy)
 	if err != nil {
 		return nil, fmt.Errorf("DB.List - get list tasks failed: %v", err)
 	}
@@ -712,7 +826,7 @@ func (s *service) GroupLists(id int) ([]*List, error) {
 		if err != nil {
 			return nil, fmt.Errorf("DB.GroupLists - result scan failed: %v", err)
 		}
-		tasks, err = s.ListTasks(data.ID)
+		tasks, err = s.ListTasks(data.ID, data.FilterBy)
 		if err != nil {
 			return nil, fmt.Errorf("DB.GroupLists - get list tasks failed: %v", err)
 		}

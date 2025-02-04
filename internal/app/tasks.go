@@ -125,7 +125,7 @@ func CreateTask(ctx *gin.Context) {
 		log.Fatalf("error title validation failed. Err: %v", err)
 	}
 
-	tasks, err := db.ListTasks(list)
+	tasks, err := db.ListTasks(list, "")
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("error handling tasks. Err: %v", err)

@@ -67,7 +67,7 @@ VALUES
         true,
         true,
         1,
-        "include=all;completed=;important=;priority=;date=td;from=;to="
+        "include=AND;completed=;important=;priority=;date=td;from=;to="
     ),
     (
         "Scheduled",
@@ -76,7 +76,7 @@ VALUES
         true,
         true,
         2,
-        "include=all;completed=;important=;priority=;date=wd;from=;to="
+        "include=AND;completed=;important=;priority=;date=wd;from=;to="
     ),
     (
         "All",
@@ -85,7 +85,7 @@ VALUES
         true,
         true,
         3,
-        "include=all;completed=;important=;priority=;date=;from=;to="
+        "include=AND;completed=;important=;priority=;date=;from=;to="
     ),
     (
         "Important",
@@ -94,7 +94,7 @@ VALUES
         true,
         true,
         4,
-        "include=all;completed=;important=y;priority=;date=wd;from=;to="
+        "include=AND;completed=;important=TRUE;priority=;date=;from=;to="
     ),
     (
         "Completed",
@@ -103,7 +103,7 @@ VALUES
         true,
         true,
         5,
-        "include=all;completed=y;important=;priority=;date=wd;from=;to="
+        "include=AND;completed=TRUE;important=;priority=;date=;from=;to="
     ),
     (
         "Inbox",

@@ -36,9 +36,12 @@ templ TaskList(tasks []*database.Task, selectedtask int) {
 }
 
 templ Task(task *database.Task, selectedtask int) {
-  <li class={ templ.KV("completed", task.Completed), templ.KV("important", task.Important) } data-id={ strconv.Itoa(task.ID) }>
+  <li
+  	class={ templ.KV("completed", task.Completed), templ.KV("important", task.Important) }
+   	data-id={ strconv.Itoa(task.ID) }
+  >
     <span
-      class="completed-ckeck"
+      class="trigger completed-ckeck"
       title="Set it as complete"
       hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/completed" }
       hx-trigger="click"
@@ -59,7 +62,7 @@ templ Task(task *database.Task, selectedtask int) {
     </label>
     <span>{ strings.Repeat("!", task.Priority) }</span>
     <span
-      class="importance-check"
+      class="trigger importance-check"
       title="Set it as important"
       hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/important" }
       hx-trigger="click"
@@ -76,9 +79,9 @@ templ PersistedListContent(lists []*database.List, persistence *database.Persist
  	}
 }
 
-templ SearchListContent(lists []*database.List, persistence *database.Persistence) {
+templ MultiListContent(lists []*database.List, persistence *database.Persistence) {
 	if len(lists) == 0 {
-		@components.NoSearchResultsScreen()
+		@components.NoResultsScreen()
 	} else {
 		<div>
 			<div class="search-toolbar">
@@ -124,7 +127,10 @@ templ ListsContent(list *database.List, persistence *database.Persistence, isMul
 		            <button class="add-task" type="submit">Add</button>
 		        </form>
 			}
-	        <div class="tasks">
+	        <div class="tasks" hx-get="/lists/all"
+				hx-target=".lists__container"
+				hx-trigger="click delay:20ms"
+			>
 	            @TaskList(list.Tasks, 0)
 	        </div>
 	    </div>
