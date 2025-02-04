@@ -9,6 +9,7 @@ import (
 	"rminder/web"
 	"rminder/web/components"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -104,11 +105,13 @@ func CreateList(ctx *gin.Context) {
 	important := ctx.Request.FormValue("important")
 	priority := ctx.Request.FormValue("priority")
 	date := ctx.Request.FormValue("date")
-	from := ctx.Request.FormValue("from")
-	to := ctx.Request.FormValue("to")
+
+	// TODO: error handling
+	from, _ := time.Parse("2006-01-02", ctx.Request.FormValue("from"))
+	to, _ := time.Parse("2006-01-02", ctx.Request.FormValue("to"))
 
 	if include != "" {
-		filter = fmt.Sprintf("include=%s;completed=%s;important=%s;priority=%s;date=%s;from=%s;to=%s", include, completed, important, priority, date, from, to)
+		filter = fmt.Sprintf("include=%s;completed=%s;important=%s;priority=%s;date=%s;from=%s;to=%s", include, completed, important, priority, date, from.Format(time.DateTime), to.Format(time.DateTime))
 	}
 
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
@@ -203,11 +206,13 @@ func UpdateList(ctx *gin.Context) {
 	important := ctx.Request.FormValue("important")
 	priority := ctx.Request.FormValue("priority")
 	date := ctx.Request.FormValue("date")
-	from := ctx.Request.FormValue("from")
-	to := ctx.Request.FormValue("to")
+
+	// TODO: error handling
+	from, _ := time.Parse("2006-01-02", ctx.Request.FormValue("from"))
+	to, _ := time.Parse("2006-01-02", ctx.Request.FormValue("to"))
 
 	if include != "" {
-		filter = fmt.Sprintf("include=%s;completed=%s;important=%s;priority=%s;date=%s;from=%s;to=%s", include, completed, important, priority, date, from, to)
+		filter = fmt.Sprintf("include=%s;completed=%s;important=%s;priority=%s;date=%s;from=%s;to=%s", include, completed, important, priority, date, from.Format(time.DateTime), to.Format(time.DateTime))
 	}
 
 	if name != "" && len(name) >= 3 && len(name) <= 255 && swatch != "" && icon != "" {
@@ -279,7 +284,7 @@ func SearchLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.SearchListContent(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.MultiListContent(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in SearchLists: %e", err)

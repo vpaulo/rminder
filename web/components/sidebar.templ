@@ -178,24 +178,24 @@ templ ListModal(lists []*database.List) {
 			            <label for="include">Include</label>
 			            <select name="include">
 							<option value="" selected>No Filter</option>
-							<option value="any">Any</option>
-							<option value="all">All</option>
+							<option value="OR">Any</option>
+							<option value="AND">All</option>
 			            </select>
 	               	</div>
 	                <div>
 			            <label for="completed">Completed</label>
 			            <select name="completed">
 							<option value="" selected>Any</option>
-							<option value="y">Yes</option>
-							<option value="n">No</option>
+							<option value="TRUE">Yes</option>
+							<option value="FALSE">No</option>
 			            </select>
 	               	</div>
 					<div>
 			            <label for="important">Important</label>
 			            <select name="important">
 							<option value="" selected>Any</option>
-							<option value="y">Yes</option>
-							<option value="n">No</option>
+							<option value="TRUE">Yes</option>
+							<option value="FALSE">No</option>
 			            </select>
 					</div>
 	          		<div>
