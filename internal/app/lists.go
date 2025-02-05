@@ -17,7 +17,7 @@ import (
 func GetLists(ctx *gin.Context) {
 	db := GetUserDatabase(ctx)
 
-	lists, err := db.Lists()
+	lists, err := db.Lists("")
 	if err != nil {
 		log.Fatalf("error handling GetLists. Err: %v", err)
 	}
@@ -42,8 +42,9 @@ func GetList(ctx *gin.Context) {
 	listID := ctx.Param("listID")
 
 	var (
-		list *database.List
-		err  error
+		lists []*database.List
+		list  *database.List
+		err   error
 	)
 
 	if listID != "" {
@@ -59,6 +60,14 @@ func GetList(ctx *gin.Context) {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("error updating persistence list. Err: %v", err)
 		}
+
+		if list.FilterBy != "" {
+			lists, err = db.Lists(list.FilterBy)
+			if err != nil {
+				log.Fatalf("error handling GetLists. Err: %v", err)
+			}
+		}
+
 	} else {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -70,7 +79,12 @@ func GetList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.ListsContent(list, persistence, false).Render(ctx.Request.Context(), ctx.Writer)
+
+	if list.FilterBy == "" {
+		err = web.ListsContent(list, persistence, false).Render(ctx.Request.Context(), ctx.Writer)
+	} else {
+		err = web.MultiListContent(lists, list.Name, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	}
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in ListsContent: %e", err)
@@ -125,7 +139,7 @@ func CreateList(ctx *gin.Context) {
 		log.Fatalf("error form field validation failed. Err: %v", err)
 	}
 
-	lists, err := db.Lists()
+	lists, err := db.Lists("")
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("error handling lists. Err: %v", err)
@@ -162,7 +176,7 @@ func DeleteList(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	lists, err := db.Lists()
+	lists, err := db.Lists("")
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("error handling DeleteList lists. Err: %v", err)
@@ -226,7 +240,7 @@ func UpdateList(ctx *gin.Context) {
 		log.Fatalf("error form field validation failed. Err: %v", err)
 	}
 
-	lists, err := db.Lists()
+	lists, err := db.Lists("")
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("error handling lists. Err: %v", err)
@@ -284,7 +298,7 @@ func SearchLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.MultiListContent(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.MultiListContent(lists, "Search Results", persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in SearchLists: %e", err)

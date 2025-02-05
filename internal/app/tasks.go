@@ -31,7 +31,7 @@ func GetTasks(ctx *gin.Context) {
 	case "completed":
 		tasks, err = db.CompletedTasks()
 	default:
-		lists, err = db.Lists()
+		lists, err = db.Lists("")
 	}
 
 	if err != nil {
@@ -46,7 +46,7 @@ func GetTasks(ctx *gin.Context) {
 
 	if slug == "" {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(lists, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
+		err = web.Tasks(lists, nil, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in tasksHandler: %e", err)

@@ -37,7 +37,7 @@ type Service interface {
 	UpdateTaskStartDate(id string, date string) error
 	UpdateTaskEndDate(id string, date string) error
 
-	Lists() ([]*List, error)
+	Lists(filter string) ([]*List, error)
 	List(ID string) (*List, error)
 	ListTasks(id int, filter string) ([]*Task, error)
 	CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error
@@ -87,7 +87,7 @@ func New(database_path string) Service {
 
 func (s *service) loadSqlFile() error {
 	// Check db already has been initialised
-	lists, err := s.Lists()
+	lists, err := s.Lists("")
 	if len(lists) > 0 || err == nil {
 		return nil
 	}
@@ -493,7 +493,7 @@ func (s *service) DeleteTask(id string) error {
 	return nil
 }
 
-func (s *service) Lists() ([]*List, error) {
+func (s *service) Lists(filter string) ([]*List, error) {
 	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
@@ -506,6 +506,7 @@ func (s *service) Lists() ([]*List, error) {
 	}
 
 	var tasks []*Task
+	var ids []int
 
 	lists := make([]*List, 0)
 	for result.Next() {
@@ -526,12 +527,35 @@ func (s *service) Lists() ([]*List, error) {
 		if err != nil {
 			return nil, fmt.Errorf("DB.Lists - result scan failed: %v", err)
 		}
-		tasks, err = s.ListTasks(data.ID, data.FilterBy)
+
+		fl := data.FilterBy
+		if filter != "" {
+			fl = filter
+		}
+
+		tasks, err = s.ListTasks(data.ID, fl)
 		if err != nil {
 			return nil, fmt.Errorf("DB.Lists - get list tasks failed: %v", err)
 		}
 		data.Tasks = tasks
 		lists = append(lists, data)
+		ids = append(ids, data.ID)
+	}
+
+	// Adjustment for length of lists, mostly to set sidebar list task count
+	if filter == "" {
+		for _, l := range lists {
+			if l.FilterBy != "" {
+				for _, id := range ids {
+					tasks, err = s.ListTasks(id, l.FilterBy)
+					if err != nil {
+						return nil, fmt.Errorf("DB.Lists - get list tasks failed: %v", err)
+					}
+
+					l.Tasks = append(l.Tasks, tasks...)
+				}
+			}
+		}
 	}
 
 	return lists, nil
@@ -543,9 +567,8 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		err   error
 	)
 
-	if filter == "" {
-		query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=?")
-	} else {
+	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=?")
+	if filter != "" {
 		// TODO: find better way for this, do not like it
 		fl := make([]string, 0)
 		op := ""
@@ -585,58 +608,34 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 					today := time.Now().Format(time.DateOnly)
 
 					// Adding 00:00:00 to normalise how dates are saved
-					str := fmt.Sprintf("start_at >= '%s 00:00:00' OR end_at = '%s 00:00:00' OR ('%s 00:00:00' BETWEEN start_at AND end_at)", today, today, today)
+					str := fmt.Sprintf("start_at = '%s 00:00:00' OR end_at = '%s 00:00:00' OR (NOT start_at = '' AND NOT end_at = '' AND '%s 00:00:00' BETWEEN start_at AND end_at)", today, today, today)
 
-					if q == "" {
-						q = str
-					} else {
-						q = fmt.Sprintf("(%s)", str)
-					}
+					q = fmt.Sprintf("(%s)", str)
 				// With Date
 				case "wd":
 					str := "NOT start_at = '' OR NOT end_at = ''"
 
-					if q == "" {
-						q = str
-					} else {
-						q = fmt.Sprintf("(%s)", str)
-					}
+					q = fmt.Sprintf("(%s)", str)
 				// On Date
 				case "od":
 					str := fmt.Sprintf("start_at = '%s'", from)
 
-					if q == "" {
-						q = str
-					} else {
-						q = fmt.Sprintf("(%s)", str)
-					}
+					q = fmt.Sprintf("(%s)", str)
 				// Before a Date
 				case "bd":
 					str := fmt.Sprintf("NOT start_at = '' AND start_at < '%s'", from)
 
-					if q == "" {
-						q = str
-					} else {
-						q = fmt.Sprintf("(%s)", str)
-					}
+					q = fmt.Sprintf("(%s)", str)
 				// After a Date
 				case "ad":
 					str := fmt.Sprintf("NOT start_at = '' AND start_at > '%s'", from)
 
-					if q == "" {
-						q = str
-					} else {
-						q = fmt.Sprintf("(%s)", str)
-					}
+					q = fmt.Sprintf("(%s)", str)
 				// On Range
 				case "rg":
 					str := fmt.Sprintf("start_at BETWEEN %s AND %s OR end_at BETWEEN %s AND %s", from, to, from, to)
 
-					if q == "" {
-						q = str
-					} else {
-						q = fmt.Sprintf("(%s)", str)
-					}
+					q = fmt.Sprintf("(%s)", str)
 				}
 			}
 
@@ -646,9 +645,7 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		}
 
 		if len(fl) > 0 {
-			query, err = s.db.Prepare("SELECT * FROM task WHERE " + strings.Join(fl, fmt.Sprintf(" %s ", op)))
-		} else {
-			query, err = s.db.Prepare("SELECT * FROM task")
+			query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? AND " + strings.Join(fl, fmt.Sprintf(" %s ", op)))
 		}
 	}
 
