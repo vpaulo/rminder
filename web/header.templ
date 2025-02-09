@@ -11,19 +11,27 @@ templ Header(user *user.User) {
             <span class="app__logo"></span>
             <!-- app name -->
             <span class="app__name">RMINDER</span>
+            <span class="app__separator">/</span>
+            <span class="app__stage">Beta</span>
+            <span class="app__version">0.1.0</span>
         </div>
-        if !user.HasPremium {
-            <rm-get-premium>
-                <button class="btn primary">Get Premium</button>
-                @GetPremiumModal()
-            </rm-get-premium>
-        } else {
-           <p>👑 You have premium!</p>
-        }
+        <!-- Premium  -->
+        <!-- Logout -->
         <div class="header-end">
             <a class="icon logout-icon" href="/logout"></a>
-        </div>        
+        </div>
     </header>
+}
+
+templ hasPremium(user *user.User) {
+	if !user.HasPremium {
+        <rm-get-premium>
+            <button class="btn primary">Get Premium</button>
+            @GetPremiumModal()
+        </rm-get-premium>
+    } else {
+        <p>👑 You have premium!</p>
+    }
 }
 
 templ GetPremiumModal() {

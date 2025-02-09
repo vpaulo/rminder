@@ -195,6 +195,13 @@ header {
     height: var(--size-40);
     justify-content: center;
 }
+.app__stage,
+.app__version {
+    font-size: 0.8rem;
+}
+.app__version {
+    font-weight: bold;
+}
 
 .main {
     min-width: 250px;
@@ -381,14 +388,14 @@ header {
 .completed-ckeck {
     mask: url("/assets/icons/icon-square.svg") no-repeat 50%;
 }
-.completed .completed-ckeck {
+.completed.completed-ckeck {
     mask: url("/assets/icons/icon-check-square.svg") no-repeat 50%;
     background-color: var(--primary);
 }
 .importance-check {
     mask: url("/assets/icons/icon-star.svg") no-repeat 50%;
 }
-.important .importance-check {
+.important.importance-check {
     mask: url("/assets/icons/icon-star-solid.svg") no-repeat 50%;
     background-color: var(--primary);
 }

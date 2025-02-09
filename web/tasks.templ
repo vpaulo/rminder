@@ -35,39 +35,51 @@ templ TaskList(tasks []*database.Task, selectedtask int) {
   </ul>
 }
 
+templ TaskCompletedElem(task *database.Task) {
+	<span
+	   class={ templ.KV("completed", task.Completed), "completed-ckeck" }
+	   title="Set it as complete"
+	   hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/completed" }
+	   hx-trigger="click"
+	   hx-swap="outerHTML"
+	   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "'] .completed-ckeck" }
+	></span>
+}
+
+templ TaskImportantElem(task *database.Task) {
+	<span
+	   class={ templ.KV("important", task.Important), "importance-check" }
+	   title="Set it as important"
+	   hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/important" }
+	   hx-trigger="click"
+	   hx-swap="outerHTML"
+	   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "'] .importance-check" }
+	></span>
+}
+
 templ Task(task *database.Task, selectedtask int) {
-  <li
-  	class={ templ.KV("completed", task.Completed), templ.KV("important", task.Important) }
-   	data-id={ strconv.Itoa(task.ID) }
-  >
-    <span
-      class="completed-ckeck"
-      title="Set it as complete"
-      hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/completed" }
-      hx-trigger="click"
-      hx-swap="outerHTML"
-      hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }></span>
-    <label
-      class="show-details"
-      hx-get={ "/tasks/" + strconv.Itoa(task.ID) }
-      hx-trigger="change"
-      hx-target=".details"
-    >
-      <span>{ task.Title }</span>
-      if selectedtask == task.ID {
-      	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) } checked/>
-      } else {
-     	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
-      }
-    </label>
-    <span>{ strings.Repeat("!", task.Priority) }</span>
-    <span
-      class="importance-check"
-      title="Set it as important"
-      hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/important" }
-      hx-trigger="click"
-      hx-swap="outerHTML"
-      hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }></span>
+	<li
+		data-id={ strconv.Itoa(task.ID) }
+		hx-get="/lists/all"
+		hx-target=".lists__container"
+		hx-trigger="click delay:20ms"
+	>
+		@TaskCompletedElem(task)
+	    <label
+	      class="show-details"
+	      hx-get={ "/tasks/" + strconv.Itoa(task.ID) }
+	      hx-trigger="change"
+	      hx-target=".details"
+	    >
+	      <span>{ task.Title }</span>
+	      if selectedtask == task.ID {
+	      	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) } checked/>
+	      } else {
+	     	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) }/>
+	      }
+	    </label>
+	    <span>{ strings.Repeat("!", task.Priority) }</span>
+	    @TaskImportantElem(task)
   </li>
 }
 
@@ -133,11 +145,7 @@ templ ListsContent(list *database.List, persistence *database.Persistence, isMul
 		            <button class="add-task" type="submit">Add</button>
 		        </form>
 			}
-			<!-- TODO: find a way to not trigger at every click but only when completed and important are updated -->
-	        <div class="tasks" hx-get="/lists/all"
-				hx-target=".lists__container"
-				hx-trigger="click delay:20ms"
-			>
+	        <div class="tasks">
 	            @TaskList(list.Tasks, 0)
 	        </div>
 	    </div>
