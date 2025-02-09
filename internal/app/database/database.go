@@ -285,30 +285,6 @@ func (s *service) CompletedTasks() ([]*Task, error) {
 	return tasks, nil
 }
 
-// func (s *service) Totals() (*Total, error) {
-// 	query, err := s.db.Prepare(`SELECT
-// 		    COALESCE(SUM(CASE WHEN completed = true THEN 1 ELSE 0 END), 0) AS total_completed,
-// 			COALESCE(SUM(CASE WHEN important = true THEN 1 ELSE 0 END), 0) AS total_important,
-// 			COALESCE(SUM(CASE WHEN my_day = true THEN 1 ELSE 0 END), 0) AS total_my_day,
-// 			COUNT(*) as total_tasks	FROM task`)
-// 	defer query.Close()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("DB.Totals - prepare query failed: %v", err)
-// 	}
-
-// 	total := new(Total)
-// 	err = query.QueryRow().Scan(
-// 		&total.Completed,
-// 		&total.Important,
-// 		&total.MyDay,
-// 		&total.Tasks)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("DB.Totals - query result failed: %v", err)
-// 	}
-
-// 	return total, nil
-// }
-
 func (s *service) CreateTask(title string, list int) error {
 	query, err := s.db.Prepare("INSERT INTO task (title, list_id) Values (?,?)")
 	if err != nil {
@@ -441,14 +417,19 @@ func (s *service) UpdateTaskStartDate(id string, date string) error {
 	}
 	defer query.Close()
 
-	// TODO: create date formating helpers to be used across application
-	tm, err := time.Parse("2006-01-02", date)
+	timeUpdate := ""
 
-	if err != nil {
-		return fmt.Errorf("DB.UpdateTaskStartDate - format date failed: %v", err)
+	if date != "" {
+		// TODO: create date formating helpers to be used across application
+		tm, err := time.Parse("2006-01-02", date)
+		if err != nil {
+			return fmt.Errorf("DB.UpdateTaskStartDate - format date failed: %v", err)
+		}
+
+		timeUpdate = tm.Format(time.DateTime)
 	}
 
-	_, err = query.Exec(tm.Format(time.DateTime), id)
+	_, err = query.Exec(timeUpdate, id)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskStartDate - update query result failed: %v", err)
 	}
@@ -463,14 +444,19 @@ func (s *service) UpdateTaskEndDate(id string, date string) error {
 	}
 	defer query.Close()
 
-	// TODO: create date formating helpers to be used across application
-	tm, err := time.Parse("2006-01-02", date)
+	timeUpdate := ""
 
-	if err != nil {
-		return fmt.Errorf("DB.UpdateTaskEndDate - format date failed: %v", err)
+	if date != "" {
+		// TODO: create date formating helpers to be used across application
+		tm, err := time.Parse("2006-01-02", date)
+		if err != nil {
+			return fmt.Errorf("DB.UpdateTaskEndDate - format date failed: %v", err)
+		}
+
+		timeUpdate = tm.Format(time.DateTime)
 	}
 
-	_, err = query.Exec(tm.Format(time.DateTime), id)
+	_, err = query.Exec(timeUpdate, id)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskEndDate - update query result failed: %v", err)
 	}
@@ -546,6 +532,7 @@ func (s *service) Lists(filter string) ([]*List, error) {
 	if filter == "" {
 		for _, l := range lists {
 			if l.FilterBy != "" {
+				l.Tasks = make([]*Task, 0)
 				for _, id := range ids {
 					tasks, err = s.ListTasks(id, l.FilterBy)
 					if err != nil {

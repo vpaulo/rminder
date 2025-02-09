@@ -43,7 +43,11 @@ templ Details(task *database.Task) {
                     }
                 </select>
             </div>
-            <div class="details__schedule">
+            <div class="details__schedule"
+            	hx-get="/lists/all"
+             	hx-target=".lists__container"
+             	hx-trigger="change delay:20ms"
+            >
             	<label>
              		<span>Start Date</span>
              		<input

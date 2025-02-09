@@ -232,7 +232,15 @@ func UpdateTask(ctx *gin.Context) {
 		}
 
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Task(task, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
+
+		if slug == "important" {
+			err = web.TaskImportantElem(task).Render(ctx.Request.Context(), ctx.Writer)
+		} else if slug == "completed" {
+			err = web.TaskCompletedElem(task).Render(ctx.Request.Context(), ctx.Writer)
+		} else {
+			err = web.Task(task, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
+		}
+
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in Task: %e", err)
