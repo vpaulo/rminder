@@ -34,7 +34,6 @@ func CreatePremiumCheckoutSession(ctx *gin.Context) {
 	params.PaymentIntentData.AddMetadata("user_id", app.GetUser(ctx).Id)
 
 	s, err := session.New(params)
-
 	if err != nil {
 		log.Printf("session.New: %v", err)
 	}
@@ -47,8 +46,8 @@ func PremiumCheckoutSuccessHandler(ctx *gin.Context) {
 
 	err := web.PremiumPaymentSuccessful().Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in CreatePremiumCheckoutSession: %e", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in CreatePremiumCheckoutSession: %e :: %v", err, e)
 	}
 }
 

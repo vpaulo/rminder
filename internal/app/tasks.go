@@ -35,8 +35,8 @@ func GetTasks(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("error handling tasks. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("error handling tasks. Err: %e :: %v", err, e)
 	}
 
 	persistence, err := db.Persistence()
@@ -48,15 +48,15 @@ func GetTasks(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = web.Tasks(lists, nil, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("Error rendering in tasksHandler: %e", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("Error rendering in tasksHandler: %e :: %v", err, e)
 		}
 	} else {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = web.TaskList(tasks, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("Error rendering in TaskList: %e", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("Error rendering in TaskList: %e :: %v", err, e)
 		}
 	}
 }
@@ -74,26 +74,27 @@ func GetTask(ctx *gin.Context) {
 	if taskID != "" {
 		task, err = db.Task(taskID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error handling task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error handling task. Err: %e :: %v", err, e)
 		}
 
 		id, _ := strconv.Atoi(taskID)
 		err = db.UpdatePersistenceTask(id)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error updating persistence task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error updating persistence task. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error task id. Err: %e :: %v", err, e)
 		return
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = components.Details(task).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("Error rendering in TaskList: %e", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("Error rendering in TaskList: %e :: %v", err, e)
 	}
 }
 
@@ -102,8 +103,8 @@ func CreateTask(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("error parsing form. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error parsing form. Err: %e :: %v", err, e)
 	}
 
 	// create new task
@@ -117,18 +118,18 @@ func CreateTask(ctx *gin.Context) {
 	if title != "" && len(title) >= 3 && len(title) <= 255 && list != 0 {
 		err := db.CreateTask(title, list)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error creating task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error creating task. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("error title validation failed. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error title validation failed. Err: %e :: %v", err, e)
 	}
 
 	tasks, err := db.ListTasks(list, "")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("error handling tasks. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("error handling tasks. Err: %e :: %v", err, e)
 	}
 
 	persistence, err := db.Persistence()
@@ -139,8 +140,8 @@ func CreateTask(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = web.TaskList(tasks, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("Error rendering in TaskList: %e", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("Error rendering in TaskList: %e :: %v", err, e)
 	}
 }
 
@@ -154,11 +155,12 @@ func DeleteTask(ctx *gin.Context) {
 	if taskID != "" {
 		err = db.DeleteTask(taskID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error deleting task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error deleting task. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("task ID must not be empty"))
+		e := ctx.AbortWithError(http.StatusBadRequest, errors.New("task ID must not be empty"))
+		log.Fatalf("error task id. Err: %e :: %v", err, e)
 		return
 	}
 
@@ -174,7 +176,8 @@ func UpdateTask(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error parsing form. Err: %e :: %v", err, e)
 		return
 	}
 
@@ -187,9 +190,8 @@ func UpdateTask(ctx *gin.Context) {
 			if title != "" && len(title) >= 3 && len(title) <= 255 {
 				err = db.UpdateTask(taskID, title)
 			} else {
-				// TODO use ApiError here
-				ctx.AbortWithError(http.StatusInternalServerError, errors.New("title validation failed"))
-				log.Fatalf("error title validation failed. Err: %v", err)
+				e := ctx.AbortWithError(http.StatusInternalServerError, errors.New("title validation failed"))
+				log.Fatalf("error title validation failed. Err: %e :: %v", err, e)
 			}
 		case "description":
 			err = db.UpdateTaskDescription(taskID, ctx.Request.FormValue("description"))
@@ -208,16 +210,17 @@ func UpdateTask(ctx *gin.Context) {
 		}
 
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error updating task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error updating task. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error task id. Err: %e :: %v", err, e)
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
-		log.Fatalf("error handling UpdateTask Persistence. Err: %v", err)
+		log.Fatalf("error handling UpdateTask Persistence. Err: %e", err)
 	}
 
 	if slug == "description" {
@@ -227,8 +230,8 @@ func UpdateTask(ctx *gin.Context) {
 		// get task
 		task, err := db.Task(taskID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error handling task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error handling task. Err: %e :: %v", err, e)
 		}
 
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -242,8 +245,8 @@ func UpdateTask(ctx *gin.Context) {
 		}
 
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("Error rendering in Task: %e", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("Error rendering in Task: %e :: %v", err, e)
 		}
 	}
 }
