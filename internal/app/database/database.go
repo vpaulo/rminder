@@ -357,7 +357,6 @@ func (s *service) Task(id string) (*Task, error) {
 		&task.ParentId,
 		&task.CreatedAt,
 		&task.UpdatedAt)
-
 	if err != nil {
 		return nil, fmt.Errorf("DB.Task - query result failed: %v", err)
 	}
@@ -695,7 +694,6 @@ func (s *service) List(id string) (*List, error) {
 		&list.Position,
 		&list.CreatedAt,
 		&list.UpdatedAt)
-
 	if err != nil {
 		return nil, fmt.Errorf("DB.List - query result failed: %v", err)
 	}
@@ -763,7 +761,6 @@ func (s *service) Group(id int) (*GroupList, error) {
 		&group.Position,
 		&group.CreatedAt,
 		&group.UpdatedAt)
-
 	if err != nil {
 		return nil, fmt.Errorf("DB.Group - query result failed: %v", err)
 	}
@@ -877,10 +874,10 @@ func (s *service) DeleteList(id int) error {
 
 func (s *service) Persistence() (*Persistence, error) {
 	query, err := s.db.Prepare("SELECT * FROM persistence WHERE id=1")
-	defer query.Close()
 	if err != nil {
 		return nil, fmt.Errorf("DB.Persistence - prepare query failed: %v", err)
 	}
+	defer query.Close()
 
 	data := new(Persistence)
 	err = query.QueryRow().Scan(
@@ -888,7 +885,6 @@ func (s *service) Persistence() (*Persistence, error) {
 		&data.TaskId,
 		&data.ListId,
 		&data.GroupId)
-
 	if err != nil {
 		return nil, fmt.Errorf("DB.Persistence - query result failed: %v", err)
 	}
@@ -898,10 +894,10 @@ func (s *service) Persistence() (*Persistence, error) {
 
 func (s *service) UpdatePersistence(task int, list int, group int) error {
 	query, err := s.db.Prepare("UPDATE persistence SET task_id = ?, list_id = ?, group_id = ? WHERE id=1")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdatePersistence - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(task, list, group)
 	if err != nil {
@@ -913,10 +909,10 @@ func (s *service) UpdatePersistence(task int, list int, group int) error {
 
 func (s *service) UpdatePersistenceTask(task int) error {
 	query, err := s.db.Prepare("UPDATE persistence SET task_id = ? WHERE id=1")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdatePersistenceTask - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(task)
 	if err != nil {
@@ -928,10 +924,10 @@ func (s *service) UpdatePersistenceTask(task int) error {
 
 func (s *service) UpdatePersistenceList(list int) error {
 	query, err := s.db.Prepare("UPDATE persistence SET list_id = ? WHERE id=1")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdatePersistenceList - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(list)
 	if err != nil {
@@ -943,10 +939,10 @@ func (s *service) UpdatePersistenceList(list int) error {
 
 func (s *service) UpdatePersistenceGroup(group int) error {
 	query, err := s.db.Prepare("UPDATE persistence SET group_id = ? WHERE id=1")
-	defer query.Close()
 	if err != nil {
 		return fmt.Errorf("DB.UpdatePersistenceGroup - prepare update query failed: %v", err)
 	}
+	defer query.Close()
 
 	_, err = query.Exec(group)
 	if err != nil {

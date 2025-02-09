@@ -51,6 +51,5 @@ func UserMiddleware(s *App) gin.HandlerFunc {
 		SetUserDatabase(ctx, db)
 
 		ctx.Next()
-
 	}
 }

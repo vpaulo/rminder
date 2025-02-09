@@ -31,8 +31,8 @@ func GetLists(ctx *gin.Context) {
 
 	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in GetLists: %e", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in GetLists: %e :: %v", err, e)
 	}
 }
 
@@ -50,15 +50,15 @@ func GetList(ctx *gin.Context) {
 	if listID != "" {
 		list, err = db.List(listID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error handling task. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error handling task. Err: %v :: %v", err, e)
 		}
 
 		id, _ := strconv.Atoi(listID)
 		err = db.UpdatePersistence(0, id, 0)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error updating persistence list. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error updating persistence list. Err: %v :: %v", err, e)
 		}
 
 		if list.FilterBy != "" {
@@ -67,9 +67,9 @@ func GetList(ctx *gin.Context) {
 				log.Fatalf("error handling GetLists. Err: %v", err)
 			}
 		}
-
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error no list id. Err: %v :: %v", err, e)
 		return
 	}
 
@@ -86,8 +86,8 @@ func GetList(ctx *gin.Context) {
 		err = web.MultiListContent(lists, list.Name, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	}
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("Error rendering in ListsContent: %e", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("Error rendering in ListsContent: %e :: %v", err, e)
 	}
 }
 
@@ -96,8 +96,8 @@ func CreateList(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("error parsing form. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error parsing form. Err: %v :: %v", err, e)
 	}
 
 	// create new task
@@ -113,7 +113,7 @@ func CreateList(ctx *gin.Context) {
 	icon := ctx.Request.FormValue("icon")
 
 	// Filters
-	var filter = ""
+	filter := ""
 	include := ctx.Request.FormValue("include")
 	completed := ctx.Request.FormValue("completed")
 	important := ctx.Request.FormValue("important")
@@ -131,18 +131,18 @@ func CreateList(ctx *gin.Context) {
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
 		err := db.CreateList(list, swatch, icon, pos, pinned == "1", filter)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error creating list. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error creating list. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("error form field validation failed. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error form field validation failed. Err: %e :: %v", err, e)
 	}
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("error handling lists. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("error handling lists. Err: %e :: %v", err, e)
 	}
 
 	persistence, err := db.Persistence()
@@ -153,8 +153,8 @@ func CreateList(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("Error rendering in Lists: %e", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("Error rendering in Lists: %e :: %v", err, e)
 	}
 }
 
@@ -169,17 +169,18 @@ func DeleteList(ctx *gin.Context) {
 		id, _ := strconv.Atoi(listID)
 		err = db.DeleteList(id)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error deleting list. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error deleting list. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error list id. Err: %e :: %v", err, e)
 	}
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("error handling DeleteList lists. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("error handling DeleteList lists. Err: %e :: %v", err, e)
 	}
 
 	persistence, err := db.Persistence()
@@ -190,8 +191,8 @@ func DeleteList(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("Error rendering in Lists: %e", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("Error rendering in Lists: %e :: %v", err, e)
 	}
 }
 
@@ -202,8 +203,8 @@ func UpdateList(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("error parsing form. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error parsing form. Err: %e :: %v", err, e)
 	}
 
 	// update new task
@@ -214,7 +215,7 @@ func UpdateList(ctx *gin.Context) {
 	icon := ctx.Request.FormValue("icon")
 
 	// Filters
-	var filter = ""
+	filter := ""
 	include := ctx.Request.FormValue("include")
 	completed := ctx.Request.FormValue("completed")
 	important := ctx.Request.FormValue("important")
@@ -232,18 +233,18 @@ func UpdateList(ctx *gin.Context) {
 	if name != "" && len(name) >= 3 && len(name) <= 255 && swatch != "" && icon != "" {
 		err := db.UpdateList(id, name, swatch, icon, pinned == "1", filter)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error creating list. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error creating list. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("error form field validation failed. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error form field validation failed. Err: %e :: %v", err, e)
 	}
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("error handling lists. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("error handling lists. Err: %e :: %v", err, e)
 	}
 
 	persistence, err := db.Persistence()
@@ -254,8 +255,8 @@ func UpdateList(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		log.Fatalf("Error rendering in Lists: %e", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, err)
+		log.Fatalf("Error rendering in Lists: %e :: %v", err, e)
 	}
 }
 
@@ -269,38 +270,43 @@ func SearchLists(ctx *gin.Context) {
 
 	err = ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("error parsing form. Err: %e :: %v", err, e)
 	}
 
 	query := ctx.Request.FormValue("query")
 
 	if query != "" && len(query) >= 3 {
 		lists, err = db.SearchLists(query)
+		if err != nil {
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error search list. Err: %e :: %v", err, e)
+		}
 
 		err = db.UpdatePersistence(0, 0, 0)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			log.Fatalf("error updating persistence list. Err: %v", err)
+			e := ctx.AbortWithError(http.StatusInternalServerError, err)
+			log.Fatalf("error updating persistence list. Err: %e :: %v", err, e)
 		}
 	} else {
-		ctx.AbortWithError(http.StatusInternalServerError, errors.New("Search query validation failed"))
-		log.Fatalf("Search query validation failed. Err: %v", err)
+		e := ctx.AbortWithError(http.StatusInternalServerError, errors.New("Search query validation failed"))
+		log.Fatalf("Search query validation failed. Err: %e :: %v", err, e)
 	}
 
 	if err != nil {
-		log.Fatalf("error handling SearchLists. Err: %v", err)
+		log.Fatalf("error handling SearchLists. Err: %e", err)
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
-		log.Fatalf("error handling SearchLists Persistence. Err: %v", err)
+		log.Fatalf("error handling SearchLists Persistence. Err: %e", err)
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	err = web.MultiListContent(lists, "Search Results", persistence).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in SearchLists: %e", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in SearchLists: %e :: %v", err, e)
 	}
 }

@@ -47,7 +47,7 @@ func AppLoadHandler(ctx *gin.Context) {
 
 	err = web.Tasks(lists, multiList, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in appLoadHandler: %e", err)
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in appLoadHandler: %e :: %v", err, e)
 	}
 }

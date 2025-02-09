@@ -1,6 +1,7 @@
 package login
 
 import (
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,7 +20,10 @@ func LogoutHandler(ctx *gin.Context) {
 
 	session := sessions.Default(ctx)
 	session.Clear()
-	session.Save()
+	err = session.Save()
+	if err != nil {
+		log.Fatalf("Error saving session: %e", err)
+	}
 
 	returnTo := os.Getenv("AUTH0_RETURN_TO_URL")
 

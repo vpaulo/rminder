@@ -4,7 +4,6 @@ import "time"
 
 func formatDate(date string) string {
 	tm, err := time.Parse(time.RFC3339, date)
-
 	if err != nil {
 		return ""
 	}
@@ -14,7 +13,6 @@ func formatDate(date string) string {
 
 func formatDateOnly(date string) string {
 	tm, err := time.Parse(time.RFC3339, date)
-
 	if err != nil {
 		return ""
 	}
