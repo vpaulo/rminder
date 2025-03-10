@@ -32,7 +32,7 @@ class SidebarElement extends HTMLElement {
     form.reset();
 
     form.removeAttribute("hx-put");
-    form.setAttribute("hx-post", "/lists/create");
+    form.setAttribute("hx-post", "/v0/lists/create");
 
     form.querySelectorAll("input:checked")?.forEach((el) => {
       el.removeAttribute("checked");
