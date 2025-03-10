@@ -26,12 +26,12 @@ templ SidebarHeader() {
 templ Search() {
 	<div
        	class="searchbox__container"
-       	hx-get="/lists/all"
+       	hx-get="/v0/lists/all"
        	hx-target=".lists__container"
        	hx-trigger="submit delay:20ms">
 		<form
 			class="searchbox__form"
-			hx-post={ "/lists/search" }
+			hx-post={ "/v0/lists/search" }
 	       	method="POST"
 		    hx-trigger="submit, keyup[enterKey]"
 		    hx-target={ ".main" }>
@@ -86,7 +86,7 @@ templ List(list *database.List, selectedList int) {
 		data-filter={ list.FilterBy }>
         <label
             class="list"
-            hx-get={ "/lists/" + strconv.Itoa(list.ID)}
+            hx-get={ "/v0/lists/" + strconv.Itoa(list.ID)}
             hx-trigger="change"
             hx-target=".main"
         >
@@ -122,7 +122,7 @@ templ SidebarFooter(lists []*database.List) {
 templ ListModal(lists []*database.List) {
 	<dialog class="list-form-container">
         <form
-        hx-post="/lists/create"
+        hx-post="/v0/lists/create"
         method="POST"
         hx-trigger="submit, keyup[enterKey]"
         hx-target={ ".lists__container" }

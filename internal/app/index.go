@@ -51,3 +51,13 @@ func AppLoadHandler(ctx *gin.Context) {
 		log.Fatalf("Error rendering in appLoadHandler: %e :: %v", err, e)
 	}
 }
+
+func LandingPageLoadHandler(ctx *gin.Context) {
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	err := web.Home().Render(ctx.Request.Context(), ctx.Writer)
+	if err != nil {
+		e := ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Fatalf("Error rendering in Home page: %e :: %v", err, e)
+	}
+}

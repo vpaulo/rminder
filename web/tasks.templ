@@ -39,7 +39,7 @@ templ TaskCompletedElem(task *database.Task) {
 	<span
 	   class={ templ.KV("completed", task.Completed), "completed-ckeck" }
 	   title="Set it as complete"
-	   hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/completed" }
+	   hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/completed" }
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
 	   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "'] .completed-ckeck" }
@@ -50,7 +50,7 @@ templ TaskImportantElem(task *database.Task) {
 	<span
 	   class={ templ.KV("important", task.Important), "importance-check" }
 	   title="Set it as important"
-	   hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/important" }
+	   hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/important" }
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
 	   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "'] .importance-check" }
@@ -60,14 +60,14 @@ templ TaskImportantElem(task *database.Task) {
 templ Task(task *database.Task, selectedtask int) {
 	<li
 		data-id={ strconv.Itoa(task.ID) }
-		hx-get="/lists/all"
+		hx-get="/v0/lists/all"
 		hx-target=".lists__container"
 		hx-trigger="click delay:20ms"
 	>
 		@TaskCompletedElem(task)
 	    <label
 	      class="show-details"
-	      hx-get={ "/tasks/" + strconv.Itoa(task.ID) }
+	      hx-get={ "/v0/tasks/" + strconv.Itoa(task.ID) }
 	      hx-trigger="change"
 	      hx-target=".details"
 	    >
@@ -119,13 +119,13 @@ templ ListsContent(list *database.List, persistence *database.Persistence, isMul
 	    </div>
 	    <div
 	    	class="container"
-	    	hx-get="/lists/all"
+	    	hx-get="/v0/lists/all"
 	     	hx-target=".lists__container"
 	     	hx-trigger="submit delay:20ms">
 			if !isMultilist {
 		        <form
 		        	class="add-tasks"
-		         	hx-post="/tasks/create"
+		         	hx-post="/v0/tasks/create"
 		          	method="POST"
 		           	hx-target=".tasks"
 		            hx-on::after-request="this.reset()">

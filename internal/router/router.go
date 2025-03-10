@@ -34,7 +34,8 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/callback", login.CallbackHandler(application, auth))
 	router.GET("/logout", login.LogoutHandler)
 
-	router.GET("/", app.UserMiddleware(application), app.AppLoadHandler)
+	router.GET("/", app.LandingPageLoadHandler)
+	router.GET("/tasks", app.UserMiddleware(application), app.AppLoadHandler)
 
 	checkout_group := router.Group("/checkout", app.UserMiddleware(application))
 	checkout_group.POST("/create-checkout-session", checkout.CreatePremiumCheckoutSession)
@@ -42,7 +43,10 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 
 	router.POST("/post-checkout/webhook", checkout.CheckoutWebhookHandler(application))
 
-	tasks := router.Group("/tasks", app.UserMiddleware(application))
+	// v0 api returns html chunks, and also to allow creation of more routes at home level
+	v0 := router.Group("/v0", app.UserMiddleware(application))
+
+	tasks := v0.Group("/tasks")
 	tasks.GET("/all", app.GetTasks)
 	tasks.GET("/my-day", app.GetTasks)
 	tasks.GET("/important", app.GetTasks)
@@ -52,7 +56,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	tasks.DELETE("/:taskID", app.DeleteTask)
 	tasks.PUT("/:taskID/:slug", app.UpdateTask)
 
-	lists := router.Group("/lists", app.UserMiddleware(application))
+	lists := v0.Group("/lists")
 	lists.GET("/all", app.GetLists)
 	lists.POST("/create", app.CreateList)
 	lists.POST("/search", app.SearchLists)

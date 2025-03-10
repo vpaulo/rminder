@@ -11,7 +11,7 @@ templ Details(task *database.Task) {
             <div class="detail__title">
                 <form
                   class="add-tasks"
-                  hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/title" }
+                  hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/title" }
                   method="POST"
                   hx-swap="outerHTML"
                   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }>
@@ -30,7 +30,7 @@ templ Details(task *database.Task) {
                 <label for="priority">Priority</label>
                 <select
                     name="priority"
-                    hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/priority" }
+                    hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/priority" }
                     hx-trigger="change"
                     hx-swap="outerHTML"
                    	hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
@@ -44,7 +44,7 @@ templ Details(task *database.Task) {
                 </select>
             </div>
             <div class="details__schedule"
-            	hx-get="/lists/all"
+            	hx-get="/v0/lists/all"
              	hx-target=".lists__container"
              	hx-trigger="change delay:20ms"
             >
@@ -54,7 +54,7 @@ templ Details(task *database.Task) {
                			name="from"
                   		type="date"
                     	value={ formatDateOnly(task.StartAt) }
-                      	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
+                      	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
                        	hx-trigger="change"
                         hx-swap="none">
              	</label>
@@ -64,14 +64,14 @@ templ Details(task *database.Task) {
                 		name="to"
                   		type="date"
                     	value={ formatDateOnly(task.EndAt) }
-                     	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
+                     	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
                      	hx-trigger="change"
                       	hx-swap="none">
               	</label>
             </div>
             <div class="detail__note">
                 <form
-                    hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/description" }
+                    hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/description" }
                     hx-vals='js:{description: getDescription()}'
                     hx-swap="none" method="POST">
                     <div id="note-editor" class="ql-container ql-snow">@templ.Raw(task.Description)</div>
@@ -82,7 +82,7 @@ templ Details(task *database.Task) {
         <div class="details__footer">
             <button
             	class="close"
-            	hx-put={ "/tasks/" + strconv.Itoa(task.ID) + "/remove-persistence" }
+            	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/remove-persistence" }
             	hx-swap="none">
                 <i class="close-icon"></i>
             </button>
@@ -103,7 +103,7 @@ templ Modal(id int) {
                 <button class="btn default">Cancel</button>
                 <button
                   class="btn warning"
-                  hx-delete={ "/tasks/" + strconv.Itoa(id) }
+                  hx-delete={ "/v0/tasks/" + strconv.Itoa(id) }
                   hx-swap="outerHTML"
                   hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(id) + "']" }>Delete task</button>
             </div>

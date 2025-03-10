@@ -27,16 +27,6 @@ class ListNavigationElement extends HTMLElement {
   edit(e) {
     e.preventDefault();
 
-    console.log(
-      ">>> LIST: ",
-      this.listId,
-      this.listName,
-      this.colour,
-      this.icon,
-      this.pinned,
-      this.position,
-      this.filter,
-    );
     const form = this.formContainer.querySelector("form");
 
     form.querySelectorAll("input:checked")?.forEach((el) => {
@@ -62,8 +52,8 @@ class ListNavigationElement extends HTMLElement {
       .map((f) => f.split("=")[1]);
 
     form.removeAttribute("hx-post");
-    form.setAttribute("hx-put", `/lists/${this.listId}`);
-    removeBtn.setAttribute("hx-delete", `/lists/${this.listId}`);
+    form.setAttribute("hx-put", `/v0/lists/${this.listId}`);
+    removeBtn.setAttribute("hx-delete", `/v0/lists/${this.listId}`);
 
     name.value = this.listName;
     pinned.toggleAttribute("checked", this.pinned === "");
