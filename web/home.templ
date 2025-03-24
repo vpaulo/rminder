@@ -1,6 +1,6 @@
 package web
 
-templ Home() {
+templ Home(userExists bool) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -110,6 +110,7 @@ templ Home() {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                gap: 20px;
             }
 
             .hero-screen {
@@ -198,7 +199,7 @@ templ Home() {
             </style>
 		</head>
 		<body>
-			@HomeHeader()
+			@HomeHeader(userExists)
 			{ children... }
 			<main>
 		        <section class="section about">
@@ -216,21 +217,40 @@ templ Home() {
             				<p>Sign up for free and start managing your tasks instantly.</p>
 						</div>
 						<div class="hero-cta">
-							<a href="#cta" class="btn primary">Get started</a>
+							<a href="/tasks" class="btn primary">Get started</a>
 						</div>
 					</div>
 					<div class="hero-screen">
 						<img class="" src="/assets/screens/screen_1.png" alt="App screen of tasks" />
 					</div>
 		        </section>
+				<section class="section overview">
+					<h3>Overview</h3>
+					<p>Rminder is a fast and simple application designed to provide users with seamless access to their tasks, leveraging a dedicated user database to enhance performance and ease of use. The app is optimized for quick actions and a minimalistic interface, ensuring an intuitive experience for users at every touchpoint.</p>
+				</section>
 		        <section class="section features">
-		            <h3>Powerful Features Tailored for individuals</h3>
+		            <h3>Key Features</h3>
+
+					<h4>Dedicated User Database</h4>
 					<ul>
-						<li><strong>Task Prioritization:</strong> Organize your tasks by importance and deadlines, ensuring you never miss a beat.</li>
-						<li><strong>Individual:</strong> Dedicated database for each user</li>
-						<li><strong>Customizable Views:</strong> Choose from list, kanban, or calendar views to manage your tasks in a way that works for you.</li>
-						<li><strong>Time Tracking:</strong> Track how much time you’re spending on tasks for better efficiency and productivity insights.</li>
+						<li><strong>Personalized Experience:</strong> Each user has a unique, dedicated database, allowing the app to deliver a tailored experience on every use.</li>
+						<li><strong>Fast Data Retrieval:</strong> Data is stored in an optimized database structure to ensure quick loading times and minimal lag, even with larger datasets.</li>
 					</ul>
+					<hr class="hr">
+					<h4>Lightning-Fast Performance</h4>
+					<ul>
+						<li><strong>Optimized for Speed:</strong> Every interaction within the app is designed for speed, reducing loading times and unnecessary steps for a smooth user experience.</li>
+						<li><strong>Minimalist Design:</strong> The user interface is clean and uncluttered, ensuring quick access to important features without distractions.</li>
+						<li><strong>Instant Syncing:</strong> Changes and updates to user data are synced instantly across the app, making it feel responsive in real-time.</li>
+					</ul>
+					<hr class="hr">
+					<h4>Simple & Intuitive Interface</h4>
+					<ul>
+						<li><strong>User-Friendly Design:</strong> The app’s interface is simple and easy to navigate, with intuitive icons and a clear layout.</li>
+						<li><strong>Quick Actions:</strong> Key features are accessible with one or two taps, reducing time spent searching for what you need.</li>
+						<li><strong>No Overload:</strong> Focused on only essential features, eliminating unnecessary complexity and keeping user interaction straightforward.</li>
+					</ul>
+					<hr class="hr">
 		        </section>
 		    </main>
 			<footer>
@@ -253,7 +273,7 @@ templ Home() {
 	</html>
 }
 
-templ HomeHeader() {
+templ HomeHeader(userExists bool) {
     <header>
         <div class="header__start">
             <!-- logo -->
@@ -261,7 +281,9 @@ templ HomeHeader() {
         </div>
         <!-- Logout -->
         <div class="header-end">
-            <a class="icon logout-icon" href="/logout"></a>
+           	if userExists {
+            	<a class="icon logout-icon" href="/logout"></a>
+            }
         </div>
     </header>
 }
