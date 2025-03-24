@@ -4,8 +4,10 @@ import (
 	"log"
 	"net/http"
 	"rminder/internal/app/database"
+	"rminder/internal/app/user"
 	"rminder/web"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,9 +55,17 @@ func AppLoadHandler(ctx *gin.Context) {
 }
 
 func LandingPageLoadHandler(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+
+	userExists := false
+	user_id := user.GetUserId(session)
+	if user_id != "" {
+		userExists = true
+	}
+
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err := web.Home().Render(ctx.Request.Context(), ctx.Writer)
+	err := web.Home(userExists).Render(ctx.Request.Context(), ctx.Writer)
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in Home page: %e :: %v", err, e)
