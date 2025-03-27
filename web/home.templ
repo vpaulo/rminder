@@ -9,193 +9,196 @@ templ Home(userExists bool) {
 			<!-- App Styles/Scripts -->
 			<link href="/assets/css/fonts.css" rel="stylesheet">
            	<link href="/assets/css/styles.css" rel="stylesheet"/>
+            <link href="/assets/css/components/appSwitcher.css" rel="stylesheet"/>
+
+            <script type="module" src="/assets/js/components/appSwitcher.js"></script>
             <style>
-            h1,h2,h3,h4,p {
-                margin: 0;
-                padding: 0;
-            }
-
-            h1 {
-               font-size: 36px;
-            }
-
-            h2 {
-               font-size: 30px;
-            }
-
-            h3 {
-               font-size: 24px;
-            }
-
-            h4 {
-               font-size: 18px;
-            }
-
-            p {
-               font-size: 16px;
-            }
-
-            header, main, footer {
-                color: var(--base-colour);
-                background-color: var(--colour-neutral-100);
-                padding: 50px 50px 0;
-            }
-
-            body {
-                grid-template-rows: 130px 1fr;
-                overflow: auto;
-            }
-
-            img {
-              display: block;
-              max-width: 100%;
-            }
-
-            .app__logo {
-                background-image: url("/assets/favicons/icon-76x76.png");
-                width: 76px;
-                height: 76px;
-            }
-
-            a {
-                text-decoration: none;
-                color: var(--base-colour);
-            }
-            a:hover {
-                color: var(--primary);
-            }
-
-            .intro__name {
-                font-family: 'Arizonia', cursive;
-                font-size: 54px;
-            }
-
-            .home {
-                color: var(--primary);
-                font-family: 'Arizonia', cursive;
-                font-size: 64px;
-                width: 78px;
-                line-height: 64px;
-                text-decoration: none;
-            }
-
-            .social-media {
-                padding: 32px 0;
-            }
-
-            .social-media a {
-                display: inline-flex;
-                align-items: center;
-                margin: 5px 10px;
-            }
-
-            a svg {
-                fill: var(--base-colour);
-            }
-
-            a:hover svg {
-                fill: var(--primary);
-            }
-
-            .section + .section {
-                padding-top: 50px;
-            }
-
-            .section.hero {
-                display: flex;
-                gap: 40px
-            }
-
-            .hero-content {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                gap: 20px;
-            }
-
-            .hero-screen {
-                border: 1px solid var(--base-colour);
-            }
-
-            .hero-heading {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .hero-cta {
-                display: flex;
-            }
-
-            .about {
-                position: relative;
-
-                hgroup {
-                    padding-bottom: 50px;
+                h1,h2,h3,h4,p {
+                    margin: 0;
+                    padding: 0;
                 }
-            }
 
-            .hr {
-                height: 1px;
-                width: 90%;
-                border: 0;
-                background-color: var(--base-grey);
-            }
+                h1 {
+                font-size: 36px;
+                }
 
-            footer {
-                display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-                padding-bottom: 50px;
-            }
+                h2 {
+                font-size: 30px;
+                }
 
-            footer > * {
-                flex: 1 1 auto;
-            }
+                h3 {
+                font-size: 24px;
+                }
 
-            .footer__links {
-                display: flex;
-                list-style: none;
-                margin: 0;
-                padding: 0;
-            }
+                h4 {
+                font-size: 18px;
+                }
 
-            .footer__links li {
-                padding: 0 10px;
-            }
+                p {
+                font-size: 16px;
+                }
 
-            .link {
-                text-decoration: underline;
-            }
-
-            .copyright {
-                width: 100%;
-            }
-
-            @media screen and (max-width: 700px) {
                 header, main, footer {
-                    padding: 20px 10px 0;
+                    color: var(--base-colour);
+                    background-color: var(--colour-neutral-100);
+                    padding: 50px 50px 0;
                 }
 
-                .home {
-                    font-size: 48px;
-                    width: 60px;
-                    line-height: 48px;
+                body {
+                    grid-template-rows: 130px 1fr;
+                    overflow: auto;
+                }
+
+                img {
+                display: block;
+                max-width: 100%;
+                }
+
+                .app__logo {
+                    background-image: url("/assets/favicons/icon-76x76.png");
+                    width: 76px;
+                    height: 76px;
+                }
+
+                a {
+                    text-decoration: none;
+                    color: var(--base-colour);
+                }
+                a:hover {
+                    color: var(--primary);
                 }
 
                 .intro__name {
-                    overflow-wrap: break-word;
+                    font-family: 'Arizonia', cursive;
+                    font-size: 54px;
+                }
+
+                .home {
+                    color: var(--primary);
+                    font-family: 'Arizonia', cursive;
+                    font-size: 64px;
+                    width: 78px;
+                    line-height: 64px;
+                    text-decoration: none;
+                }
+
+                .social-media {
+                    padding: 32px 0;
+                }
+
+                .social-media a {
+                    display: inline-flex;
+                    align-items: center;
+                    margin: 5px 10px;
+                }
+
+                a svg {
+                    fill: var(--base-colour);
+                }
+
+                a:hover svg {
+                    fill: var(--primary);
+                }
+
+                .section + .section {
+                    padding-top: 50px;
                 }
 
                 .section.hero {
+                    display: flex;
+                    gap: 40px
+                }
+
+                .hero-content {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
                     gap: 20px;
-                    flex-wrap: wrap;
+                }
+
+                .hero-screen {
+                    border: 1px solid var(--base-colour);
+                }
+
+                .hero-heading {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
+                .hero-cta {
+                    display: flex;
+                }
+
+                .about {
+                    position: relative;
+
+                    hgroup {
+                        padding-bottom: 50px;
+                    }
+                }
+
+                .hr {
+                    height: 1px;
+                    width: 90%;
+                    border: 0;
+                    background-color: var(--base-grey);
                 }
 
                 footer {
-                    padding-bottom: 20px;
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    padding-bottom: 50px;
                 }
-            }
+
+                footer > * {
+                    flex: 1 1 auto;
+                }
+
+                .footer__links {
+                    display: flex;
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .footer__links li {
+                    padding: 0 10px;
+                }
+
+                .link {
+                    text-decoration: underline;
+                }
+
+                .copyright {
+                    width: 100%;
+                }
+
+                @media screen and (max-width: 700px) {
+                    header, main, footer {
+                        padding: 20px 10px 0;
+                    }
+
+                    .home {
+                        font-size: 48px;
+                        width: 60px;
+                        line-height: 48px;
+                    }
+
+                    .intro__name {
+                        overflow-wrap: break-word;
+                    }
+
+                    .section.hero {
+                        gap: 20px;
+                        flex-wrap: wrap;
+                    }
+
+                    footer {
+                        padding-bottom: 20px;
+                    }
+                }
             </style>
 		</head>
 		<body>
@@ -281,6 +284,13 @@ templ HomeHeader(userExists bool) {
         </div>
         <!-- Logout -->
         <div class="header-end">
+        	<rm-app-switcher>
+	        	<button class="apps-icon" popovertarget="app-switcher">Toggle the popover</button>
+	         	<div id="app-switcher" popover>
+					<span>Home</span>
+					<a href="/tasks" alt="Tasks">Tasks</a>
+				</div>
+        	</rm-app-switcher>
            	if userExists {
             	<a class="icon logout-icon" href="/logout"></a>
             }

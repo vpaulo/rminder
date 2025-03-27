@@ -159,3 +159,30 @@ header {
 .app__version {
     font-weight: bold;
 }
+
+.header-end {
+    display: flex;
+
+    > a {
+        cursor: pointer;
+        width: var(--size-40);
+        height: var(--size-40);
+        display: block;
+        background-color: var(--base-colour);
+
+        &:hover {
+            background-color: var(--primary);
+        }
+    }
+}
+
+.icon {
+    background-color: var(--base-colour);
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+}
+
+.logout-icon {
+    mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
+}

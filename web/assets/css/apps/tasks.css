@@ -241,13 +241,6 @@ rm-tasks-app {
         height: calc(var(--vh) - (2 * var(--size-40) + 62px));
     }
 
-    .icon {
-        background-color: var(--base-colour);
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-    }
-
     .today-icon {
         mask: url("/assets/icons/today-icon.svg") no-repeat 50%;
     }
@@ -305,10 +298,6 @@ rm-tasks-app {
         mask: url("/assets/icons/pen-icon.svg") no-repeat 50%;
     }
 
-    .logout-icon {
-        mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
-    }
-
     .ellipsis-vertical-icon {
         mask: url("/assets/icons/ellipsis-vertical-icon.svg") no-repeat 50%;
     }
@@ -323,18 +312,6 @@ rm-tasks-app {
 
     .filter-icon {
         mask: url("/assets/icons/filter-icon.svg") no-repeat 50%;
-    }
-
-    .header-end > a {
-        cursor: pointer;
-        width: var(--size-40);
-        height: var(--size-40);
-        display: block;
-        background-color: var(--base-colour);
-
-        &:hover {
-            background-color: var(--primary);
-        }
     }
 
     .details__body {

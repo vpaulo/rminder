@@ -18,6 +18,14 @@ templ Header(user *user.User) {
         <!-- Premium  -->
         <!-- Logout -->
         <div class="header-end">
+        	<rm-app-switcher>
+	        	<button class="apps-icon" popovertarget="app-switcher">Toggle the popover</button>
+	         	<div id="app-switcher" popover>
+					<a href="/" alt="Home">Home</a>
+					<span>Tasks</span>
+				</div>
+         	</rm-app-switcher>
+
             <a class="icon logout-icon" href="/logout"></a>
         </div>
     </header>
