@@ -15,6 +15,497 @@ rm-tasks-app {
             }
         }
     }
+    .key {
+        display: block;
+        height: 32px;
+        width: 32px;
+
+        &.ctrl {
+            background: url("/assets/icons/keyboardKeyCtrl.svg") no-repeat 50%;
+        }
+        &.n {
+            background: url("/assets/icons/keyboardKeyN.svg") no-repeat 50%;
+        }
+        &.f {
+            background: url("/assets/icons/keyboardKeyF.svg") no-repeat 50%;
+        }
+        &.numbers {
+            background: url("/assets/icons/keyboardKeyNumbers.svg") no-repeat 50%;
+        }
+    }
+
+    .search-screen,
+    .landing-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .landing-screen {
+        .instructions {
+            width: 100%;
+
+            p {
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+
+                > span {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    width: 100%;
+                    font-size: 1rem;
+                    letter-spacing: 1px;
+
+                    &:first-child {
+                        justify-content: flex-end;
+                    }
+
+                    &:last-child {
+                        justify-content: flex-start;
+                    }
+                }
+            }
+        }
+    }
+
+    .search-screen {
+        .message p {
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+    }
+
+    .details {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: var(--details-width);
+    }
+
+    .detail__my-day {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .tasks__list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .tasks__list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tasks__list > li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        background-color: #fff;
+    }
+    .tasks__list > li:hover,
+    .tasks__list > li:has(input:checked) {
+        background-color: var(--base-grey);
+    }
+    .add-tasks {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    #task {
+        font-size: 1.3rem;
+        color: var(--primary);
+        padding: 16px 12px;
+        width: 100%;
+    }
+    #task::placeholder {
+        color: var(--primary);
+    }
+    #task:focus {
+        outline: none;
+        color: var(--base-colour);
+    }
+    #task:focus ~ .add-task {
+        color: var(--primary);
+    }
+    #task:focus::placeholder {
+        color: var(--base-colour);
+    }
+    .add-task {
+        background: transparent;
+        border: transparent;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        letter-spacing: 1px;
+    }
+    .add-task:focus {
+        outline: none;
+    }
+    .add-task--label {
+        width: 24px;
+        height: 24px;
+        flex: 0 0 24px;
+        cursor: pointer;
+        text-align: center;
+        line-height: 28px;
+
+        mask: url("/assets/icons/add-icon.svg") no-repeat 50%;
+        background-color: var(--base-colour);
+    }
+    .add-task--label:hover {
+        background-color: var(--primary);
+    }
+    .show-details {
+        width: 100%;
+        height: 100%;
+        text-align: left;
+        font-size: 1.2rem;
+        color: var(--base-colour);
+        padding: 8px 0;
+        cursor: pointer;
+    }
+    .completed .show-details {
+        text-decoration: line-through from-font var(--primary);
+    }
+    .completed-ckeck,
+    .importance-check,
+    .my-day {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 auto;
+        background-color: var(--base-colour);
+        cursor: pointer;
+    }
+    .completed-ckeck {
+        mask: url("/assets/icons/icon-square.svg") no-repeat 50%;
+    }
+    .completed.completed-ckeck {
+        mask: url("/assets/icons/icon-check-square.svg") no-repeat 50%;
+        background-color: var(--primary);
+    }
+    .importance-check {
+        mask: url("/assets/icons/icon-star.svg") no-repeat 50%;
+    }
+    .important.importance-check {
+        mask: url("/assets/icons/icon-star-solid.svg") no-repeat 50%;
+        background-color: var(--primary);
+    }
+    .my-day {
+        mask: url("/assets/icons/today-icon.svg") no-repeat 50%;
+    }
+    .today .my-day {
+        background-color: var(--primary);
+    }
+    .detail__title {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-10);
+    }
+    .title,
+    .note {
+        width: 100%;
+        color: var(--base-colour);
+        font-size: 0.9rem;
+        padding: 8px 6px;
+    }
+    .title:focus,
+    .note:focus {
+        outline: none;
+    }
+    .title {
+        text-overflow: ellipsis;
+    }
+    .completed .title {
+        text-decoration: line-through from-font var(--primary);
+    }
+    .title:focus {
+        background-color: var(--base-grey);
+    }
+
+    .multi {
+        .tasks {
+            overflow-y: hidden;
+            height: auto;
+        }
+    }
+
+    .tasks {
+        overflow-y: auto;
+        height: calc(var(--vh) - (2 * var(--size-40) + 62px));
+    }
+
+    .icon {
+        background-color: var(--base-colour);
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+    }
+
+    .today-icon {
+        mask: url("/assets/icons/today-icon.svg") no-repeat 50%;
+    }
+    .icon-star {
+        mask: url("/assets/icons/icon-star.svg") no-repeat 50%;
+    }
+    .icon-check-square {
+        mask: url("/assets/icons/icon-check-square.svg") no-repeat 50%;
+    }
+    .icon-tasks {
+        mask: url("/assets/icons/icon-tasks.svg") no-repeat 50%;
+    }
+
+    .bars-progress-icon {
+        mask: url("/assets/icons/bars-progress-icon.svg") no-repeat 50%;
+    }
+
+    .calendar-icon {
+        mask: url("/assets/icons/calendar-icon.svg") no-repeat 50%;
+    }
+
+    .clipboard-icon {
+        mask: url("/assets/icons/clipboard-icon.svg") no-repeat 50%;
+    }
+
+    .clipboard-list-icon {
+        mask: url("/assets/icons/clipboard-list-icon.svg") no-repeat 50%;
+    }
+
+    .list-ul-icon {
+        mask: url("/assets/icons/list-ul-icon.svg") no-repeat 50%;
+    }
+
+    .file-icon {
+        mask: url("/assets/icons/file-icon.svg") no-repeat 50%;
+    }
+
+    .folder-icon {
+        mask: url("/assets/icons/folder-icon.svg") no-repeat 50%;
+    }
+
+    .folder-open-icon {
+        mask: url("/assets/icons/folder-open-icon.svg") no-repeat 50%;
+    }
+
+    .bell-icon {
+        mask: url("/assets/icons/bell-icon.svg") no-repeat 50%;
+    }
+
+    .bookmark-icon {
+        mask: url("/assets/icons/bookmark-icon.svg") no-repeat 50%;
+    }
+
+    .pen-icon {
+        mask: url("/assets/icons/pen-icon.svg") no-repeat 50%;
+    }
+
+    .logout-icon {
+        mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
+    }
+
+    .ellipsis-vertical-icon {
+        mask: url("/assets/icons/ellipsis-vertical-icon.svg") no-repeat 50%;
+    }
+
+    .search-icon {
+        mask: url("/assets/icons/search-icon.svg") no-repeat 50%;
+    }
+
+    .clear-icon {
+        mask: url("/assets/icons/clear-icon.svg") no-repeat 50%;
+    }
+
+    .filter-icon {
+        mask: url("/assets/icons/filter-icon.svg") no-repeat 50%;
+    }
+
+    .header-end > a {
+        cursor: pointer;
+        width: var(--size-40);
+        height: var(--size-40);
+        display: block;
+        background-color: var(--base-colour);
+
+        &:hover {
+            background-color: var(--primary);
+        }
+    }
+
+    .details__body {
+        height: calc(var(--vh) - (2 * var(--size-40)));
+        overflow: auto;
+    }
+    .details__body > div {
+        background-color: #fff;
+        margin: 10px 0;
+        padding: 10px 12px;
+    }
+    .details__body > div:first-child {
+        margin-top: 0;
+    }
+    .detail__note > form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    #note-editor {
+        width: 100%;
+        height: 300px;
+    }
+
+    .details__priority {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        label {
+            font-size: 0.9rem;
+        }
+    }
+
+    .details__schedule {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        label {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9rem;
+        }
+    }
+    /* TODO: Check new CSS features as nesting */
+    rm-task-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    rm-task-details .ql-toolbar.ql-snow,
+    rm-task-details .ql-container.ql-snow {
+        border: 1px solid var(--base-grey);
+    }
+    rm-task-details .ql-toolbar.ql-snow {
+        width: 100%;
+    }
+    .add-note {
+        margin-top: 10px;
+    }
+    .rename,
+    .add-note {
+        background-color: transparent;
+        border: 1px solid transparent;
+        font-size: 0.8rem;
+        color: var(--primary);
+        font-weight: 600;
+        padding: 0;
+        cursor: pointer;
+    }
+    .rename:hover,
+    .add-note:hover {
+        border-bottom-color: var(--primary);
+    }
+    .rename:focus,
+    .add-note:focus {
+        outline: none;
+    }
+    .remove,
+    .close {
+        background: transparent;
+        border: 0;
+        width: 36px;
+        height: 32px;
+        cursor: pointer;
+        line-height: 1px;
+    }
+    .remove:focus,
+    .close:focus {
+        outline: none;
+    }
+    .remove {
+        border-left: 1px solid var(--base-grey);
+    }
+    .trash-icon {
+        display: block;
+        mask: url("/assets/icons/trash-icon.svg");
+        mask-repeat: no-repeat;
+        mask-position: 50%;
+        mask-size: 16px;
+        background-color: var(--base-colour);
+        width: 27px;
+        height: 27px;
+    }
+    .remove:hover .trash-icon {
+        background-color: var(--base-red);
+    }
+    .close {
+        border-right: 1px solid var(--base-grey);
+    }
+    .close-icon {
+        display: block;
+        mask: url("/assets/icons/close-icon.svg");
+        mask-repeat: no-repeat;
+        mask-position: 50%;
+        mask-size: 27px 18px;
+        background-color: var(--base-colour);
+        width: 27px;
+        height: 27px;
+    }
+    .close:hover .close-icon {
+        background-color: var(--primary);
+    }
+    .menu {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+
+        background-image: url("/assets/icons/menu-icon.svg");
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+    .list-toolbar,
+    .search-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--colour-neutral-100);
+        padding: 10px 12px;
+        height: var(--size-40);
+    }
+    .list-title,
+    .search-title {
+        letter-spacing: 2px;
+    }
+    .creation-date {
+        font-size: 0.8rem;
+    }
+
+    .modal {
+        border: none;
+    }
+    .modal__content {
+        width: var(--modal-width);
+        padding: 20px;
+        background: #fff;
+    }
+    .modal__actions {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 10px;
+        gap: 10px;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .completed-ckeck:hover,
+        .importance-check:hover {
+            background-color: var(--primary);
+        }
+    }
 }
 rm-tasks-app:not(:has(.tasks__list input:checked)) .details {
     display: none;
