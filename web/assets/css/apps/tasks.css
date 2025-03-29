@@ -32,6 +32,22 @@ rm-tasks-app {
         &.numbers {
             background: url("/assets/icons/keyboardKeyNumbers.svg") no-repeat 50%;
         }
+
+        &.j {
+            background: url("/assets/icons/keyboardKeyJ.svg") no-repeat 50%;
+        }
+        &.k {
+            background: url("/assets/icons/keyboardKeyK.svg") no-repeat 50%;
+        }
+        &.bl {
+            background: url("/assets/icons/keyboardKey[.svg") no-repeat 50%;
+        }
+        &.br {
+            background: url("/assets/icons/keyboardKey].svg") no-repeat 50%;
+        }
+        &.a {
+            background: url("/assets/icons/keyboardKeyA.svg") no-repeat 50%;
+        }
     }
 
     .search-screen,
