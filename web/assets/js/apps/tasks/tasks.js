@@ -44,6 +44,15 @@ class TasksAppElement extends HTMLElement {
         e.preventDefault();
         this.querySelector(".searchbox")?.focus();
         break;
+      case e.code === "KeyX":
+        this.toggleTaskCompletion();
+        break;
+      case e.code === "KeyI":
+        this.toggleTaskImportance();
+        break;
+      case e.code === "KeyP":
+        this.switchPriority();
+        break;
     }
   }
 
@@ -86,6 +95,34 @@ class TasksAppElement extends HTMLElement {
       items[type === navigationType.Next ? 0 : lastIndex].click();
     } else {
       items[type === navigationType.Next ? selected + 1 : selected - 1].click();
+    }
+  }
+
+  toggleTaskCompletion() {
+    const selected = [...this.querySelectorAll(".tasks__list > li input")]?.findIndex((e) => e.checked);
+
+    if (selected >= 0) {
+      this.querySelectorAll(".tasks__list > li .completed-ckeck")[selected].click();
+    }
+  }
+
+  toggleTaskImportance() {
+    const selected = [...this.querySelectorAll(".tasks__list > li input")]?.findIndex((e) => e.checked);
+
+    if (selected >= 0) {
+      this.querySelectorAll(".tasks__list > li .importance-check")[selected].click();
+    }
+  }
+
+  switchPriority() {
+    const selected = [...this.querySelectorAll(".tasks__list > li input")]?.findIndex((e) => e.checked);
+
+    if (selected >= 0) {
+      const element = this.querySelector(".details__priority select[name='priority']");
+
+      element.value = element.value === "4" ? 0 : Number(element.value) + 1;
+      element.dispatchEvent(new Event("change"));
+      // TODO: when first option is selected it does not show the name
     }
   }
 

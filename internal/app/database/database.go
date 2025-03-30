@@ -401,6 +401,11 @@ func (s *service) UpdateTaskPriority(id string, priority string) error {
 	}
 	defer query.Close()
 
+	// when setting value none through the keybinding it does not return "0" but ""
+	if priority == "" {
+		priority = "0"
+	}
+
 	_, err = query.Exec(priority, id)
 	if err != nil {
 		return fmt.Errorf("DB.UpdateTaskPriority - update query result failed: %v", err)

@@ -48,6 +48,15 @@ rm-tasks-app {
         &.a {
             background: url("/assets/icons/keyboardKeyA.svg") no-repeat 50%;
         }
+        &.x {
+            background: url("/assets/icons/keyboardKeyX.svg") no-repeat 50%;
+        }
+        &.i {
+            background: url("/assets/icons/keyboardKeyI.svg") no-repeat 50%;
+        }
+        &.p {
+            background: url("/assets/icons/keyboardKeyP.svg") no-repeat 50%;
+        }
     }
 
     .search-screen,
