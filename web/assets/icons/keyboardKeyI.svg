@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32px" height="32px" xmlns:bx="https://boxy-svg.com">
+  <path style="fill: rgb(217, 217, 217); stroke-width: 0px;" d="M -0.032 52 H 63.968 V 60 A 4 4 0 0 1 59.968 64 H 3.968 A 4 4 0 0 1 -0.032 60 V 52 Z" bx:shape="rect -0.032 52 64 12 0 0 4 4 1@803e0e2d"/>
+  <rect style="fill-rule: nonzero; paint-order: fill; fill: rgb(237, 237, 237); stroke-width: 0px;" width="64" height="56" rx="4" ry="4"/>
+  <text style="fill: rgb(65, 65, 65); font-family: Arial, sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 1px; line-height: 30px; white-space: pre; text-anchor: middle;" transform="matrix(0.9960950016975403, 0, 0, 1.0450420379638672, 22.810026168823242, 2.189953088760376)" x="9.226" y="30.576">i</text>
+</svg>
