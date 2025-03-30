@@ -56,6 +56,7 @@ func (s *App) loadUserFromFile(user_id string) (*user.User, error) {
 
 	file, err := os.Open(user_file_path)
 	if err != nil {
+		log.Printf("Failed to load user from file: %s error: %v", user_file_path, err)
 		return nil, err
 	}
 	defer file.Close()
@@ -64,6 +65,7 @@ func (s *App) loadUserFromFile(user_id string) (*user.User, error) {
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&user)
 	if err != nil {
+		log.Printf("Failed to decode error: %v", err)
 		return nil, err
 	}
 
@@ -74,6 +76,7 @@ func (s *App) GetUser(user_id string) (*user.User, error) {
 	if user_obj, ok := s.users[user_id]; !ok {
 		user_obj, err := s.loadUserFromFile(user_id)
 		if err != nil {
+			log.Printf("Failed to get user: %s error: %v", user_id, err)
 			return nil, err
 		}
 		s.users[user_id] = user_obj
@@ -90,11 +93,13 @@ func (s *App) SaveUser(user *user.User) error {
 
 	err := ensureDirectoryExists(user_directory)
 	if err != nil {
+		log.Printf("Failed to create user directory: %s error: %v", user_directory, err)
 		return err
 	}
 
 	file, err := os.Create(user_file_path)
 	if err != nil {
+		log.Printf("Failed to create user file: %s error: %v", user_file_path, err)
 		return err
 	}
 	defer file.Close()
@@ -102,6 +107,7 @@ func (s *App) SaveUser(user *user.User) error {
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(user)
 	if err != nil {
+		log.Printf("Failed save to user file: error: %v", err)
 		return err
 	}
 
