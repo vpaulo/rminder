@@ -11,7 +11,7 @@ func formatDate(date string) string {
 	return tm.Format(time.DateTime)
 }
 
-func formatDateOnly(date string) string {
+func FormatDateOnly(date string) string {
 	tm, err := time.Parse(time.RFC3339, date)
 	if err != nil {
 		return ""

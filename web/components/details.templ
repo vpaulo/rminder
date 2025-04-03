@@ -53,7 +53,7 @@ templ Details(task *database.Task) {
              		<input
                			name="from"
                   		type="date"
-                    	value={ formatDateOnly(task.StartAt) }
+                    	value={ FormatDateOnly(task.StartAt) }
                       	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
                        	hx-trigger="change"
                         hx-swap="none">
@@ -63,7 +63,7 @@ templ Details(task *database.Task) {
               		<input
                 		name="to"
                   		type="date"
-                    	value={ formatDateOnly(task.EndAt) }
+                    	value={ FormatDateOnly(task.EndAt) }
                      	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
                      	hx-trigger="change"
                       	hx-swap="none">

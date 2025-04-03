@@ -72,6 +72,13 @@ templ Task(task *database.Task, selectedtask int) {
 	      hx-target=".details"
 	    >
 	      <span>{ task.Title }</span>
+		  if task.StartAt != "" && task.EndAt != "" {
+			<span class="dates">{ components.FormatDateOnly(task.StartAt) } to { components.FormatDateOnly(task.EndAt) }</span>
+		  } else if task.StartAt != "" {
+			<span class="dates">Start { components.FormatDateOnly(task.StartAt) }</span>
+		  } else if task.EndAt != "" {
+			<span class="dates">Due { components.FormatDateOnly(task.EndAt) }</span>
+		  }
 	      if selectedtask == task.ID {
 	      	<input class="hidden" type="radio" name="task-detail" value={ strconv.Itoa(task.ID) } checked/>
 	      } else {

@@ -188,6 +188,8 @@ rm-tasks-app {
         background-color: var(--primary);
     }
     .show-details {
+        display: flex;
+        flex-direction: column;
         width: 100%;
         height: 100%;
         text-align: left;
@@ -195,6 +197,11 @@ rm-tasks-app {
         color: var(--base-colour);
         padding: 8px 0;
         cursor: pointer;
+
+        .dates {
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
     }
     .completed .show-details {
         text-decoration: line-through from-font var(--primary);
