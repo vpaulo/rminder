@@ -59,10 +59,12 @@ templ TaskImportantElem(task *database.Task) {
 
 templ Task(task *database.Task, selectedtask int) {
 	<li
+		class="drag-item"
 		data-id={ strconv.Itoa(task.ID) }
 		hx-get="/v0/lists/all"
 		hx-target=".lists__container"
 		hx-trigger="click delay:20ms"
+		draggable="true"
 	>
 		@TaskCompletedElem(task)
 	    <label
