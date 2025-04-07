@@ -14,16 +14,20 @@ class TasksAppElement extends HTMLElement {
   observer;
   /** @type {boolean} */
   isEditing = false;
+  /** @type {HTMLUListElement} */
+  tasksList;
+  /** @type {HTMLLIElement} */
+  draggedTask = null;
 
   /** @type {function(KeyboardEvent): void} */
   #keybidings(e) {
     if (this.editing) return;
 
     switch (true) {
-      case e.code === "ArrowDown" || e.code === "KeyJ":
+      case e.shiftKey === false && (e.code === "ArrowDown" || e.code === "KeyJ"):
         this.navigation(navigationElement.Task, navigationType.Next);
         break;
-      case e.code === "ArrowUp" || e.code === "KeyK":
+      case e.shiftKey === false && (e.code === "ArrowUp" || e.code === "KeyK"):
         this.navigation(navigationElement.Task, navigationType.Previous);
         break;
       case e.code === "BracketLeft":
@@ -53,6 +57,12 @@ class TasksAppElement extends HTMLElement {
       case e.code === "KeyP":
         this.switchPriority();
         break;
+      case e.shiftKey === true && (e.code === "ArrowDown" || e.code === "KeyJ"):
+        this.reorderTask(navigationType.Next);
+        break;
+      case e.shiftKey === true && (e.code === "ArrowUp" || e.code === "KeyK"):
+        this.reorderTask(navigationType.Previous);
+        break;
     }
   }
 
@@ -64,6 +74,64 @@ class TasksAppElement extends HTMLElement {
   /** @type {function(FocusEvent): void} */
   #focusOutHandler(e) {
     this.setEdit(e.target, false);
+  }
+
+  /** @type {function(DragEvent): void} */
+  #handleDragStart(e) {
+    this.draggedTask = e.target;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", this.draggedTask.innerHTML);
+    e.target.style.opacity = "0.5";
+  }
+
+  /** @type {function(DragEvent): void} */
+  #handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const targetItem = e.target.classList.contains("drag-item")
+      ? e.target
+      : e.target.parentNode.classList.contains("drag-item")
+        ? e.target.parentNode
+        : null;
+
+    if (targetItem !== this.draggedTask && targetItem) {
+      const boundingRect = targetItem.getBoundingClientRect();
+      const offset = boundingRect.y + boundingRect.height / 2;
+      if (e.clientY - offset > 0) {
+        targetItem.style.borderBottom = "solid 2px transparent";
+        targetItem.style.borderTop = "";
+      } else {
+        targetItem.style.borderTop = "solid 2px transparent";
+        targetItem.style.borderBottom = "";
+      }
+    }
+  }
+
+  /** @type {function(DragEvent): void} */
+  #handleDrop(e) {
+    e.preventDefault();
+
+    const targetItem = e.target.classList.contains("drag-item")
+      ? e.target
+      : e.target.parentNode.classList.contains("drag-item")
+        ? e.target.parentNode
+        : null;
+
+    if (targetItem !== this.draggedTask && targetItem) {
+      if (e.clientY > targetItem.getBoundingClientRect().top + targetItem.offsetHeight / 2) {
+        targetItem.parentNode.insertBefore(this.draggedTask, targetItem.nextSibling);
+      } else {
+        targetItem.parentNode.insertBefore(this.draggedTask, targetItem);
+      }
+    }
+    this.querySelectorAll(".drag-item").forEach((el) => {
+      el.style.borderTop = "";
+      el.style.borderBottom = "";
+    });
+    this.draggedTask.style.opacity = "";
+    this.draggedTask = null;
+
+    // TODO: POST order changes
   }
 
   /** @type {function(HTMLElement, boolean): void} */
@@ -126,7 +194,31 @@ class TasksAppElement extends HTMLElement {
     }
   }
 
+  /** @type {function(NavigationType): void} */
+  reorderTask(type) {
+    window.getSelection().removeAllRanges();
+    const items = this.querySelectorAll(".tasks__list > li input");
+
+    if (items.length === 0) return;
+
+    const selected = [...items].find((e) => e.checked)?.closest(".drag-item");
+
+    if (!selected) return;
+
+    if (type === navigationType.Next && selected.nextSibling) {
+      selected.parentNode.insertBefore(selected, selected.nextSibling.nextSibling);
+    }
+
+    if (type === navigationType.Previous && selected.previousSibling) {
+      selected.parentNode.insertBefore(selected, selected.previousSibling);
+    }
+
+    // TODO: POST order changes
+  }
+
   connectedCallback() {
+    this.tasksList = this.querySelector(".tasks__list");
+
     this.observer = new ResizeObserver((entries) => {
       document.body.style.setProperty("--vh", `${document.body.clientHeight}px`);
     });
@@ -137,9 +229,18 @@ class TasksAppElement extends HTMLElement {
     this.focusInHandler = this.#focusInHandler.bind(this);
     this.focusOutHandler = this.#focusOutHandler.bind(this);
 
+    this.handleDragStart = this.#handleDragStart.bind(this);
+    this.handleDragOver = this.#handleDragOver.bind(this);
+    this.handleDrop = this.#handleDrop.bind(this);
+
     document.addEventListener("keydown", this.keybidings, false);
     document.addEventListener("focusin", this.focusInHandler, false);
     document.addEventListener("focusout", this.focusOutHandler, false);
+
+    // Add event listeners for drag and drop events
+    this.tasksList.addEventListener("dragstart", this.handleDragStart, false);
+    this.tasksList.addEventListener("dragover", this.handleDragOver, false);
+    this.tasksList.addEventListener("drop", this.handleDrop, false);
   }
 
   disconnectedCallback() {
@@ -147,6 +248,10 @@ class TasksAppElement extends HTMLElement {
     document.removeEventListener("keydown", this.keybidings, false);
     document.removeEventListener("focusin", this.focusInHandler, false);
     document.removeEventListener("focusout", this.focusOutHandler, false);
+
+    this.tasksList.removeEventListener("dragstart", this.handleDragStart, false);
+    this.tasksList.removeEventListener("dragover", this.handleDragOver, false);
+    this.tasksList.removeEventListener("drop", this.handleDrop, false);
   }
 }
 
