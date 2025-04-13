@@ -57,3 +57,8 @@ type Persistence struct {
 	ListId  int `json:"list_id"`
 	GroupId int `json:"group_id"`
 }
+
+type Reorder struct {
+	ID       int `json:"id"`
+	Position int `json:"position"`
+}

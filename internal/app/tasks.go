@@ -250,3 +250,29 @@ func UpdateTask(ctx *gin.Context) {
 		}
 	}
 }
+
+func ReorderTasks(ctx *gin.Context) {
+	db := GetUserDatabase(ctx)
+	var reorder []database.Reorder
+	var err error
+
+	if err = ctx.ShouldBindJSON(&reorder); err != nil {
+		ctx.Error(err)
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	// reorder tasks.
+	err = db.ReorderTasks(reorder)
+
+	if err != nil {
+		ctx.IndentedJSON(http.StatusOK, gin.H{
+			"message": "Tasks order update unsuccessful.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{
+		"message": "Tasks order update successful.",
+		"status":  http.StatusOK,
+	})
+}

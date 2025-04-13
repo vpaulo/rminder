@@ -36,6 +36,7 @@ type Service interface {
 	UpdateTaskPriority(ID string, priority string) error
 	UpdateTaskStartDate(id string, date string) error
 	UpdateTaskEndDate(id string, date string) error
+	ReorderTasks(reorder []Reorder) error
 
 	Lists(filter string) ([]*List, error)
 	List(ID string) (*List, error)
@@ -169,7 +170,7 @@ func (s *service) Close() error {
 
 func (s *service) Tasks() ([]*Task, error) {
 	// TODO: maybe change the default for order by created_at
-	query, err := s.db.Prepare("SELECT * FROM task ORDER BY updated_at DESC")
+	query, err := s.db.Prepare("SELECT * FROM task ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Tasks - prepare query failed: %v", err)
 	}
@@ -208,7 +209,7 @@ func (s *service) Tasks() ([]*Task, error) {
 }
 
 func (s *service) ImportantTasks() ([]*Task, error) {
-	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY updated_at DESC")
+	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.ImportantTasks - prepare query failed: %v", err)
 	}
@@ -247,7 +248,7 @@ func (s *service) ImportantTasks() ([]*Task, error) {
 }
 
 func (s *service) CompletedTasks() ([]*Task, error) {
-	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY updated_at DESC")
+	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.CompletedTasks - prepare query failed: %v", err)
 	}
@@ -483,8 +484,25 @@ func (s *service) DeleteTask(id string) error {
 	return nil
 }
 
+func (s *service) ReorderTasks(reorder []Reorder) error {
+	query, err := s.db.Prepare("UPDATE task SET position = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
+	if err != nil {
+		return fmt.Errorf("DB.ReorderTasks - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	for _, order := range reorder {
+		_, err = query.Exec(order.Position, order.ID)
+		if err != nil {
+			return fmt.Errorf("DB.ReorderTasks - update task failed: %v, %v", err, order.ID)
+		}
+	}
+
+	return nil
+}
+
 func (s *service) Lists(filter string) ([]*List, error) {
-	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at ASC")
+	query, err := s.db.Prepare("SELECT * FROM list ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
 	}
@@ -558,7 +576,7 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		err   error
 	)
 
-	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=?")
+	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? ORDER BY position ASC, created_at ASC")
 	if filter != "" {
 		// TODO: find better way for this, do not like it
 		fl := make([]string, 0)
@@ -713,7 +731,7 @@ func (s *service) List(id string) (*List, error) {
 }
 
 func (s *service) Groups() ([]*GroupList, error) {
-	query, err := s.db.Prepare("SELECT * FROM group_list ORDER BY created_at DESC")
+	query, err := s.db.Prepare("SELECT * FROM group_list ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Groups - prepare query failed: %v", err)
 	}
@@ -958,7 +976,7 @@ func (s *service) UpdatePersistenceGroup(group int) error {
 }
 
 func (s *service) SearchLists(searchQuery string) ([]*List, error) {
-	query, err := s.db.Prepare("SELECT * FROM list ORDER BY created_at ASC")
+	query, err := s.db.Prepare("SELECT * FROM list ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.SearchLists - prepare query failed: %v", err)
 	}
