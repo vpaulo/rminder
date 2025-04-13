@@ -44,6 +44,7 @@ type Service interface {
 	CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error
 	UpdateList(id int, name string, colour string, icon string, pinned bool, filter string) error
 	DeleteList(id int) error
+	ReorderLists(reorder []Reorder) error
 
 	Groups() ([]*GroupList, error)
 	Group(ID int) (*GroupList, error)
@@ -890,6 +891,23 @@ func (s *service) DeleteList(id int) error {
 	_, err = query.Exec(id)
 	if err != nil {
 		return fmt.Errorf("DB.DeleteList - update query result failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *service) ReorderLists(reorder []Reorder) error {
+	query, err := s.db.Prepare("UPDATE list SET position = ?, updated_at = CURRENT_TIMESTAMP WHERE id=?")
+	if err != nil {
+		return fmt.Errorf("DB.ReorderLists - prepare update query failed: %v", err)
+	}
+	defer query.Close()
+
+	for _, order := range reorder {
+		_, err = query.Exec(order.Position, order.ID)
+		if err != nil {
+			return fmt.Errorf("DB.ReorderLists - update task failed: %v, %v", err, order.ID)
+		}
 	}
 
 	return nil

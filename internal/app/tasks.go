@@ -261,7 +261,7 @@ func ReorderTasks(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	// reorder tasks.
+
 	err = db.ReorderTasks(reorder)
 
 	if err != nil {

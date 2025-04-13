@@ -14,5 +14,5 @@ func SetV1Routes(router *gin.Engine, application *app.App) {
 	tasks.POST("/reorder", app.ReorderTasks)
 
 	lists := v1.Group("/lists")
-	lists.GET("/reorder", app.GetLists) // TODO
+	lists.POST("/reorder", app.ReorderLists)
 }

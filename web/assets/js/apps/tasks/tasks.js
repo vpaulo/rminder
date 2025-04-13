@@ -48,10 +48,10 @@ class TasksAppElement extends HTMLElement {
       case e.shiftKey === false && (e.code === "ArrowUp" || e.code === "KeyK"):
         this.navigation(navigationElement.Task, navigationType.Previous);
         break;
-      case e.code === "BracketLeft":
+      case e.shiftKey === false && e.code === "BracketLeft":
         this.navigation(navigationElement.List, navigationType.Next);
         break;
-      case e.code === "BracketRight":
+      case e.shiftKey === false && e.code === "BracketRight":
         this.navigation(navigationElement.List, navigationType.Previous);
         break;
       case e.code === "KeyA":
@@ -80,6 +80,12 @@ class TasksAppElement extends HTMLElement {
         break;
       case e.shiftKey === true && (e.code === "ArrowUp" || e.code === "KeyK"):
         this.reorderTask(navigationType.Previous);
+        break;
+      case e.shiftKey === true && e.code === "BracketLeft":
+        this.reorderList(navigationType.Next);
+        break;
+      case e.shiftKey === true && e.code === "BracketRight":
+        this.reorderList(navigationType.Previous);
         break;
     }
   }
@@ -263,6 +269,60 @@ class TasksAppElement extends HTMLElement {
 
     if (error) {
       console.error("POST: Tasks reorder: ", error);
+    }
+  }
+
+  /** @type {function(NavigationType): void} */
+  reorderList(type) {
+    window.getSelection().removeAllRanges();
+    const items = this.querySelectorAll(".lists-holder > rm-list-nav input");
+
+    if (items.length === 0) return;
+
+    const selected = [...items].find((e) => e.checked)?.closest("rm-list-nav");
+
+    if (!selected) return;
+
+    if (type === navigationType.Next && selected.nextSibling) {
+      selected.parentNode.insertBefore(selected, selected.nextSibling.nextSibling);
+    }
+
+    if (type === navigationType.Previous && selected.previousSibling) {
+      selected.parentNode.insertBefore(selected, selected.previousSibling);
+    }
+    // TODO: maybe add a delay or debounce the call to server
+    this.updateListPosition();
+  }
+
+  // TODO: maybe combine updateListPosition with updateTaskPosition, because it's very similar
+  async updateListPosition() {
+    /** @type {Reorder[]} */
+    const lists = [];
+
+    this.querySelectorAll(".lists-holder > rm-list-nav")?.forEach((list, i) => {
+      if (+list.dataset.position !== i) {
+        lists.push({
+          id: +list.dataset.id,
+          position: i,
+        });
+        list.dataset.position = i;
+      }
+    });
+
+    if (lists.length === 0) return;
+
+    const [error] = await tryCatch(
+      fetch("/v1/lists/reorder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(lists),
+      }),
+    );
+
+    if (error) {
+      console.error("POST: Lists reorder: ", error);
     }
   }
 

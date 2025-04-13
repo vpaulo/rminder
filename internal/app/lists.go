@@ -310,3 +310,29 @@ func SearchLists(ctx *gin.Context) {
 		log.Fatalf("Error rendering in SearchLists: %e :: %v", err, e)
 	}
 }
+
+func ReorderLists(ctx *gin.Context) {
+	db := GetUserDatabase(ctx)
+	var reorder []database.Reorder
+	var err error
+
+	if err = ctx.ShouldBindJSON(&reorder); err != nil {
+		ctx.Error(err)
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = db.ReorderLists(reorder)
+
+	if err != nil {
+		ctx.IndentedJSON(http.StatusOK, gin.H{
+			"message": "Lists order update unsuccessful.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{
+		"message": "Lists order update successful.",
+		"status":  http.StatusOK,
+	})
+}
