@@ -61,6 +61,7 @@ templ Task(task *database.Task, selectedtask int) {
 	<li
 		class="drag-item"
 		data-id={ strconv.Itoa(task.ID) }
+		data-position={ strconv.Itoa(task.Position) }
 		hx-get="/v0/lists/all"
 		hx-target=".lists__container"
 		hx-trigger="click delay:20ms"

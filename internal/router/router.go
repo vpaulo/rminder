@@ -64,6 +64,9 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	lists.DELETE("/:listID", app.DeleteList)
 	lists.PUT("/:listID", app.UpdateList)
 
+	// v1 api returns JSON
+	SetV1Routes(router, application)
+
 	// Static files
 	staticFiles, err := fs.Sub(web.Files, "assets")
 	if err != nil {

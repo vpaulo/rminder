@@ -9,6 +9,24 @@ const navigationElement = {
   List: 1,
 };
 
+/** @typedef {[null, T]} Success */
+/** @typedef {[E]} Failure */
+/** @typedef {Success<T> | Failure<E>} Result */
+/** @typedef {{ id: number, position: number }} Reorder */
+
+/**
+ * @param {Promise<T>} promise
+ * @returns {Promise<Result<T,E>}
+ */
+async function tryCatch(promise) {
+  try {
+    const data = await promise;
+    return [null, data];
+  } catch (error) {
+    return [error];
+  }
+}
+
 class TasksAppElement extends HTMLElement {
   /** @type {ResizeObserver} */
   observer;
@@ -131,7 +149,8 @@ class TasksAppElement extends HTMLElement {
     this.draggedTask.style.opacity = "";
     this.draggedTask = null;
 
-    // TODO: POST order changes
+    // TODO: maybe add a delay or debounce the call to server
+    this.updateTaskPosition();
   }
 
   /** @type {function(HTMLElement, boolean): void} */
@@ -212,8 +231,39 @@ class TasksAppElement extends HTMLElement {
     if (type === navigationType.Previous && selected.previousSibling) {
       selected.parentNode.insertBefore(selected, selected.previousSibling);
     }
+    // TODO: maybe add a delay or debounce the call to server
+    this.updateTaskPosition();
+  }
 
-    // TODO: POST order changes
+  async updateTaskPosition() {
+    /** @type {Reorder[]} */
+    const tasks = [];
+
+    this.querySelectorAll(".tasks__list > li")?.forEach((task, i) => {
+      if (+task.dataset.position !== i) {
+        tasks.push({
+          id: +task.dataset.id,
+          position: i,
+        });
+        task.dataset.position = i;
+      }
+    });
+
+    if (tasks.length === 0) return;
+
+    const [error] = await tryCatch(
+      fetch("/v1/tasks/reorder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tasks),
+      }),
+    );
+
+    if (error) {
+      console.error("POST: Tasks reorder: ", error);
+    }
   }
 
   connectedCallback() {
