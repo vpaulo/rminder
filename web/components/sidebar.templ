@@ -83,7 +83,8 @@ templ List(list *database.List, selectedList int) {
 		data-icon={ list.Icon }
 		data-pinned?={ list.Pinned }
 		data-position={ strconv.Itoa(list.Position) }
-		data-filter={ list.FilterBy }>
+		data-filter={ list.FilterBy }
+		draggable="true">
         <label
             class="list"
             hx-get={ "/v0/lists/" + strconv.Itoa(list.ID)}
