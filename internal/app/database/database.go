@@ -288,18 +288,27 @@ func (s *service) CompletedTasks() ([]*Task, error) {
 }
 
 func (s *service) CreateTask(title string, list int) error {
-	query, err := s.db.Prepare("INSERT INTO task (title, list_id) Values (?,?)")
+	query, err := s.db.Prepare("INSERT INTO task (title, list_id, position) Values (?,?,?)")
 	if err != nil {
 		return fmt.Errorf("DB.CreateTask - prepare create query failed: %v", err)
 	}
 	defer query.Close()
+
+	var position int
+
+	tasks, e := s.Tasks()
+	if e != nil {
+		position = 0
+	}
 
 	task := &Task{
 		Title:  title,
 		ListId: list,
 	}
 
-	_, err = query.Exec(task.Title, task.ListId)
+	position = len(tasks)
+
+	_, err = query.Exec(task.Title, task.ListId, position)
 	if err != nil {
 		return fmt.Errorf("DB.CreateTask - create query result failed: %v", err)
 	}
