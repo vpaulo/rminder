@@ -163,7 +163,7 @@ class TasksAppElement extends HTMLElement {
   setEdit(element, state) {
     if (
       element.tagName.toLowerCase() === "input" ||
-      (element.tagName.toLowerCase() === "div" && element.classList.hasClass("ql-editor"))
+      (element.tagName.toLowerCase() === "div" && element.classList.contains("ql-editor"))
     ) {
       this.editing = state;
     }
