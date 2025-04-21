@@ -43,11 +43,7 @@ templ Details(task *database.Task) {
                     }
                 </select>
             </div>
-            <div class="details__schedule"
-            	hx-get="/v0/lists/all"
-             	hx-target=".lists__container"
-             	hx-trigger="change delay:20ms"
-            >
+            <div class="details__schedule">
             	<label>
              		<span>Start Date</span>
              		<input
@@ -56,7 +52,8 @@ templ Details(task *database.Task) {
                     	value={ FormatDateOnly(task.StartAt) }
                       	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
                        	hx-trigger="change"
-                        hx-swap="none">
+                        hx-swap="outerHTML"
+                        hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
              	</label>
              	<label>
               		<span>Due Date</span>
@@ -66,7 +63,8 @@ templ Details(task *database.Task) {
                     	value={ FormatDateOnly(task.EndAt) }
                      	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
                      	hx-trigger="change"
-                      	hx-swap="none">
+                      	hx-swap="outerHTML"
+                       hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
               	</label>
             </div>
             <div class="detail__note">
