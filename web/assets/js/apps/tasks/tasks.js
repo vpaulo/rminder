@@ -112,15 +112,11 @@ class TasksAppElement extends HTMLElement {
   #handleDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
-    const targetItem = e.target.classList.contains("drag-item")
-      ? e.target
-      : e.target.parentNode.classList.contains("drag-item")
-        ? e.target.parentNode
-        : null;
+    const targetItem = e.target.classList.contains("drag-item") ? e.target : e.target.closest(".drag-item");
 
     if (targetItem !== this.draggedTask && targetItem) {
       const boundingRect = targetItem.getBoundingClientRect();
-      const offset = boundingRect.y + boundingRect.height / 2;
+      const offset = boundingRect.top + boundingRect.height / 2;
       if (e.clientY - offset > 0) {
         targetItem.style.borderBottom = "solid 2px transparent";
         targetItem.style.borderTop = "";
@@ -135,11 +131,7 @@ class TasksAppElement extends HTMLElement {
   #handleDrop(e) {
     e.preventDefault();
 
-    const targetItem = e.target.classList.contains("drag-item")
-      ? e.target
-      : e.target.parentNode.classList.contains("drag-item")
-        ? e.target.parentNode
-        : null;
+    const targetItem = e.target.classList.contains("drag-item") ? e.target : e.target.closest(".drag-item");
 
     if (targetItem !== this.draggedTask && targetItem) {
       if (e.clientY > targetItem.getBoundingClientRect().top + targetItem.offsetHeight / 2) {
@@ -188,6 +180,13 @@ class TasksAppElement extends HTMLElement {
       items[type === navigationType.Next ? 0 : lastIndex].click();
     } else {
       items[type === navigationType.Next ? selected + 1 : selected - 1].click();
+    }
+
+    if (element === navigationElement.Task) {
+      this.querySelector(".tasks")?.scrollTo({
+        top: selected >= lastIndex / 2 ? (selected || 1) * 44 : 0, // 44 is the min height for a task
+        behavior: "smooth",
+      });
     }
   }
 

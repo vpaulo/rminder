@@ -87,6 +87,6 @@ func CallbackHandler(s *app.App, auth *authenticator.Authenticator) gin.HandlerF
 		}
 
 		// Redirect to logged in page.
-		ctx.Redirect(http.StatusTemporaryRedirect, "/")
+		ctx.Redirect(http.StatusTemporaryRedirect, "/tasks")
 	}
 }
