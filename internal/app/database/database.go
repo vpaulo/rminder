@@ -171,7 +171,7 @@ func (s *service) Close() error {
 
 func (s *service) Tasks() ([]*Task, error) {
 	// TODO: maybe change the default for order by created_at
-	query, err := s.db.Prepare("SELECT * FROM task ORDER BY position ASC, created_at ASC")
+	query, err := s.db.Prepare("SELECT * FROM task ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Tasks - prepare query failed: %v", err)
 	}
@@ -210,7 +210,7 @@ func (s *service) Tasks() ([]*Task, error) {
 }
 
 func (s *service) ImportantTasks() ([]*Task, error) {
-	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY position ASC, created_at ASC")
+	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.ImportantTasks - prepare query failed: %v", err)
 	}
@@ -249,7 +249,7 @@ func (s *service) ImportantTasks() ([]*Task, error) {
 }
 
 func (s *service) CompletedTasks() ([]*Task, error) {
-	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY position ASC, created_at ASC")
+	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.CompletedTasks - prepare query failed: %v", err)
 	}
@@ -586,7 +586,7 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		err   error
 	)
 
-	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? ORDER BY position ASC, created_at ASC")
+	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if filter != "" {
 		// TODO: find better way for this, do not like it
 		fl := make([]string, 0)
