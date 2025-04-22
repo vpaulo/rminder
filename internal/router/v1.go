@@ -10,6 +10,8 @@ func SetV1Routes(router *gin.Engine, application *app.App) {
 	// v1 api returns JSON
 	v1 := router.Group("/v1", app.UserMiddleware(application))
 
+	v1.GET("/export", app.ExportLists)
+
 	tasks := v1.Group("/tasks")
 	tasks.POST("/reorder", app.ReorderTasks)
 
