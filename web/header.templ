@@ -19,12 +19,19 @@ templ Header(user *user.User) {
         <!-- Logout -->
         <div class="header-end">
         	<rm-app-switcher>
-	        	<button class="apps-icon" popovertarget="app-switcher">Toggle the popover</button>
+	        	<button class="apps-icon" popovertarget="app-switcher"></button>
 	         	<div id="app-switcher" popover>
 					<a href="/" alt="Home">Home</a>
 					<span>Tasks</span>
 				</div>
          	</rm-app-switcher>
+          	<rm-settings-switcher>
+	        	<button class="settings-icon" popovertarget="settings-switcher"></button>
+	         	<div id="settings-switcher" popover>
+					<span data-action="import">Import</span>
+					<span data-action="export">Export</span>
+				</div>
+          	</rm-settings-switcher>
 
             <a class="icon logout-icon" href="/logout"></a>
         </div>

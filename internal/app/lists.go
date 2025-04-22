@@ -336,3 +336,19 @@ func ReorderLists(ctx *gin.Context) {
 		"status":  http.StatusOK,
 	})
 }
+
+func ExportLists(ctx *gin.Context) {
+	db := GetUserDatabase(ctx)
+
+	var err error
+
+	lists, err := db.Lists("")
+	if err != nil {
+		ctx.IndentedJSON(http.StatusOK, gin.H{
+			"message": "Lists export unsuccessful.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	ctx.IndentedJSON(http.StatusOK, lists)
+}

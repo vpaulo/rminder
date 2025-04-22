@@ -1,3 +1,5 @@
+import { tryCatch } from "../../utils.js";
+
 /** @typedef {{ Next: number, Previous: number }} NavigationType */
 const navigationType = {
   Next: 0,
@@ -9,23 +11,7 @@ const navigationElement = {
   List: 1,
 };
 
-/** @typedef {[null, T]} Success */
-/** @typedef {[E]} Failure */
-/** @typedef {Success<T> | Failure<E>} Result */
 /** @typedef {{ id: number, position: number }} Reorder */
-
-/**
- * @param {Promise<T>} promise
- * @returns {Promise<Result<T,E>}
- */
-async function tryCatch(promise) {
-  try {
-    const data = await promise;
-    return [null, data];
-  } catch (error) {
-    return [error];
-  }
-}
 
 class TasksAppElement extends HTMLElement {
   /** @type {ResizeObserver} */
