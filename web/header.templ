@@ -72,6 +72,7 @@ templ UploadFileModal() {
         method="POST"
         hx-trigger="submit, keyup[enterKey]"
         hx-target={ ".lists__container" }
+        hx-swap="none"
         hx-on::after-request="this.reset();this.parentElement.close()">
         	<div id="messages"></div>
             <label for="file" class="checkbox__container">Select data file</label>
