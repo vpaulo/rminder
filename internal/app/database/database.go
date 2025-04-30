@@ -45,6 +45,9 @@ type Service interface {
 	UpdateList(id int, name string, colour string, icon string, pinned bool, filter string) error
 	DeleteList(id int) error
 	ReorderLists(reorder []Reorder) error
+	ImportLists(lists []*List) error
+	AddImportedList(list *List) error
+	AddImportedTask(task *Task, list int) error
 
 	Groups() ([]*GroupList, error)
 	Group(ID int) (*GroupList, error)
@@ -917,6 +920,72 @@ func (s *service) ReorderLists(reorder []Reorder) error {
 		if err != nil {
 			return fmt.Errorf("DB.ReorderLists - update task failed: %v, %v", err, order.ID)
 		}
+	}
+
+	return nil
+}
+
+func (s *service) ImportLists(lists []*List) error {
+	for _, list := range lists {
+		if !list.Base {
+			if err := s.AddImportedList(list); err != nil {
+				return fmt.Errorf("DB.ImportLists - add list failed: %v", err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *service) AddImportedList(list *List) error {
+	query, err := s.db.Prepare("INSERT INTO list (name, colour, icon, position, pinned, filter_by) Values (?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		return fmt.Errorf("DB.AddImportedList - prepare create query failed: %v", err)
+	}
+	defer query.Close()
+
+	var position int
+	lists, e := s.Lists("")
+
+	if e != nil {
+		position = 0
+	}
+
+	position = len(lists)
+
+	var newList sql.Result
+
+	newList, err = query.Exec(list.Name, list.Colour, list.Icon, position, list.Pinned, list.FilterBy)
+	if err != nil {
+		return fmt.Errorf("DB.AddImportedList - create query result failed: %v", err)
+	}
+
+	var newID int64
+	newID, err = newList.LastInsertId()
+
+	if err != nil {
+		return fmt.Errorf("DB.AddImportedList - get list id failed: %v", err)
+	}
+
+	for _, task := range list.Tasks {
+		if err := s.AddImportedTask(task, int(newID)); err != nil {
+			return fmt.Errorf("DB.AddImportedList - add task failed: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (s *service) AddImportedTask(task *Task, list int) error {
+	query, err := s.db.Prepare("INSERT INTO task (title, completed, important, priority, description, start_at, end_at, position, list_id) Values (?,?,?,?,?,?,?,?,?)")
+	if err != nil {
+		return fmt.Errorf("DB.AddImportedTask - prepare create query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(task.Title, task.Completed, task.Important, task.Priority, task.Description, task.StartAt, task.EndAt, task.Position, list)
+	if err != nil {
+		return fmt.Errorf("DB.AddImportedTask - create query result failed: %v", err)
 	}
 
 	return nil

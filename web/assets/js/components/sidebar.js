@@ -3,7 +3,7 @@ class SidebarElement extends HTMLElement {
   cancelBtn;
   /** @type HTMLButtonElement */
   addList;
-  /** @type HTMLDivElement */
+  /** @type HTMLDialogElement */
   formContainer;
   /** @type HTMLIElement */
   clearIcon;
