@@ -1,9 +1,12 @@
 package app
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"rminder/internal/app/database"
 	"rminder/web"
@@ -163,10 +166,11 @@ func DeleteList(ctx *gin.Context) {
 
 	listID := ctx.Param("listID")
 
+	var id int
 	var err error
 
 	if listID != "" {
-		id, _ := strconv.Atoi(listID)
+		id, _ = strconv.Atoi(listID)
 		err = db.DeleteList(id)
 		if err != nil {
 			e := ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -186,6 +190,14 @@ func DeleteList(ctx *gin.Context) {
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Fatalf("error handling DeleteList Persistence. Err: %v", err)
+	}
+
+	if persistence.ListId == id {
+		err = db.UpdatePersistenceList(0)
+		if err != nil {
+			log.Fatalf("error handling DeleteList Persistence Update. Err: %v", err)
+		}
+		persistence.ListId = 0
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -325,6 +337,7 @@ func ReorderLists(ctx *gin.Context) {
 	err = db.ReorderLists(reorder)
 
 	if err != nil {
+		log.Printf("error lists order update unsuccessful. Err: %e", err)
 		ctx.IndentedJSON(http.StatusOK, gin.H{
 			"message": "Lists order update unsuccessful.",
 			"status":  http.StatusInternalServerError,
@@ -344,11 +357,82 @@ func ExportLists(ctx *gin.Context) {
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.IndentedJSON(http.StatusOK, gin.H{
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"message": "Lists export unsuccessful.",
 			"status":  http.StatusInternalServerError,
 		})
 	}
 
 	ctx.IndentedJSON(http.StatusOK, lists)
+}
+
+func ImportLists(ctx *gin.Context) {
+	db := GetUserDatabase(ctx)
+
+	var err error
+	var openedFile multipart.File
+	var file []byte
+
+	// Parse the multipart form, 10 MB max upload size
+	ctx.Request.ParseMultipartForm(10 << 20)
+
+	// Retrieve the file from form data
+	formFile, err := ctx.FormFile("file")
+	if err != nil {
+		if err == http.ErrMissingFile {
+			log.Printf("error no file submitted. Err: %e", err)
+			ctx.IndentedJSON(http.StatusNoContent, gin.H{
+				"message": "No file submitted.",
+				"status":  http.StatusNoContent,
+			})
+		} else {
+			log.Printf("error retrieving the file. Err: %e", err)
+			ctx.IndentedJSON(http.StatusNotFound, gin.H{
+				"message": "Error retrieving the file.",
+				"status":  http.StatusNotFound,
+			})
+		}
+	}
+
+	openedFile, err = formFile.Open()
+
+	if err != nil {
+		log.Printf("error not able to open file. Err: %e", err)
+		ctx.IndentedJSON(http.StatusNoContent, gin.H{
+			"message": "Not able to open file.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	file, err = io.ReadAll(openedFile)
+
+	if err != nil {
+		log.Printf("error not able to read file. Err: %e", err)
+		ctx.IndentedJSON(http.StatusNoContent, gin.H{
+			"message": "Not able to read file.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	var lists []*database.List
+	if err := json.Unmarshal(file, &lists); err != nil {
+		log.Printf("error not able to unmarshal file. Err: %e", err)
+		ctx.IndentedJSON(http.StatusNoContent, gin.H{
+			"message": "Not able to unmarshal file.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	if err := db.ImportLists(lists); err != nil {
+		log.Printf("error failed to save imported lists. Err: %e", err)
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to save imported lists.",
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{
+		"message": "Lists imported successfuly.",
+		"status":  http.StatusOK,
+	})
 }

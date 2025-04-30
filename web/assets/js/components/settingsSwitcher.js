@@ -1,6 +1,16 @@
 import { tryCatch } from "../utils.js";
 
 class SettingsSwitcherElement extends HTMLElement {
+  /** @type HTMLDialogElement */
+  formContainer;
+  /** @type HTMLInputElement */
+  fileElem;
+  /** @type HTMLDivElement */
+  messages;
+
+  maxFileSize = 10 * 1024 * 1024; // 10MB
+  allowedTypes = ["application/json"];
+
   /** @type {function(MouseEvent): void} */
   async #handleClick(e) {
     if (!e.target.dataset.action) return;
@@ -22,18 +32,7 @@ class SettingsSwitcherElement extends HTMLElement {
     }
 
     if (e.target.dataset.action === "import") {
-      // const [error] = await tryCatch(
-      //   fetch("/v1/import", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(tasks),
-      //   }),
-      // );
-      // if (error) {
-      //   console.error("POST: Import lists: ", error);
-      // }
+      this.formContainer.showModal();
     }
   }
 
@@ -56,19 +55,49 @@ class SettingsSwitcherElement extends HTMLElement {
     document.querySelector("#" + a.id).remove();
   }
 
+  #handleFiles() {
+    this.validateFile(this.inputElem.files[0]);
+  }
+
+  validateFile(file) {
+    this.messages.textContent = ""; // clear messages
+    if (!this.allowedTypes.includes(file.type)) {
+      this.showError(`${file.name} is not an allowed file type.`);
+      return false;
+    }
+
+    if (file.size > this.maxFileSize) {
+      this.showError(`${file.name} exceeds the maximum file size of 10MB.`);
+      return false;
+    }
+
+    return true;
+  }
+
+  showError(message) {
+    this.messages.textContent = message;
+  }
+
   connectedCallback() {
     const rect = this.getBoundingClientRect();
     const bodyRect = document.body.getBoundingClientRect();
+    this.formContainer = this.querySelector(".file-form-container");
+    this.inputElem = this.querySelector("#file");
+    this.messages = this.querySelector("#messages");
 
     this.style.setProperty("--popover-top", `${rect.bottom}px`);
     this.style.setProperty("--popover-right", `${bodyRect.right - rect.right + 10}px`);
 
     this.handleClick = this.#handleClick.bind(this);
+    this.handleFiles = this.#handleFiles.bind(this);
+
     this.addEventListener("click", this.handleClick, false);
+    this.inputElem.addEventListener("change", this.handleFiles, false);
   }
 
   disconnectedCallback() {
     this.removeEventListener("click", this.handleClick, false);
+    this.inputElem.removeEventListener("change", this.handleFiles, false);
   }
 }
 

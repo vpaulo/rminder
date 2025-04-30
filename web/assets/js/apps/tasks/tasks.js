@@ -333,9 +333,9 @@ class TasksAppElement extends HTMLElement {
     document.addEventListener("focusout", this.focusOutHandler, false);
 
     // Add event listeners for drag and drop events
-    this.tasksList.addEventListener("dragstart", this.handleDragStart, false);
-    this.tasksList.addEventListener("dragover", this.handleDragOver, false);
-    this.tasksList.addEventListener("drop", this.handleDrop, false);
+    this.tasksList?.addEventListener("dragstart", this.handleDragStart, false);
+    this.tasksList?.addEventListener("dragover", this.handleDragOver, false);
+    this.tasksList?.addEventListener("drop", this.handleDrop, false);
   }
 
   disconnectedCallback() {
@@ -344,9 +344,9 @@ class TasksAppElement extends HTMLElement {
     document.removeEventListener("focusin", this.focusInHandler, false);
     document.removeEventListener("focusout", this.focusOutHandler, false);
 
-    this.tasksList.removeEventListener("dragstart", this.handleDragStart, false);
-    this.tasksList.removeEventListener("dragover", this.handleDragOver, false);
-    this.tasksList.removeEventListener("drop", this.handleDrop, false);
+    this.tasksList?.removeEventListener("dragstart", this.handleDragStart, false);
+    this.tasksList?.removeEventListener("dragover", this.handleDragOver, false);
+    this.tasksList?.removeEventListener("drop", this.handleDrop, false);
   }
 }
 

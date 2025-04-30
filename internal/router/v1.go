@@ -11,6 +11,7 @@ func SetV1Routes(router *gin.Engine, application *app.App) {
 	v1 := router.Group("/v1", app.UserMiddleware(application))
 
 	v1.GET("/export", app.ExportLists)
+	v1.POST("/import", app.ImportLists)
 
 	tasks := v1.Group("/tasks")
 	tasks.POST("/reorder", app.ReorderTasks)
