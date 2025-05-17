@@ -366,6 +366,7 @@ rm-tasks-app {
     #note-editor {
         width: 100%;
         height: 300px;
+        max-width: 288px;
     }
 
     .details__priority {
