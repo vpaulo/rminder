@@ -1,7 +1,3 @@
-PRAGMA journal_mode = WAL;
-
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE IF NOT EXISTS group_list (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

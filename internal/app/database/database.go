@@ -76,40 +76,22 @@ func New(database_path string) Service {
 		log.Fatalf("%s: %v", database_path, err)
 	}
 
+	// PRAGMAs must run outside transactions, so set them before migrations
+	db.Exec("PRAGMA journal_mode = WAL")
+	db.Exec("PRAGMA foreign_keys = ON")
+
 	dbInstance := &service{
 		database_path: database_path,
 		db:            db,
 	}
 
-	err = dbInstance.loadSqlFile()
+	err = dbInstance.migrate()
 	if err != nil {
-		// Failed to create tables.
+		// Failed to run migrations.
 		log.Fatalf("%s: %v", database_path, err)
 	}
 
 	return dbInstance
-}
-
-func (s *service) loadSqlFile() error {
-	// Check db already has been initialised
-	lists, err := s.Lists("")
-	if len(lists) > 0 || err == nil {
-		return nil
-	}
-
-	// Read file
-	file, err := Schema.ReadFile("schema.sql")
-	if err != nil {
-		return err
-	}
-
-	// Execute all
-	_, err = s.db.Exec(string(file))
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Health checks the health of the database connection by pinging the database.
