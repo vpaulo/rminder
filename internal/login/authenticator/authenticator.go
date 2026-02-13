@@ -3,6 +3,7 @@ package authenticator
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
@@ -18,8 +19,11 @@ type Authenticator struct {
 
 // New instantiates the *Authenticator.
 func New(cfg config.AuthConfig) (*Authenticator, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	provider, err := oidc.NewProvider(
-		context.Background(),
+		ctx,
 		"https://"+cfg.Domain+"/",
 	)
 	if err != nil {

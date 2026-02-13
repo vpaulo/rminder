@@ -2,8 +2,8 @@ package database
 
 import "embed"
 
-//go:embed "schema.sql"
-var Schema embed.FS
+//go:embed "migrations"
+var Migrations embed.FS
 
 type Task struct {
 	ID          int    `json:"id"`
