@@ -1,40 +1,4 @@
-package web
-
-templ Base() {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			@Meta()
-
-			<!-- App Styles/Scripts -->
-			<link href="/assets/css/fonts.css" rel="stylesheet">
-            <link href="/assets/css/styles.css" rel="stylesheet"/>
-            <link href="/assets/css/components/sidebar.css" rel="stylesheet"/>
-            <link href="/assets/css/components/listNavigation.css" rel="stylesheet"/>
-            <link href="/assets/css/components/appSwitcher.css" rel="stylesheet"/>
-            <link href="/assets/css/components/settingsSwitcher.css" rel="stylesheet"/>
-            <link href="/assets/css/apps/tasks.css" rel="stylesheet"/>
-            <link href="/assets/css/libs/quill.snow.css" rel="stylesheet"/>
-
-			<script src="/assets/js/libs/htmx.min.js"></script>
-			<script src="/assets/js/libs/quill.js" defer></script>
-			<script type="module" src="/assets/js/utils.js"></script>
-			<script type="module" src="/assets/js/components/premium.js"></script>
-			<script type="module" src="/assets/js/components/details.js"></script>
-			<script type="module" src="/assets/js/components/sidebar.js"></script>
-			<script type="module" src="/assets/js/components/listNavigation.js"></script>
-			<script type="module" src="/assets/js/components/appSwitcher.js"></script>
-			<script type="module" src="/assets/js/components/settingsSwitcher.js"></script>
-			<script type="module" src="/assets/js/apps/tasks/tasks.js"></script>
-		</head>
-		<body>
-			{ children... }
-			<script src="/assets/js/main.js"></script>
-		</body>
-	</html>
-}
-
-templ Meta() {
+{{define "meta"}}
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 	<meta
@@ -127,4 +91,26 @@ templ Meta() {
 	<link rel="canonical" href="https://rminder.app" />
 
 	<title>Rminder</title>
-}
+{{end}}
+
+{{define "app-styles"}}
+	<link href="/assets/css/fonts.css" rel="stylesheet">
+	<link href="/assets/css/styles.css" rel="stylesheet"/>
+	<link href="/assets/css/components/sidebar.css" rel="stylesheet"/>
+	<link href="/assets/css/components/listNavigation.css" rel="stylesheet"/>
+	<link href="/assets/css/components/appSwitcher.css" rel="stylesheet"/>
+	<link href="/assets/css/components/settingsSwitcher.css" rel="stylesheet"/>
+	<link href="/assets/css/apps/tasks.css" rel="stylesheet"/>
+	<link href="/assets/css/libs/quill.snow.css" rel="stylesheet"/>
+
+	<script src="/assets/js/libs/htmx.min.js"></script>
+	<script src="/assets/js/libs/quill.js" defer></script>
+	<script type="module" src="/assets/js/utils.js"></script>
+	<script type="module" src="/assets/js/components/premium.js"></script>
+	<script type="module" src="/assets/js/components/details.js"></script>
+	<script type="module" src="/assets/js/components/sidebar.js"></script>
+	<script type="module" src="/assets/js/components/listNavigation.js"></script>
+	<script type="module" src="/assets/js/components/appSwitcher.js"></script>
+	<script type="module" src="/assets/js/components/settingsSwitcher.js"></script>
+	<script type="module" src="/assets/js/apps/tasks/tasks.js"></script>
+{{end}}

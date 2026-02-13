@@ -5,13 +5,13 @@ all: build
 
 build:
 	@echo "Building..."
-	@templ generate
+	# @templ generate
 
 	@go build -o bin/rminder cmd/rminder/main.go
 
 build-prod:
 	@echo "Building PROD..."
-	@templ generate
+	# @templ generate
 
 	@go build -a -ldflags "-s -w" -o bin/rminder cmd/rminder/main.go
 	#upx --best --lzma bin/rminder

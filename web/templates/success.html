@@ -1,7 +1,11 @@
-package web
-
-templ PremiumPaymentSuccessful() {
-	@Base() {
+{{define "success-page"}}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{template "meta"}}
+		{{template "app-styles"}}
+	</head>
+	<body>
 		<div>
 			<h1>Thank you for your payment!</h1>
 			<p>You are now a premium user.</p>
@@ -10,5 +14,7 @@ templ PremiumPaymentSuccessful() {
 				<a href="/" class="btn btn-primary">Go back to Rminder</a>
 			</p>
 		</div>
-	}
-}
+		<script src="/assets/js/main.js"></script>
+	</body>
+</html>
+{{end}}

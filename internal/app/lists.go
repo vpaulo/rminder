@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"rminder/internal/app/database"
 	"rminder/web"
-	"rminder/web/components"
 	"strconv"
 	"time"
 
@@ -32,7 +31,10 @@ func GetLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+		"Lists":       lists,
+		"Persistence": persistence,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in GetLists: %e :: %v", err, e)
@@ -84,9 +86,17 @@ func GetList(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	if list.FilterBy == "" {
-		err = web.ListsContent(list, persistence, false).Render(ctx.Request.Context(), ctx.Writer)
+		err = web.Render(ctx.Writer, "lists-content", map[string]any{
+			"List":        list,
+			"Persistence": persistence,
+			"IsMultilist": false,
+		})
 	} else {
-		err = web.MultiListContent(lists, list.Name, persistence).Render(ctx.Request.Context(), ctx.Writer)
+		err = web.Render(ctx.Writer, "multi-list-content", map[string]any{
+			"Lists":       lists,
+			"Title":       list.Name,
+			"Persistence": persistence,
+		})
 	}
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -154,7 +164,10 @@ func CreateList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+		"Lists":       lists,
+		"Persistence": persistence,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in Lists: %e :: %v", err, e)
@@ -201,7 +214,10 @@ func DeleteList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+		"Lists":       lists,
+		"Persistence": persistence,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in Lists: %e :: %v", err, e)
@@ -265,7 +281,10 @@ func UpdateList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = components.SidebarLists(lists, persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+		"Lists":       lists,
+		"Persistence": persistence,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in Lists: %e :: %v", err, e)
@@ -316,7 +335,11 @@ func SearchLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.MultiListContent(lists, "Search Results", persistence).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "multi-list-content", map[string]any{
+		"Lists":       lists,
+		"Title":       "Search Results",
+		"Persistence": persistence,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in SearchLists: %e :: %v", err, e)

@@ -1,25 +1,18 @@
-package components
-
-import (
-    "rminder/internal/app/database"
-    "strconv"
-)
-
-templ Details(task *database.Task) {
-    <rm-task-details task-id={ strconv.Itoa(task.ID) }>
+{{define "details"}}
+    <rm-task-details task-id="{{itoa .ID}}">
         <div class="details__body">
             <div class="detail__title">
                 <form
                   class="add-tasks"
-                  hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/title" }
+                  hx-put="{{concat "/v0/tasks/" (itoa .ID) "/title"}}"
                   method="POST"
                   hx-swap="outerHTML"
-                  hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']" }>
+                  hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
                     <input
                         class="title"
                         name="title"
                         type="text"
-                        value={ task.Title }
+                        value="{{.Title}}"
                         minlength="3"
                         maxlength="255"
                         hx-validate="true"/>
@@ -30,17 +23,17 @@ templ Details(task *database.Task) {
                 <label for="priority">Priority</label>
                 <select
                     name="priority"
-                    hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/priority" }
+                    hx-put="{{concat "/v0/tasks/" (itoa .ID) "/priority"}}"
                     hx-trigger="change"
                     hx-swap="outerHTML"
-                   	hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
-                    for i, value := range priorityValues() {
-                        if i == task.Priority {
-                            <option value={ strconv.Itoa(i) } selected>{ value }</option>
-                        } else {
-                            <option value={ strconv.Itoa(i) }>{ value }</option>
-                        }
-                    }
+                   	hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
+                    {{range $i, $value := priorityValues}}
+                        {{if eq $i $.Priority}}
+                            <option value="{{itoa $i}}" selected>{{$value}}</option>
+                        {{else}}
+                            <option value="{{itoa $i}}">{{$value}}</option>
+                        {{end}}
+                    {{end}}
                 </select>
             </div>
             <div class="details__schedule">
@@ -49,30 +42,30 @@ templ Details(task *database.Task) {
              		<input
                			name="from"
                   		type="date"
-                    	value={ FormatDateOnly(task.StartAt) }
-                      	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-start" }
+                    	value="{{formatDateOnly .StartAt}}"
+                      	hx-put="{{concat "/v0/tasks/" (itoa .ID) "/date-start"}}"
                        	hx-trigger="change"
                         hx-swap="outerHTML"
-                        hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
+                        hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
              	</label>
              	<label>
               		<span>Due Date</span>
               		<input
                 		name="to"
                   		type="date"
-                    	value={ FormatDateOnly(task.EndAt) }
-                     	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/date-end" }
+                    	value="{{formatDateOnly .EndAt}}"
+                     	hx-put="{{concat "/v0/tasks/" (itoa .ID) "/date-end"}}"
                      	hx-trigger="change"
                       	hx-swap="outerHTML"
-                       hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(task.ID) + "']"  }>
+                       hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
               	</label>
             </div>
             <div class="detail__note">
                 <form
-                    hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/description" }
+                    hx-put="{{concat "/v0/tasks/" (itoa .ID) "/description"}}"
                     hx-vals='js:{description: getDescription()}'
                     hx-swap="none" method="POST">
-                    <div id="note-editor" class="ql-container ql-snow">@templ.Raw(task.Description)</div>
+                    <div id="note-editor" class="ql-container ql-snow">{{rawHTML .Description}}</div>
                     <button class="add-note" type="submit">Add</button>
                 </form>
             </div>
@@ -80,20 +73,20 @@ templ Details(task *database.Task) {
         <div class="details__footer">
             <button
             	class="close"
-            	hx-put={ "/v0/tasks/" + strconv.Itoa(task.ID) + "/remove-persistence" }
+            	hx-put="{{concat "/v0/tasks/" (itoa .ID) "/remove-persistence"}}"
             	hx-swap="none">
                 <i class="close-icon"></i>
             </button>
-            <span class="creation-date" title="Creation date">{ formatDate(task.CreatedAt) }</span>
+            <span class="creation-date" title="Creation date">{{formatDate .CreatedAt}}</span>
             <button class="remove">
                 <i class="trash-icon"></i>
             </button>
         </div>
-        @Modal(task.ID)
+        {{template "delete-modal" .ID}}
     </rm-task-details>
-}
+{{end}}
 
-templ Modal(id int) {
+{{define "delete-modal"}}
     <dialog class="modal">
         <div class="modal__content">
             <span>Task will be permanent deleted, you won't be able to undo this action.</span>
@@ -101,10 +94,10 @@ templ Modal(id int) {
                 <button class="btn default">Cancel</button>
                 <button
                   class="btn warning"
-                  hx-delete={ "/v0/tasks/" + strconv.Itoa(id) }
+                  hx-delete="{{concat "/v0/tasks/" (itoa .)}}"
                   hx-swap="outerHTML"
-                  hx-target={ ".tasks__list > li[data-id='" + strconv.Itoa(id) + "']" }>Delete task</button>
+                  hx-target="{{concat ".tasks__list > li[data-id='" (itoa .) "']"}}">Delete task</button>
             </div>
         </div>
     </dialog>
-}
+{{end}}

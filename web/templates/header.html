@@ -1,10 +1,4 @@
-package web
-
-import (
-    "rminder/internal/app/user"
-)
-
-templ Header(user *user.User) {
+{{define "header"}}
     <header>
         <div class="header__start">
             <!-- logo -->
@@ -18,53 +12,53 @@ templ Header(user *user.User) {
         <!-- Premium  -->
         <!-- Logout -->
         <div class="header-end">
-        	<rm-app-switcher>
-	        	<button class="apps-icon" popovertarget="app-switcher"></button>
-	         	<div id="app-switcher" popover>
-					<a href="/" alt="Home">Home</a>
-					<span>Tasks</span>
-				</div>
-         	</rm-app-switcher>
-          	<rm-settings-switcher>
-	        	<button class="settings-icon" popovertarget="settings-switcher"></button>
-	         	<div id="settings-switcher" popover>
-					<span data-action="import">Import</span>
-					<span data-action="export">Export</span>
-				</div>
-				@UploadFileModal()
-          	</rm-settings-switcher>
+            <rm-app-switcher>
+                <button class="apps-icon" popovertarget="app-switcher"></button>
+                <div id="app-switcher" popover>
+                    <a href="/" alt="Home">Home</a>
+                    <span>Tasks</span>
+                </div>
+            </rm-app-switcher>
+            <rm-settings-switcher>
+                <button class="settings-icon" popovertarget="settings-switcher"></button>
+                <div id="settings-switcher" popover>
+                    <span data-action="import">Import</span>
+                    <span data-action="export">Export</span>
+                </div>
+                {{template "upload-file-modal"}}
+            </rm-settings-switcher>
             <a class="icon logout-icon" href="/logout"></a>
         </div>
     </header>
-}
+{{end}}
 
-templ hasPremium(user *user.User) {
-	if !user.HasPremium {
+{{define "has-premium"}}
+    {{if not .User.HasPremium}}
         <rm-get-premium>
             <button class="btn primary">Get Premium</button>
-            @GetPremiumModal()
+            {{template "get-premium-modal"}}
         </rm-get-premium>
-    } else {
-        <p>👑 You have premium!</p>
-    }
-}
+    {{else}}
+        <p>&#x1f451; You have premium!</p>
+    {{end}}
+{{end}}
 
-templ GetPremiumModal() {
+{{define "get-premium-modal"}}
     <dialog class="modal">
         <div class="modal__content">
             <span>Upgrade to unlock our most powerful features for work and collaboration.</span>
             <p>Get Premium for $9.99/month</p>
             <div class="modal__actions">
                 <form action="/checkout/create-checkout-session" method="POST">
-                    <button class="btn primary" >Get</button>
+                    <button class="btn primary">Get</button>
                 </form>
                 <button class="btn default">Cancel</button>
             </div>
         </div>
     </dialog>
-}
+{{end}}
 
-templ UploadFileModal() {
+{{define "upload-file-modal"}}
 	<dialog class="file-form-container"
 	hx-get="/v0/lists/all"
 	hx-target=".lists__container"
@@ -74,7 +68,7 @@ templ UploadFileModal() {
         hx-encoding="multipart/form-data"
         method="POST"
         hx-trigger="submit, keyup[enterKey]"
-        hx-target={ ".lists__container" }
+        hx-target=".lists__container"
         hx-swap="none"
         hx-on::after-request="this.reset();this.parentElement.close()">
         	<div id="messages"></div>
@@ -93,4 +87,4 @@ templ UploadFileModal() {
             </fieldset>
         </form>
     </dialog>
-}
+{{end}}
