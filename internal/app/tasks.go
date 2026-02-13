@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"rminder/internal/app/database"
 	"rminder/web"
-	"rminder/web/components"
 	"strconv"
 	"strings"
 
@@ -15,7 +14,6 @@ import (
 
 func GetTasks(ctx *gin.Context) {
 	db := GetUserDatabase(ctx)
-	user := GetUser(ctx)
 
 	slug := strings.TrimPrefix(ctx.Request.URL.Path, "/")
 
@@ -46,14 +44,21 @@ func GetTasks(ctx *gin.Context) {
 
 	if slug == "" {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Tasks(lists, nil, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
+		err = web.Render(ctx.Writer, "tasks-page", map[string]any{
+			"Lists":       lists,
+			"MultiList":   ([]*database.List)(nil),
+			"Persistence": persistence,
+		})
 		if err != nil {
 			e := ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in tasksHandler: %e :: %v", err, e)
 		}
 	} else {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.TaskList(tasks, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
+		err = web.Render(ctx.Writer, "task-list", map[string]any{
+			"Tasks":        tasks,
+			"SelectedTask": persistence.TaskId,
+		})
 		if err != nil {
 			e := ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Fatalf("Error rendering in TaskList: %e :: %v", err, e)
@@ -91,7 +96,7 @@ func GetTask(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = components.Details(task).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "details", task)
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in TaskList: %e :: %v", err, e)
@@ -138,7 +143,10 @@ func CreateTask(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.TaskList(tasks, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "task-list", map[string]any{
+		"Tasks":        tasks,
+		"SelectedTask": persistence.TaskId,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Fatalf("Error rendering in TaskList: %e :: %v", err, e)
@@ -237,11 +245,14 @@ func UpdateTask(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		if slug == "important" {
-			err = web.TaskImportantElem(task).Render(ctx.Request.Context(), ctx.Writer)
+			err = web.Render(ctx.Writer, "task-important-elem", task)
 		} else if slug == "completed" {
-			err = web.TaskCompletedElem(task).Render(ctx.Request.Context(), ctx.Writer)
+			err = web.Render(ctx.Writer, "task-completed-elem", task)
 		} else {
-			err = web.Task(task, persistence.TaskId).Render(ctx.Request.Context(), ctx.Writer)
+			err = web.Render(ctx.Writer, "task", map[string]any{
+				"Task":         task,
+				"SelectedTask": persistence.TaskId,
+			})
 		}
 
 		if err != nil {

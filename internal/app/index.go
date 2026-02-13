@@ -13,7 +13,6 @@ import (
 
 func AppLoadHandler(ctx *gin.Context) {
 	db := GetUserDatabase(ctx)
-	user := GetUser(ctx)
 
 	var multiList []*database.List
 
@@ -47,7 +46,11 @@ func AppLoadHandler(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Tasks(lists, multiList, persistence, user).Render(ctx.Request.Context(), ctx.Writer)
+	err = web.Render(ctx.Writer, "tasks-page", map[string]any{
+		"Lists":       lists,
+		"MultiList":   multiList,
+		"Persistence": persistence,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in appLoadHandler: %e :: %v", err, e)
@@ -65,7 +68,9 @@ func LandingPageLoadHandler(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err := web.Home(userExists).Render(ctx.Request.Context(), ctx.Writer)
+	err := web.Render(ctx.Writer, "home-page", map[string]any{
+		"UserExists": userExists,
+	})
 	if err != nil {
 		e := ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Fatalf("Error rendering in Home page: %e :: %v", err, e)
