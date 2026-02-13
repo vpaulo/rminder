@@ -1,42 +1,100 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
-	"strconv"
-
-	"github.com/joho/godotenv"
-	"github.com/stripe/stripe-go/v81"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"rminder/internal/login/authenticator"
+	"rminder/internal/pkg/config"
+	"rminder/internal/pkg/logger"
 	"rminder/internal/router"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Failed to load the env vars: %v", err)
+	// Initialise Logger
+	log := slog.Default()
+	log.Info("Starting Platform")
+
+	// Load configuration
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "configs/config.json"
 	}
 
-	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
-
-	auth, err := authenticator.New()
+	cfg, err := config.Load(configPath)
 	if err != nil {
-		log.Fatalf("Failed to initialize the authenticator: %v", err)
+		log.Error("Failed to load config:", "error", err)
 	}
 
-	rtr := router.New(auth)
-
-	port, err := strconv.Atoi(os.Getenv("PORT"))
+	// Initialise App Logger
+	appLogger, err := logger.New(logger.Config{
+		Level:  cfg.Logging.Level,
+		Format: cfg.Logging.Format,
+		Output: cfg.Logging.Output,
+	})
 	if err != nil {
-		log.Fatalf("Port not found in .env file: %v", err)
+		log.Error("Failed to initialize logger", "error", err)
+		os.Exit(1)
 	}
 
-	log.Printf("Server listening on http://localhost:%d/", port)
+	auth, err := authenticator.New(cfg.Auth)
+	if err != nil {
+		appLogger.Error("Failed to initialize the authenticator", "error", err)
+		os.Exit(1)
+	}
 
-	hostAndPort := fmt.Sprintf("0.0.0.0:%d", port)
-	if err := http.ListenAndServe(hostAndPort, rtr); err != nil {
-		log.Fatalf("There was an error with the http server: %v", err)
+	// Initialize Routes
+	rtr := router.New(auth, appLogger, cfg)
+
+	// Starting server
+	addr := fmt.Sprintf(":%d", cfg.Server.AuthPort)
+	appLogger.Info("Auth service starting", "addr", addr)
+
+	readTimeout, _ := config.ParseDuration(cfg.Server.ReadTimeout)
+	writeTimeout, _ := config.ParseDuration(cfg.Server.WriteTimeout)
+
+	srv := &http.Server{
+		Addr:         addr,
+		Handler:      rtr,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+	}
+
+	// Start server in a goroutine
+	serverErrors := make(chan error, 1)
+	go func() {
+		appLogger.Info("Rminder started", "port", addr)
+		serverErrors <- srv.ListenAndServe()
+	}()
+
+	// Handle graceful shutdown
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case err := <-serverErrors:
+		appLogger.Error("Server error", "error", err)
+		os.Exit(1)
+	case sig := <-shutdown:
+		appLogger.Info("Shutdown signal received", "signal", sig)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := srv.Shutdown(ctx); err != nil {
+			appLogger.Error("Graceful shutdown failed", "error", err)
+			if err := srv.Close(); err != nil {
+				appLogger.Error("Server close failed", "error", err)
+			}
+		}
+
+		appLogger.Info("Rminder stopped")
+		appLogger.Close()
 	}
 }
