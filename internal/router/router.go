@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/app"
-	"rminder/internal/checkout"
 	"rminder/internal/login"
 	"rminder/internal/login/authenticator"
 	"rminder/internal/pkg/config"
@@ -37,12 +36,6 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 
 	router.GET("/", app.LandingPageLoadHandler)
 	router.GET("/tasks", app.UserMiddleware(application), app.AppLoadHandler)
-
-	checkout_group := router.Group("/checkout", app.UserMiddleware(application))
-	checkout_group.POST("/create-checkout-session", checkout.CreatePremiumCheckoutSession)
-	checkout_group.GET("/success", checkout.PremiumCheckoutSuccessHandler)
-
-	router.POST("/post-checkout/webhook", checkout.CheckoutWebhookHandler(application))
 
 	// v0 api returns html chunks, and also to allow creation of more routes at home level
 	v0 := router.Group("/v0", app.UserMiddleware(application))

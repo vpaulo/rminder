@@ -64,7 +64,7 @@ Install packages on the host:
 ```
 deb -i rminder.deb
 deb -i rminder-caddy.deb
-``` 
+```
 
 Enable systemd services:
 ```
@@ -88,31 +88,3 @@ Check the logs:
 journalctl -u rminder.service -f
 journalctl -u rminder-caddy.service -f
 ```
-
-# Testing Stripe payments
-
-Ensure you have these variables in the `.env` file:
-```
-STRIPE_RETURN_TO_URL=http://localhost:3000
-STRIPE_PREMIUM_PRICE_ID=...
-STRIPE_SECRET_KEY=...
-STRIPE_WEBHOOK_SECRET=...
-```
-
-`STRIPE_SECRET_KEY` you can get from your Stripe account. You will have to create a product and set a price and then copy the price id to `STRIPE_PREMIUM_PRICE_ID`.
-
-Download Stripe CLI and login:
-
-```
-stripe login
-```
-
-Then run:
-
-```
-stripe listen --forward-to localhost:3000/post-checkout/webhook
-```
-
-Copy webhook secret and put it in `STRIPE_WEBHOOK_SECRET`.
-
-You can now do test payments with Stripe!
