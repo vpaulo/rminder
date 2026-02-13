@@ -41,3 +41,6 @@ rm_data/
 package/rminder/usr/local/bin/rminder
 package/rminder-caddy/usr/local/bin/rminder-caddy
 package/*.deb
+
+# Helpers
+IMPROVEMENTS.md

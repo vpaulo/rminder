@@ -3,10 +3,11 @@ package authenticator
 import (
 	"context"
 	"errors"
-	"os"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
+
+	"rminder/internal/pkg/config"
 )
 
 // Authenticator is used to authenticate our users.
@@ -16,19 +17,19 @@ type Authenticator struct {
 }
 
 // New instantiates the *Authenticator.
-func New() (*Authenticator, error) {
+func New(cfg config.AuthConfig) (*Authenticator, error) {
 	provider, err := oidc.NewProvider(
 		context.Background(),
-		"https://"+os.Getenv("AUTH0_DOMAIN")+"/",
+		"https://"+cfg.Domain+"/",
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	conf := oauth2.Config{
-		ClientID:     os.Getenv("AUTH0_CLIENT_ID"),
-		ClientSecret: os.Getenv("AUTH0_CLIENT_SECRET"),
-		RedirectURL:  os.Getenv("AUTH0_CALLBACK_URL"),
+		ClientID:     cfg.ClientID,
+		ClientSecret: cfg.ClientSecret,
+		RedirectURL:  cfg.CallbackUrl,
 		Endpoint:     provider.Endpoint(),
 		Scopes:       []string{oidc.ScopeOpenID, "profile"},
 	}

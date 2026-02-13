@@ -1,0 +1,28 @@
+{
+  "server": {
+    "auth_port": 4001,
+    "read_timeout": "15s",
+    "write_timeout": "15s"
+  },
+  "database": {
+    "users_dir": "${USER_ROOT_DIRECTORY}",
+    "max_connections": 25
+  },
+  "auth": {
+    "cookie": "${COOKIE_AUTHENTICATION_KEY}",
+    "domain": "${AUTH0_DOMAIN}",
+    "client_id": "${AUTH0_CLIENT_ID}",
+    "client_secret": "${AUTH0_CLIENT_SECRET}",
+    "callback_url": "${AUTH0_CALLBACK_URL}",
+    "return_url": "${AUTH0_RETURN_TO_URL}"
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "output": "${USER_ROOT_DIRECTORY}logs/app.log"
+  },
+  "cache": {
+    "default_expiry": "5m",
+    "cleanup_interval": "10m"
+  }
+}

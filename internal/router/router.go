@@ -4,7 +4,6 @@ import (
 	"encoding/gob"
 	"io/fs"
 	"net/http"
-	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -14,12 +13,14 @@ import (
 	"rminder/internal/checkout"
 	"rminder/internal/login"
 	"rminder/internal/login/authenticator"
+	"rminder/internal/pkg/config"
+	"rminder/internal/pkg/logger"
 	"rminder/web"
 )
 
 // New registers the routes and returns the router.
-func New(auth *authenticator.Authenticator) *gin.Engine {
-	application := app.New()
+func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Config) *gin.Engine {
+	application := app.New(log, cfg)
 
 	router := gin.Default()
 
@@ -27,12 +28,12 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	// we must first register them using gob.Register
 	gob.Register(map[string]interface{}{})
 
-	store := cookie.NewStore([]byte(os.Getenv("COOKIE_AUTHENTICATION_KEY")))
+	store := cookie.NewStore([]byte(cfg.Auth.Cookie))
 	router.Use(sessions.Sessions("auth-session", store))
 
 	router.GET("/login", login.LoginHandler(auth))
 	router.GET("/callback", login.CallbackHandler(application, auth))
-	router.GET("/logout", login.LogoutHandler)
+	router.GET("/logout", login.LogoutHandler(cfg.Auth))
 
 	router.GET("/", app.LandingPageLoadHandler)
 	router.GET("/tasks", app.UserMiddleware(application), app.AppLoadHandler)
