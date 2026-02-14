@@ -30,9 +30,9 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	store := cookie.NewStore([]byte(cfg.Auth.Cookie))
 	router.Use(sessions.Sessions("auth-session", store))
 
-	router.GET("/login", login.LoginHandler(auth))
+	router.GET("/login", login.LoginHandler(auth, log))
 	router.GET("/callback", login.CallbackHandler(application, auth))
-	router.GET("/logout", login.LogoutHandler(cfg.Auth))
+	router.GET("/logout", login.LogoutHandler(cfg.Auth, log))
 
 	router.GET("/", app.LandingPageLoadHandler)
 	router.GET("/tasks", app.UserMiddleware(application), app.AppLoadHandler)

@@ -1,7 +1,6 @@
 package login
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 
@@ -9,13 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/pkg/config"
+	"rminder/internal/pkg/logger"
 )
 
 // Handler for our logout.
-func LogoutHandler(cfg config.AuthConfig) gin.HandlerFunc {
+func LogoutHandler(cfg config.AuthConfig, log *logger.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		logoutUrl, err := url.Parse("https://" + cfg.Domain + "/v2/logout")
 		if err != nil {
+			log.Error("error parsing logout URL", "error", err)
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -24,8 +25,12 @@ func LogoutHandler(cfg config.AuthConfig) gin.HandlerFunc {
 		session.Clear()
 		err = session.Save()
 		if err != nil {
-			log.Fatalf("Error saving session: %e", err)
+			log.Error("error saving session on logout", "error", err)
+			ctx.String(http.StatusInternalServerError, err.Error())
+			return
 		}
+
+		log.Info("user logged out")
 
 		parameters := url.Values{}
 		parameters.Add("returnTo", cfg.ReturnUrl)
