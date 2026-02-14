@@ -1,7 +1,6 @@
 package app
 
 import (
-	"errors"
 	"net/http"
 	"rminder/internal/app/database"
 	"rminder/web"
@@ -33,14 +32,15 @@ func GetTasks(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error handling tasks", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load tasks.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling GetTasks Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load tasks.")
 		return
 	}
 
@@ -52,8 +52,8 @@ func GetTasks(ctx *gin.Context) {
 			"Persistence": persistence,
 		})
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error rendering in tasksHandler", "error", err)
+			ErrorInternalHTML(ctx, "Failed to render tasks.")
 		}
 	} else {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -62,8 +62,8 @@ func GetTasks(ctx *gin.Context) {
 			"SelectedTask": persistence.TaskId,
 		})
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error rendering in TaskList", "error", err)
+			ErrorInternalHTML(ctx, "Failed to render task list.")
 		}
 	}
 }
@@ -82,29 +82,29 @@ func GetTask(ctx *gin.Context) {
 	if taskID != "" {
 		task, err = db.Task(taskID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error handling task", "taskID", taskID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to load task.")
 			return
 		}
 
 		id, _ := strconv.Atoi(taskID)
 		err = db.UpdatePersistenceTask(id)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error updating persistence task", "taskID", taskID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to update task state.")
 			return
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("task ID must not be empty"))
 		log.Error("error task id is empty")
+		ErrorBadRequestHTML(ctx, "Task ID must not be empty.")
 		return
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = web.Render(ctx.Writer, "details", task)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error rendering in TaskList", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render task details.")
 	}
 }
 
@@ -114,8 +114,8 @@ func CreateTask(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error parsing form", "error", err)
+		ErrorBadRequestHTML(ctx, "Invalid form data.")
 		return
 	}
 
@@ -129,27 +129,28 @@ func CreateTask(ctx *gin.Context) {
 	if title != "" && len(title) >= 3 && len(title) <= 255 && list != 0 {
 		err := db.CreateTask(title, list)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error creating task", "error", err)
+			ErrorInternalHTML(ctx, "Failed to create task.")
 			return
 		}
 		log.Info("task created", "title", title, "listID", list)
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("title validation failed"))
 		log.Error("error title validation failed", "title", title, "listID", list)
+		ErrorBadRequestHTML(ctx, "Title must be between 3 and 255 characters and a list must be selected.")
 		return
 	}
 
 	tasks, err := db.ListTasks(list, "")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error handling tasks", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load tasks.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling CreateTask Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load task state.")
 		return
 	}
 
@@ -159,8 +160,8 @@ func CreateTask(ctx *gin.Context) {
 		"SelectedTask": persistence.TaskId,
 	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error rendering in TaskList", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render task list.")
 	}
 }
 
@@ -175,14 +176,14 @@ func DeleteTask(ctx *gin.Context) {
 	if taskID != "" {
 		err = db.DeleteTask(taskID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error deleting task", "taskID", taskID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to delete task.")
 			return
 		}
 		log.Info("task deleted", "taskID", taskID)
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("task ID must not be empty"))
 		log.Error("error task id is empty")
+		ErrorBadRequestHTML(ctx, "Task ID must not be empty.")
 		return
 	}
 
@@ -199,8 +200,8 @@ func UpdateTask(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error parsing form", "error", err)
+		ErrorBadRequestHTML(ctx, "Invalid form data.")
 		return
 	}
 
@@ -213,8 +214,8 @@ func UpdateTask(ctx *gin.Context) {
 			if title != "" && len(title) >= 3 && len(title) <= 255 {
 				err = db.UpdateTask(taskID, title)
 			} else {
-				ctx.AbortWithError(http.StatusBadRequest, errors.New("title validation failed"))
 				log.Error("error title validation failed", "taskID", taskID)
+				ErrorBadRequestHTML(ctx, "Title must be between 3 and 255 characters.")
 				return
 			}
 		case "description":
@@ -234,20 +235,21 @@ func UpdateTask(ctx *gin.Context) {
 		}
 
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error updating task", "taskID", taskID, "slug", slug, "error", err)
+			ErrorInternalHTML(ctx, "Failed to update task.")
 			return
 		}
 		log.Info("task updated", "taskID", taskID, "field", slug)
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("task ID must not be empty"))
 		log.Error("error task id is empty")
+		ErrorBadRequestHTML(ctx, "Task ID must not be empty.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling UpdateTask Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load task state.")
 		return
 	}
 
@@ -258,8 +260,8 @@ func UpdateTask(ctx *gin.Context) {
 		// get task
 		task, err := db.Task(taskID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error handling task", "taskID", taskID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to load task.")
 			return
 		}
 
@@ -277,8 +279,8 @@ func UpdateTask(ctx *gin.Context) {
 		}
 
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error rendering in Task", "error", err)
+			ErrorInternalHTML(ctx, "Failed to render task.")
 		}
 	}
 }
@@ -290,9 +292,8 @@ func ReorderTasks(ctx *gin.Context) {
 	var err error
 
 	if err = ctx.ShouldBindJSON(&reorder); err != nil {
-		ctx.Error(err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
 		log.Error("error binding reorder JSON", "error", err)
+		ErrorJSON(ctx, http.StatusBadRequest, "Invalid request data.")
 		return
 	}
 
@@ -300,10 +301,7 @@ func ReorderTasks(ctx *gin.Context) {
 
 	if err != nil {
 		log.Error("error reordering tasks", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Tasks order update unsuccessful.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusInternalServerError, "Tasks order update unsuccessful.")
 		return
 	}
 

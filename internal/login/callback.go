@@ -54,14 +54,14 @@ func CallbackHandler(s *app.App, auth *authenticator.Authenticator) gin.HandlerF
 		var profile map[string]interface{}
 		if err := idToken.Claims(&profile); err != nil {
 			log.Error("failed to parse ID token claims", "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to process authentication.")
 			return
 		}
 
 		user_id, err := userIdFromProfile(profile)
 		if err != nil {
 			log.Error("failed to generate user ID from profile", "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to process authentication.")
 			return
 		}
 		user.SetUserId(session, user_id)
@@ -91,7 +91,7 @@ func CallbackHandler(s *app.App, auth *authenticator.Authenticator) gin.HandlerF
 
 		if err := session.Save(); err != nil {
 			log.Error("failed to save session", "user_id", user_id, "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to save session.")
 			return
 		}
 

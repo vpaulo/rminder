@@ -18,7 +18,7 @@ func LoginHandler(auth *authenticator.Authenticator, log *logger.Logger) gin.Han
 		state, err := generateRandomState()
 		if err != nil {
 			log.Error("error generating random state", "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to initiate login.")
 			return
 		}
 
@@ -27,7 +27,7 @@ func LoginHandler(auth *authenticator.Authenticator, log *logger.Logger) gin.Han
 		session.Set("state", state)
 		if err := session.Save(); err != nil {
 			log.Error("error saving session state", "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to initiate login.")
 			return
 		}
 
