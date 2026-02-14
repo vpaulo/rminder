@@ -9,13 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/login/authenticator"
+	"rminder/internal/pkg/logger"
 )
 
 // Handler for our login.
-func LoginHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
+func LoginHandler(auth *authenticator.Authenticator, log *logger.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		state, err := generateRandomState()
 		if err != nil {
+			log.Error("error generating random state", "error", err)
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -24,10 +26,12 @@ func LoginHandler(auth *authenticator.Authenticator) gin.HandlerFunc {
 		session := sessions.Default(ctx)
 		session.Set("state", state)
 		if err := session.Save(); err != nil {
+			log.Error("error saving session state", "error", err)
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 
+		log.Info("login initiated")
 		ctx.Redirect(http.StatusTemporaryRedirect, auth.AuthCodeURL(state))
 	}
 }

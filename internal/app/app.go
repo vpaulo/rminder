@@ -27,6 +27,10 @@ func New(log *logger.Logger, cfg *config.Config) *App {
 	}
 }
 
+func (s *App) Logger() *logger.Logger {
+	return s.logger
+}
+
 func ensureDirectoryExists(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return os.MkdirAll(path, os.ModePerm)

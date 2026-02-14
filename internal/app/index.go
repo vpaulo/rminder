@@ -1,7 +1,6 @@
 package app
 
 import (
-	"log"
 	"net/http"
 	"rminder/internal/app/database"
 	"rminder/internal/app/user"
@@ -13,17 +12,20 @@ import (
 
 func AppLoadHandler(ctx *gin.Context) {
 	db := GetUserDatabase(ctx)
+	log := GetLogger(ctx)
 
 	var multiList []*database.List
 
 	lists, err := db.Lists("")
 	if err != nil {
-		log.Fatalf("error handling appLoadHandler. Err: %v", err)
+		log.Error("error handling appLoadHandler", "error", err)
+		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
-		log.Fatalf("error handling appLoadHandler Persistence. Err: %v", err)
+		log.Error("error handling appLoadHandler Persistence", "error", err)
+		return
 	}
 
 	// When loading lists will have the correct task count for the sidebar and
@@ -39,7 +41,8 @@ func AppLoadHandler(ctx *gin.Context) {
 		if filter != "" {
 			multiList, err = db.Lists(filter)
 			if err != nil {
-				log.Fatalf("error handling appLoadHandler filtered lists. Err: %v", err)
+				log.Error("error handling appLoadHandler filtered lists", "error", err)
+				return
 			}
 		}
 	}
@@ -52,13 +55,14 @@ func AppLoadHandler(ctx *gin.Context) {
 		"Persistence": persistence,
 	})
 	if err != nil {
-		e := ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in appLoadHandler: %e :: %v", err, e)
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Error("error rendering in appLoadHandler", "error", err)
 	}
 }
 
 func LandingPageLoadHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
+	log := GetLogger(ctx)
 
 	userExists := false
 	user_id := user.GetUserId(session)
@@ -72,7 +76,7 @@ func LandingPageLoadHandler(ctx *gin.Context) {
 		"UserExists": userExists,
 	})
 	if err != nil {
-		e := ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Fatalf("Error rendering in Home page: %e :: %v", err, e)
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		log.Error("error rendering in home page", "error", err)
 	}
 }
