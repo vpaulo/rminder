@@ -17,7 +17,7 @@ func LogoutHandler(cfg config.AuthConfig, log *logger.Logger) gin.HandlerFunc {
 		logoutUrl, err := url.Parse("https://" + cfg.Domain + "/v2/logout")
 		if err != nil {
 			log.Error("error parsing logout URL", "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to process logout.")
 			return
 		}
 
@@ -26,7 +26,7 @@ func LogoutHandler(cfg config.AuthConfig, log *logger.Logger) gin.HandlerFunc {
 		err = session.Save()
 		if err != nil {
 			log.Error("error saving session on logout", "error", err)
-			ctx.String(http.StatusInternalServerError, err.Error())
+			ctx.String(http.StatusInternalServerError, "Failed to process logout.")
 			return
 		}
 

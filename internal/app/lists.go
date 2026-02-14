@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -21,14 +20,15 @@ func GetLists(ctx *gin.Context) {
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error handling GetLists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load lists.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling GetLists Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load lists.")
 		return
 	}
 
@@ -39,8 +39,8 @@ func GetLists(ctx *gin.Context) {
 		"Persistence": persistence,
 	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error rendering in GetLists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render lists.")
 	}
 }
 
@@ -59,16 +59,16 @@ func GetList(ctx *gin.Context) {
 	if listID != "" {
 		list, err = db.List(listID)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error handling list", "listID", listID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to load list.")
 			return
 		}
 
 		id, _ := strconv.Atoi(listID)
 		err = db.UpdatePersistence(0, id, 0)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error updating persistence list", "listID", listID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to update list state.")
 			return
 		}
 
@@ -76,18 +76,20 @@ func GetList(ctx *gin.Context) {
 			lists, err = db.Lists(list.FilterBy)
 			if err != nil {
 				log.Error("error handling GetLists", "error", err)
+				ErrorInternalHTML(ctx, "Failed to load filtered lists.")
 				return
 			}
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("list ID must not be empty"))
 		log.Error("error no list id")
+		ErrorBadRequestHTML(ctx, "List ID must not be empty.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling GetList Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load list state.")
 		return
 	}
 
@@ -107,8 +109,8 @@ func GetList(ctx *gin.Context) {
 		})
 	}
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error rendering in ListsContent", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render list content.")
 	}
 }
 
@@ -118,8 +120,8 @@ func CreateList(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error parsing form", "error", err)
+		ErrorBadRequestHTML(ctx, "Invalid form data.")
 		return
 	}
 
@@ -153,27 +155,28 @@ func CreateList(ctx *gin.Context) {
 	if list != "" && len(list) >= 3 && len(list) <= 255 && pos != 0 && swatch != "" && icon != "" {
 		err := db.CreateList(list, swatch, icon, pos, pinned == "1", filter)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error creating list", "error", err)
+			ErrorInternalHTML(ctx, "Failed to create list.")
 			return
 		}
 		log.Info("list created", "name", list)
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("form field validation failed"))
 		log.Error("error form field validation failed", "name", list)
+		ErrorBadRequestHTML(ctx, "All fields are required and name must be between 3 and 255 characters.")
 		return
 	}
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error handling lists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load lists.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling CreateList Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load list state.")
 		return
 	}
 
@@ -183,8 +186,8 @@ func CreateList(ctx *gin.Context) {
 		"Persistence": persistence,
 	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error rendering in Lists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render lists.")
 	}
 }
 
@@ -201,27 +204,28 @@ func DeleteList(ctx *gin.Context) {
 		id, _ = strconv.Atoi(listID)
 		err = db.DeleteList(id)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error deleting list", "listID", listID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to delete list.")
 			return
 		}
 		log.Info("list deleted", "listID", listID)
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("list ID must not be empty"))
 		log.Error("error list id is empty")
+		ErrorBadRequestHTML(ctx, "List ID must not be empty.")
 		return
 	}
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error handling DeleteList lists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load lists.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling DeleteList Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load list state.")
 		return
 	}
 
@@ -229,6 +233,7 @@ func DeleteList(ctx *gin.Context) {
 		err = db.UpdatePersistenceList(0)
 		if err != nil {
 			log.Error("error handling DeleteList Persistence Update", "error", err)
+			ErrorInternalHTML(ctx, "Failed to update list state.")
 			return
 		}
 		persistence.ListId = 0
@@ -240,8 +245,8 @@ func DeleteList(ctx *gin.Context) {
 		"Persistence": persistence,
 	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error rendering in Lists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render lists.")
 	}
 }
 
@@ -253,8 +258,8 @@ func UpdateList(ctx *gin.Context) {
 
 	err := ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error parsing form", "error", err)
+		ErrorBadRequestHTML(ctx, "Invalid form data.")
 		return
 	}
 
@@ -284,27 +289,28 @@ func UpdateList(ctx *gin.Context) {
 	if name != "" && len(name) >= 3 && len(name) <= 255 && swatch != "" && icon != "" {
 		err := db.UpdateList(id, name, swatch, icon, pinned == "1", filter)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error updating list", "listID", listID, "error", err)
+			ErrorInternalHTML(ctx, "Failed to update list.")
 			return
 		}
 		log.Info("list updated", "listID", listID, "name", name)
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("form field validation failed"))
 		log.Error("error form field validation failed", "listID", listID)
+		ErrorBadRequestHTML(ctx, "All fields are required and name must be between 3 and 255 characters.")
 		return
 	}
 
 	lists, err := db.Lists("")
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error handling lists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load lists.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling UpdateList Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load list state.")
 		return
 	}
 
@@ -314,8 +320,8 @@ func UpdateList(ctx *gin.Context) {
 		"Persistence": persistence,
 	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
 		log.Error("error rendering in Lists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render lists.")
 	}
 }
 
@@ -330,8 +336,8 @@ func SearchLists(ctx *gin.Context) {
 
 	err = ctx.Request.ParseForm()
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error parsing form", "error", err)
+		ErrorBadRequestHTML(ctx, "Invalid form data.")
 		return
 	}
 
@@ -340,26 +346,27 @@ func SearchLists(ctx *gin.Context) {
 	if query != "" && len(query) >= 3 {
 		lists, err = db.SearchLists(query)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error search list", "query", query, "error", err)
+			ErrorInternalHTML(ctx, "Failed to search lists.")
 			return
 		}
 
 		err = db.UpdatePersistence(0, 0, 0)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
 			log.Error("error updating persistence list", "error", err)
+			ErrorInternalHTML(ctx, "Failed to update search state.")
 			return
 		}
 	} else {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("search query validation failed"))
 		log.Error("search query validation failed", "query", query)
+		ErrorBadRequestHTML(ctx, "Search query must be at least 3 characters.")
 		return
 	}
 
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling SearchLists Persistence", "error", err)
+		ErrorInternalHTML(ctx, "Failed to load search state.")
 		return
 	}
 
@@ -371,8 +378,8 @@ func SearchLists(ctx *gin.Context) {
 		"Persistence": persistence,
 	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
 		log.Error("error rendering in SearchLists", "error", err)
+		ErrorInternalHTML(ctx, "Failed to render search results.")
 	}
 }
 
@@ -383,9 +390,8 @@ func ReorderLists(ctx *gin.Context) {
 	var err error
 
 	if err = ctx.ShouldBindJSON(&reorder); err != nil {
-		ctx.Error(err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
 		log.Error("error binding reorder JSON", "error", err)
+		ErrorJSON(ctx, http.StatusBadRequest, "Invalid request data.")
 		return
 	}
 
@@ -393,10 +399,7 @@ func ReorderLists(ctx *gin.Context) {
 
 	if err != nil {
 		log.Error("error reordering lists", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Lists order update unsuccessful.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusInternalServerError, "Lists order update unsuccessful.")
 		return
 	}
 
@@ -414,10 +417,7 @@ func ExportLists(ctx *gin.Context) {
 	lists, err := db.Lists("")
 	if err != nil {
 		log.Error("error exporting lists", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Lists export unsuccessful.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusInternalServerError, "Lists export unsuccessful.")
 		return
 	}
 
@@ -441,16 +441,10 @@ func ImportLists(ctx *gin.Context) {
 	if err != nil {
 		if err == http.ErrMissingFile {
 			log.Error("error no file submitted", "error", err)
-			ctx.IndentedJSON(http.StatusNoContent, gin.H{
-				"message": "No file submitted.",
-				"status":  http.StatusNoContent,
-			})
+			ErrorJSON(ctx, http.StatusBadRequest, "No file submitted.")
 		} else {
 			log.Error("error retrieving the file", "error", err)
-			ctx.IndentedJSON(http.StatusNotFound, gin.H{
-				"message": "Error retrieving the file.",
-				"status":  http.StatusNotFound,
-			})
+			ErrorJSON(ctx, http.StatusBadRequest, "Error retrieving the file.")
 		}
 		return
 	}
@@ -459,10 +453,7 @@ func ImportLists(ctx *gin.Context) {
 
 	if err != nil {
 		log.Error("error not able to open file", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Not able to open file.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusInternalServerError, "Not able to open file.")
 		return
 	}
 
@@ -470,29 +461,20 @@ func ImportLists(ctx *gin.Context) {
 
 	if err != nil {
 		log.Error("error not able to read file", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Not able to read file.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusInternalServerError, "Not able to read file.")
 		return
 	}
 
 	var lists []*database.List
 	if err := json.Unmarshal(file, &lists); err != nil {
 		log.Error("error not able to unmarshal file", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Not able to unmarshal file.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusBadRequest, "Invalid file format.")
 		return
 	}
 
 	if err := db.ImportLists(lists); err != nil {
 		log.Error("error failed to save imported lists", "error", err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to save imported lists.",
-			"status":  http.StatusInternalServerError,
-		})
+		ErrorJSON(ctx, http.StatusInternalServerError, "Failed to save imported lists.")
 		return
 	}
 
