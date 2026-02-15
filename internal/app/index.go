@@ -60,23 +60,24 @@ func AppLoadHandler(ctx *gin.Context) {
 	}
 }
 
-func LandingPageLoadHandler(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	log := GetLogger(ctx)
+func LandingPageLoadHandler(s *App) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		session := sessions.Default(ctx)
 
-	userExists := false
-	user_id := user.GetUserId(session)
-	if user_id != "" {
-		userExists = true
-	}
+		userExists := false
+		user_id := user.GetUserId(session)
+		if user_id != "" {
+			userExists = true
+		}
 
-	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err := web.Render(ctx.Writer, "home-page", map[string]any{
-		"UserExists": userExists,
-	})
-	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		log.Error("error rendering in home page", "error", err)
+		err := web.Render(ctx.Writer, "home-page", map[string]any{
+			"UserExists": userExists,
+		})
+		if err != nil {
+			ctx.AbortWithError(http.StatusBadRequest, err)
+			s.logger.Error("error rendering in home page", "error", err)
+		}
 	}
 }

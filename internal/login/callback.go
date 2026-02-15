@@ -29,6 +29,13 @@ func userIdFromProfile(profile map[string]interface{}) (string, error) {
 func CallbackHandler(s *app.App, auth *authenticator.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		log := s.Logger()
+
+		if err := auth.Init(); err != nil {
+			log.Error("failed to initialize authenticator", "error", err)
+			ctx.String(http.StatusInternalServerError, "Failed to process authentication.")
+			return
+		}
+
 		session := sessions.Default(ctx)
 		if ctx.Query("state") != session.Get("state") {
 			log.Error("invalid state parameter in callback")

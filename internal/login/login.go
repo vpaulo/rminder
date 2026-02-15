@@ -15,6 +15,12 @@ import (
 // Handler for our login.
 func LoginHandler(auth *authenticator.Authenticator, log *logger.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if err := auth.Init(); err != nil {
+			log.Error("failed to initialize authenticator", "error", err)
+			ctx.String(http.StatusInternalServerError, "Failed to initiate login.")
+			return
+		}
+
 		state, err := generateRandomState()
 		if err != nil {
 			log.Error("error generating random state", "error", err)

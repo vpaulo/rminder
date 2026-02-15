@@ -34,7 +34,7 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	router.GET("/callback", login.CallbackHandler(application, auth))
 	router.GET("/logout", login.LogoutHandler(cfg.Auth, log))
 
-	router.GET("/", app.LandingPageLoadHandler)
+	router.GET("/", app.LandingPageLoadHandler(application))
 	router.GET("/tasks", app.UserMiddleware(application), app.AppLoadHandler)
 
 	// v0 api returns html chunks, and also to allow creation of more routes at home level

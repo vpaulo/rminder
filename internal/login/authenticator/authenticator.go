@@ -3,6 +3,7 @@ package authenticator
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -15,33 +16,46 @@ import (
 type Authenticator struct {
 	*oidc.Provider
 	oauth2.Config
+
+	cfg     config.AuthConfig
+	once    sync.Once
+	initErr error
 }
 
-// New instantiates the *Authenticator.
-func New(cfg config.AuthConfig) (*Authenticator, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	provider, err := oidc.NewProvider(
-		ctx,
-		"https://"+cfg.Domain+"/",
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	conf := oauth2.Config{
-		ClientID:     cfg.ClientID,
-		ClientSecret: cfg.ClientSecret,
-		RedirectURL:  cfg.CallbackUrl,
-		Endpoint:     provider.Endpoint(),
-		Scopes:       []string{oidc.ScopeOpenID, "profile"},
-	}
-
+// New instantiates the *Authenticator without connecting to the OIDC provider.
+// The provider is lazily initialized on first use.
+func New(cfg config.AuthConfig) *Authenticator {
 	return &Authenticator{
-		Provider: provider,
-		Config:   conf,
-	}, nil
+		cfg: cfg,
+	}
+}
+
+// Init ensures the OIDC provider is initialized. Safe for concurrent use.
+func (a *Authenticator) Init() error {
+	a.once.Do(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		provider, err := oidc.NewProvider(
+			ctx,
+			"https://"+a.cfg.Domain+"/",
+		)
+		if err != nil {
+			a.initErr = err
+			return
+		}
+
+		a.Provider = provider
+		a.Config = oauth2.Config{
+			ClientID:     a.cfg.ClientID,
+			ClientSecret: a.cfg.ClientSecret,
+			RedirectURL:  a.cfg.CallbackUrl,
+			Endpoint:     provider.Endpoint(),
+			Scopes:       []string{oidc.ScopeOpenID, "profile"},
+		}
+	})
+
+	return a.initErr
 }
 
 // VerifyIDToken verifies that an *oauth2.Token is a valid *oidc.IDToken.
