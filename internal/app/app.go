@@ -3,7 +3,8 @@ package app
 import (
 	"encoding/json"
 	"os"
-	"path"
+	"path/filepath"
+	"strings"
 
 	"rminder/internal/app/database"
 	"rminder/internal/app/user"
@@ -40,16 +41,43 @@ func ensureDirectoryExists(path string) error {
 	return nil
 }
 
+func (s *App) validateUserPath(user_id string) (string, error) {
+	baseDir, err := filepath.Abs(s.config.Database.UsersDir)
+	if err != nil {
+		s.logger.Error("Failed to resolve base directory: %v", baseDir, err)
+		return "", err
+	}
+
+	user_directory := filepath.Join(baseDir, user_id)
+	resolved, err := filepath.Abs(user_directory)
+	if err != nil {
+		s.logger.Error("Failed to resolve user directory for user: %s error: %v", user_id, err)
+		return "", err
+	}
+
+	if !strings.HasPrefix(resolved, baseDir+string(filepath.Separator)) {
+		s.logger.Error("Directory traversal detected for user: %s resolved: %s", user_id, resolved)
+		return "", err
+	}
+
+	return resolved, nil
+}
+
 func (s *App) GetDatabaseForUser(user_id string) (database.Service, error) {
 	if db, ok := s.user_databases[user_id]; !ok {
-		user_directory := path.Join(s.config.Database.UsersDir, user_id)
-		err := ensureDirectoryExists(user_directory)
+		user_directory, err := s.validateUserPath(user_id)
+		if err != nil {
+			s.logger.Error("Invalid user path: %s error: %v", user_id, err)
+			return nil, err
+		}
+
+		err = ensureDirectoryExists(user_directory)
 		if err != nil {
 			s.logger.Error("Failed to create directory: %s error: %v", user_directory, err)
 			return nil, err
 		}
 
-		user_database_path := path.Join(user_directory, "db.sqlite")
+		user_database_path := filepath.Join(user_directory, "db.sqlite")
 		db := database.New(user_database_path)
 		s.user_databases[user_id] = db
 		return db, nil
@@ -59,8 +87,12 @@ func (s *App) GetDatabaseForUser(user_id string) (database.Service, error) {
 }
 
 func (s *App) loadUserFromFile(user_id string) (*user.User, error) {
-	user_directory := path.Join(s.config.Database.UsersDir, user_id)
-	user_file_path := path.Join(user_directory, "user.json")
+	user_directory, err := s.validateUserPath(user_id)
+	if err != nil {
+		s.logger.Error("Invalid user path: %s error: %v", user_id, err)
+		return nil, err
+	}
+	user_file_path := filepath.Join(user_directory, "user.json")
 
 	file, err := os.Open(user_file_path)
 	if err != nil {
@@ -95,10 +127,14 @@ func (s *App) GetUser(user_id string) (*user.User, error) {
 }
 
 func (s *App) SaveUser(user *user.User) error {
-	user_directory := path.Join(s.config.Database.UsersDir, user.Id)
-	user_file_path := path.Join(user_directory, "user.json")
+	user_directory, err := s.validateUserPath(user.Id)
+	if err != nil {
+		s.logger.Error("Invalid user path: %s error: %v", user.Id, err)
+		return err
+	}
+	user_file_path := filepath.Join(user_directory, "user.json")
 
-	err := ensureDirectoryExists(user_directory)
+	err = ensureDirectoryExists(user_directory)
 	if err != nil {
 		s.logger.Error("Failed to create user directory: %s error: %v", user_directory, err)
 		return err
