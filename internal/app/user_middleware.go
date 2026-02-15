@@ -46,7 +46,7 @@ func UserMiddleware(s *App) gin.HandlerFunc {
 			return
 		}
 
-		log := s.logger.WithUserID(user_id)
+		log := s.logger.WithUserID(user_id).WithRequestID(GetRequestID(ctx))
 
 		user, err := s.GetUser(user_id)
 		if err != nil {

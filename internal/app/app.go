@@ -114,7 +114,7 @@ func (s *App) SaveUser(user *user.User) error {
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(user)
 	if err != nil {
-		s.logger.Error("Failed save to user file: error: %v", err)
+		s.logger.Error("Failed save to user file", "error", err)
 		return err
 	}
 
