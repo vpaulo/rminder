@@ -43,11 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	auth, err := authenticator.New(cfg.Auth)
-	if err != nil {
-		appLogger.Error("Failed to initialize the authenticator", "error", err)
-		os.Exit(1)
-	}
+	auth := authenticator.New(cfg.Auth)
 
 	// Initialize Routes
 	rtr := router.New(auth, appLogger, cfg)
