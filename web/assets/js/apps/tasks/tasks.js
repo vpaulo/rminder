@@ -13,6 +13,10 @@ const navigationElement = {
 
 /** @typedef {{ id: number, position: number }} Reorder */
 
+function csrfToken() {
+  return document.querySelector('meta[name="csrf-token"]')?.content || "";
+}
+
 class TasksAppElement extends HTMLElement {
   /** @type {ResizeObserver} */
   observer;
@@ -247,6 +251,7 @@ class TasksAppElement extends HTMLElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken(),
         },
         body: JSON.stringify(tasks),
       }),
@@ -301,6 +306,7 @@ class TasksAppElement extends HTMLElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken(),
         },
         body: JSON.stringify(lists),
       }),

@@ -8,7 +8,7 @@ import (
 
 func SetV1Routes(router *gin.Engine, application *app.App) {
 	// v1 api returns JSON
-	v1 := router.Group("/v1", app.UserMiddleware(application))
+	v1 := router.Group("/v1", app.UserMiddleware(application), app.CSRFMiddleware())
 
 	v1.GET("/export", app.ExportLists)
 	v1.POST("/import", app.ImportLists)

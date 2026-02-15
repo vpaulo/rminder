@@ -3,9 +3,9 @@
 <html lang="en">
 	<head>
 		{{template "meta"}}
-		{{template "app-styles"}}
+		{{template "app-styles" .}}
 	</head>
-	<body>
+	<body hx-headers='{"X-CSRF-Token": "{{.CSRFToken}}"}'>
 		{{template "header"}}
 		<rm-tasks-app>
 			<!-- left column -->

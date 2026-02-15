@@ -53,6 +53,7 @@ func AppLoadHandler(ctx *gin.Context) {
 		"Lists":       lists,
 		"MultiList":   multiList,
 		"Persistence": persistence,
+		"CSRFToken":   GetCSRFToken(ctx),
 	})
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
