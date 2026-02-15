@@ -38,10 +38,10 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	router.GET("/logout", login.LogoutHandler(cfg.Auth, log))
 
 	router.GET("/", app.LandingPageLoadHandler(application))
-	router.GET("/tasks", app.UserMiddleware(application), app.AppLoadHandler)
+	router.GET("/tasks", app.UserMiddleware(application), app.CSRFMiddleware(), app.AppLoadHandler)
 
 	// v0 api returns html chunks, and also to allow creation of more routes at home level
-	v0 := router.Group("/v0", app.UserMiddleware(application))
+	v0 := router.Group("/v0", app.UserMiddleware(application), app.CSRFMiddleware())
 
 	tasks := v0.Group("/tasks")
 	tasks.GET("/all", app.GetTasks)
