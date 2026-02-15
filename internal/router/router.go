@@ -24,6 +24,7 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	router := gin.Default()
 
 	router.Use(app.RequestIDMiddleware())
+	router.Use(app.SecurityHeadersMiddleware())
 
 	// To store custom types in our cookies,
 	// we must first register them using gob.Register
