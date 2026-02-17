@@ -1,15 +1,9 @@
-package app
+package middleware
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
-
-const requestIDKey = "request_id"
-
-func GetRequestID(ctx *gin.Context) string {
-	return ctx.GetString(requestIDKey)
-}
 
 func RequestIDMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -18,7 +12,7 @@ func RequestIDMiddleware() gin.HandlerFunc {
 			requestID = uuid.New().String()
 		}
 
-		ctx.Set(requestIDKey, requestID)
+		ctx.Set("request_id", requestID)
 		ctx.Header("X-Request-ID", requestID)
 
 		ctx.Next()

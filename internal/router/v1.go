@@ -2,20 +2,22 @@ package router
 
 import (
 	"rminder/internal/app"
+	taskhandlers "rminder/internal/handlers/tasks"
+	"rminder/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetV1Routes(router *gin.Engine, application *app.App) {
 	// v1 api returns JSON
-	v1 := router.Group("/v1", app.UserMiddleware(application), app.CSRFMiddleware())
+	v1 := router.Group("/v1", middleware.UserMiddleware(application), middleware.CSRFMiddleware())
 
-	v1.GET("/export", app.ExportLists)
-	v1.POST("/import", app.ImportLists)
+	v1.GET("/export", taskhandlers.ExportLists)
+	v1.POST("/import", taskhandlers.ImportLists)
 
 	tasks := v1.Group("/tasks")
-	tasks.POST("/reorder", app.ReorderTasks)
+	tasks.POST("/reorder", taskhandlers.ReorderTasks)
 
 	lists := v1.Group("/lists")
-	lists.POST("/reorder", app.ReorderLists)
+	lists.POST("/reorder", taskhandlers.ReorderLists)
 }
