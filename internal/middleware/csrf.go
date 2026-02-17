@@ -1,4 +1,4 @@
-package app
+package middleware
 
 import (
 	"crypto/rand"
@@ -19,14 +19,6 @@ func generateCSRFToken() (string, error) {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(b), nil
-}
-
-func GetCSRFToken(ctx *gin.Context) string {
-	token, _ := ctx.Get(csrfTokenKey)
-	if token == nil {
-		return ""
-	}
-	return token.(string)
 }
 
 func CSRFMiddleware() gin.HandlerFunc {

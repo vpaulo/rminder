@@ -10,8 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/app"
+	taskhandlers "rminder/internal/handlers/tasks"
 	"rminder/internal/login"
 	"rminder/internal/login/authenticator"
+	"rminder/internal/middleware"
 	"rminder/internal/pkg/config"
 	"rminder/internal/pkg/logger"
 	"rminder/web"
@@ -23,8 +25,8 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 
 	router := gin.Default()
 
-	router.Use(app.RequestIDMiddleware())
-	router.Use(app.SecurityHeadersMiddleware())
+	router.Use(middleware.RequestIDMiddleware())
+	router.Use(middleware.SecurityHeadersMiddleware())
 
 	// To store custom types in our cookies,
 	// we must first register them using gob.Register
@@ -38,28 +40,28 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	router.GET("/logout", login.LogoutHandler(cfg.Auth, log))
 
 	router.GET("/", app.LandingPageLoadHandler(application))
-	router.GET("/tasks", app.UserMiddleware(application), app.CSRFMiddleware(), app.AppLoadHandler)
+	router.GET("/tasks", middleware.UserMiddleware(application), middleware.CSRFMiddleware(), app.AppLoadHandler)
 
 	// v0 api returns html chunks, and also to allow creation of more routes at home level
-	v0 := router.Group("/v0", app.UserMiddleware(application), app.CSRFMiddleware())
+	v0 := router.Group("/v0", middleware.UserMiddleware(application), middleware.CSRFMiddleware())
 
 	tasks := v0.Group("/tasks")
-	tasks.GET("/all", app.GetTasks)
-	tasks.GET("/my-day", app.GetTasks)
-	tasks.GET("/important", app.GetTasks)
-	tasks.GET("/completed", app.GetTasks)
-	tasks.POST("/create", app.CreateTask)
-	tasks.GET("/:taskID", app.GetTask)
-	tasks.DELETE("/:taskID", app.DeleteTask)
-	tasks.PUT("/:taskID/:slug", app.UpdateTask)
+	tasks.GET("/all", taskhandlers.GetTasks)
+	tasks.GET("/my-day", taskhandlers.GetTasks)
+	tasks.GET("/important", taskhandlers.GetTasks)
+	tasks.GET("/completed", taskhandlers.GetTasks)
+	tasks.POST("/create", taskhandlers.CreateTask)
+	tasks.GET("/:taskID", taskhandlers.GetTask)
+	tasks.DELETE("/:taskID", taskhandlers.DeleteTask)
+	tasks.PUT("/:taskID/:slug", taskhandlers.UpdateTask)
 
 	lists := v0.Group("/lists")
-	lists.GET("/all", app.GetLists)
-	lists.POST("/create", app.CreateList)
-	lists.POST("/search", app.SearchLists)
-	lists.GET("/:listID", app.GetList)
-	lists.DELETE("/:listID", app.DeleteList)
-	lists.PUT("/:listID", app.UpdateList)
+	lists.GET("/all", taskhandlers.GetLists)
+	lists.POST("/create", taskhandlers.CreateList)
+	lists.POST("/search", taskhandlers.SearchLists)
+	lists.GET("/:listID", taskhandlers.GetList)
+	lists.DELETE("/:listID", taskhandlers.DeleteList)
+	lists.PUT("/:listID", taskhandlers.UpdateList)
 
 	// v1 api returns JSON
 	SetV1Routes(router, application)
