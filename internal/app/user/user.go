@@ -10,7 +10,6 @@ type User struct {
 	GivenName  string `json:"given_name"`
 	FamilyName string `json:"family_name"`
 	PictureUrl string `json:"picture_url"`
-	HasPremium bool   `json:"has_premium"`
 }
 
 func GetUserId(session sessions.Session) string {

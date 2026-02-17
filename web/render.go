@@ -41,8 +41,10 @@ func init() {
 
 	templates = template.Must(
 		template.New("").Funcs(funcMap).ParseFS(templateFS,
-			"templates/*.html",
-			"templates/components/*.html",
+			"templates/shared/*.html",
+			"templates/public/*.html",
+			"templates/apps/tasks/*.html",
+			"templates/apps/tasks/components/*.html",
 		),
 	)
 }
