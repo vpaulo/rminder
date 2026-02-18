@@ -33,11 +33,11 @@
 
 {{define "upload-file-modal"}}
 	<dialog class="file-form-container"
-	hx-get="/v0/lists/all"
+	hx-get="/partials/lists/all"
 	hx-target=".lists__container"
 	hx-trigger="click[event.target.matches('button')] delay:100ms from:form">
         <form
-        hx-post="/v1/import"
+        hx-post="/api/tasks/import"
         hx-encoding="multipart/form-data"
         method="POST"
         hx-trigger="submit, keyup[enterKey]"

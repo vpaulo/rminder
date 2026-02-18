@@ -247,7 +247,7 @@ class TasksAppElement extends HTMLElement {
     if (tasks.length === 0) return;
 
     const [error] = await tryCatch(
-      fetch("/v1/tasks/reorder", {
+      fetch("/api/tasks/reorder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -302,7 +302,7 @@ class TasksAppElement extends HTMLElement {
     if (lists.length === 0) return;
 
     const [error] = await tryCatch(
-      fetch("/v1/lists/reorder", {
+      fetch("/api/lists/reorder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

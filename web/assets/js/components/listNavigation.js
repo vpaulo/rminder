@@ -52,8 +52,8 @@ class ListNavigationElement extends HTMLElement {
       .map((f) => f.split("=")[1]);
 
     form.removeAttribute("hx-post");
-    form.setAttribute("hx-put", `/v0/lists/${this.listId}`);
-    removeBtn.setAttribute("hx-delete", `/v0/lists/${this.listId}`);
+    form.setAttribute("hx-put", `/partials/lists/${this.listId}`);
+    removeBtn.setAttribute("hx-delete", `/partials/lists/${this.listId}`);
 
     name.value = this.listName;
     pinned.toggleAttribute("checked", this.pinned === "");

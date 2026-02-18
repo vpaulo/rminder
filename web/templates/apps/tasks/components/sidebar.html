@@ -19,12 +19,12 @@
 {{define "search"}}
 	<div
        	class="searchbox__container"
-       	hx-get="/v0/lists/all"
+       	hx-get="/partials/lists/all"
        	hx-target=".lists__container"
        	hx-trigger="submit delay:20ms">
 		<form
 			class="searchbox__form"
-			hx-post="/v0/lists/search"
+			hx-post="/partials/lists/search"
 	       	method="POST"
 		    hx-trigger="submit, keyup[enterKey]"
 		    hx-target=".main">
@@ -81,7 +81,7 @@
 		draggable="true">
         <label
             class="list"
-            hx-get="{{concat "/v0/lists/" (itoa .List.ID)}}"
+            hx-get="{{concat "/partials/lists/" (itoa .List.ID)}}"
             hx-trigger="change"
             hx-target=".main"
         >
@@ -117,7 +117,7 @@
 {{define "list-modal"}}
 	<dialog class="list-form-container">
         <form
-        hx-post="/v0/lists/create"
+        hx-post="/partials/lists/create"
         method="POST"
         hx-trigger="submit, keyup[enterKey]"
         hx-target=".lists__container"

@@ -4,7 +4,7 @@
             <div class="detail__title">
                 <form
                   class="add-tasks"
-                  hx-put="{{concat "/v0/tasks/" (itoa .ID) "/title"}}"
+                  hx-put="{{concat "/partials/tasks/" (itoa .ID) "/title"}}"
                   method="POST"
                   hx-swap="outerHTML"
                   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
@@ -23,7 +23,7 @@
                 <label for="priority">Priority</label>
                 <select
                     name="priority"
-                    hx-put="{{concat "/v0/tasks/" (itoa .ID) "/priority"}}"
+                    hx-put="{{concat "/partials/tasks/" (itoa .ID) "/priority"}}"
                     hx-trigger="change"
                     hx-swap="outerHTML"
                    	hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
@@ -43,7 +43,7 @@
                			name="from"
                   		type="date"
                     	value="{{formatDateOnly .StartAt}}"
-                      	hx-put="{{concat "/v0/tasks/" (itoa .ID) "/date-start"}}"
+                      	hx-put="{{concat "/partials/tasks/" (itoa .ID) "/date-start"}}"
                        	hx-trigger="change"
                         hx-swap="outerHTML"
                         hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
@@ -54,7 +54,7 @@
                 		name="to"
                   		type="date"
                     	value="{{formatDateOnly .EndAt}}"
-                     	hx-put="{{concat "/v0/tasks/" (itoa .ID) "/date-end"}}"
+                     	hx-put="{{concat "/partials/tasks/" (itoa .ID) "/date-end"}}"
                      	hx-trigger="change"
                       	hx-swap="outerHTML"
                        hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
@@ -62,7 +62,7 @@
             </div>
             <div class="detail__note">
                 <form
-                    hx-put="{{concat "/v0/tasks/" (itoa .ID) "/description"}}"
+                    hx-put="{{concat "/partials/tasks/" (itoa .ID) "/description"}}"
                     hx-vals='js:{description: getDescription()}'
                     hx-swap="none" method="POST">
                     <div id="note-editor" class="ql-container ql-snow">{{rawHTML .Description}}</div>
@@ -73,7 +73,7 @@
         <div class="details__footer">
             <button
             	class="close"
-            	hx-put="{{concat "/v0/tasks/" (itoa .ID) "/remove-persistence"}}"
+            	hx-put="{{concat "/partials/tasks/" (itoa .ID) "/remove-persistence"}}"
             	hx-swap="none">
                 <i class="close-icon"></i>
             </button>
@@ -94,7 +94,7 @@
                 <button class="btn default">Cancel</button>
                 <button
                   class="btn warning"
-                  hx-delete="{{concat "/v0/tasks/" (itoa .)}}"
+                  hx-delete="{{concat "/partials/tasks/" (itoa .)}}"
                   hx-swap="outerHTML"
                   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .) "']"}}">Delete task</button>
             </div>
