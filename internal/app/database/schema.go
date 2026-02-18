@@ -27,22 +27,12 @@ type List struct {
 	Colour    string `json:"colour"`
 	Icon      string `json:"icon"`
 	FilterBy  string `json:"filter_by"`
-	GroupId   int    `json:"group_id"`
 	Pinned    bool   `json:"pinned"`
 	Base      bool   `json:"base"`
 	Position  int    `json:"position"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Tasks     []*Task
-}
-
-type GroupList struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	Position  int    `json:"position"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Lists     []*List
 }
 
 type Total struct {
@@ -52,10 +42,9 @@ type Total struct {
 }
 
 type Persistence struct {
-	ID      int `json:"id"`
-	TaskId  int `json:"task_id"`
-	ListId  int `json:"list_id"`
-	GroupId int `json:"group_id"`
+	ID     int `json:"id"`
+	TaskId int `json:"task_id"`
+	ListId int `json:"list_id"`
 }
 
 type Reorder struct {

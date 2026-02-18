@@ -49,15 +49,10 @@ type Service interface {
 	AddImportedList(list *List) error
 	AddImportedTask(task *Task, list int) error
 
-	Groups() ([]*GroupList, error)
-	Group(ID int) (*GroupList, error)
-	GroupLists(id int) ([]*List, error)
-
 	Persistence() (*Persistence, error)
-	UpdatePersistence(task int, list int, group int) error
+	UpdatePersistence(task int, list int) error
 	UpdatePersistenceTask(task int) error
 	UpdatePersistenceList(list int) error
-	UpdatePersistenceGroup(group int) error
 
 	SearchLists(searchQuery string) ([]*List, error)
 	ListTasksSearch(id int, searchQuery string) ([]*Task, error)
@@ -520,7 +515,6 @@ func (s *service) Lists(filter string) ([]*List, error) {
 			&data.Colour,
 			&data.Icon,
 			&data.FilterBy,
-			&data.GroupId,
 			&data.Pinned,
 			&data.Base,
 			&data.Position,
@@ -706,7 +700,6 @@ func (s *service) List(id string) (*List, error) {
 		&list.Colour,
 		&list.Icon,
 		&list.FilterBy,
-		&list.GroupId,
 		&list.Pinned,
 		&list.Base,
 		&list.Position,
@@ -723,117 +716,6 @@ func (s *service) List(id string) (*List, error) {
 	list.Tasks = tasks
 
 	return list, nil
-}
-
-func (s *service) Groups() ([]*GroupList, error) {
-	query, err := s.db.Prepare("SELECT * FROM group_list ORDER BY position ASC, created_at ASC")
-	if err != nil {
-		return nil, fmt.Errorf("DB.Groups - prepare query failed: %v", err)
-	}
-	defer query.Close()
-
-	result, err := query.Query()
-	if err != nil {
-		return nil, fmt.Errorf("DB.Groups - query result failed: %v", err)
-	}
-
-	var lists []*List
-
-	groups := make([]*GroupList, 0)
-	for result.Next() {
-		data := new(GroupList)
-		err := result.Scan(
-			&data.ID,
-			&data.Name,
-			&data.Position,
-			&data.CreatedAt,
-			&data.UpdatedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("DB.Groups - result scan failed: %v", err)
-		}
-		lists, err = s.GroupLists(data.ID)
-		if err != nil {
-			return nil, fmt.Errorf("DB.Groups - get list tasks failed: %v", err)
-		}
-		data.Lists = lists
-		groups = append(groups, data)
-	}
-
-	return groups, nil
-}
-
-func (s *service) Group(id int) (*GroupList, error) {
-	query, err := s.db.Prepare("SELECT * FROM group_list WHERE id=?")
-	if err != nil {
-		return nil, fmt.Errorf("DB.Group - prepare query failed: %v", err)
-	}
-	defer query.Close()
-
-	var lists []*List
-
-	group := new(GroupList)
-	err = query.QueryRow(id).Scan(
-		&group.ID,
-		&group.Name,
-		&group.Position,
-		&group.CreatedAt,
-		&group.UpdatedAt)
-	if err != nil {
-		return nil, fmt.Errorf("DB.Group - query result failed: %v", err)
-	}
-
-	lists, err = s.GroupLists(group.ID)
-	if err != nil {
-		return nil, fmt.Errorf("DB.Group - get list tasks failed: %v", err)
-	}
-	group.Lists = lists
-
-	return group, nil
-}
-
-func (s *service) GroupLists(id int) ([]*List, error) {
-	query, err := s.db.Prepare("SELECT * FROM list WHERE group_id=?")
-	if err != nil {
-		return nil, fmt.Errorf("DB.GroupLists - prepare query failed: %v", err)
-	}
-	defer query.Close()
-
-	result, err := query.Query()
-	if err != nil {
-		return nil, fmt.Errorf("DB.GroupLists - query result failed: %v", err)
-	}
-
-	var tasks []*Task
-
-	lists := make([]*List, 0)
-	for result.Next() {
-		data := new(List)
-		err := result.Scan(
-			&data.ID,
-			&data.Name,
-			&data.Colour,
-			&data.Icon,
-			&data.FilterBy,
-			&data.GroupId,
-			&data.Pinned,
-			&data.Base,
-			&data.Position,
-			&data.CreatedAt,
-			&data.UpdatedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("DB.GroupLists - result scan failed: %v", err)
-		}
-		tasks, err = s.ListTasks(data.ID, data.FilterBy)
-		if err != nil {
-			return nil, fmt.Errorf("DB.GroupLists - get list tasks failed: %v", err)
-		}
-		data.Tasks = tasks
-		lists = append(lists, data)
-	}
-
-	return lists, nil
 }
 
 func (s *service) CreateList(name string, swatch string, icon string, position int, pinned bool, filter string) error {
@@ -984,8 +866,7 @@ func (s *service) Persistence() (*Persistence, error) {
 	err = query.QueryRow().Scan(
 		&data.ID,
 		&data.TaskId,
-		&data.ListId,
-		&data.GroupId)
+		&data.ListId)
 	if err != nil {
 		return nil, fmt.Errorf("DB.Persistence - query result failed: %v", err)
 	}
@@ -993,14 +874,14 @@ func (s *service) Persistence() (*Persistence, error) {
 	return data, nil
 }
 
-func (s *service) UpdatePersistence(task int, list int, group int) error {
-	query, err := s.db.Prepare("UPDATE persistence SET task_id = ?, list_id = ?, group_id = ? WHERE id=1")
+func (s *service) UpdatePersistence(task int, list int) error {
+	query, err := s.db.Prepare("UPDATE persistence SET task_id = ?, list_id = ? WHERE id=1")
 	if err != nil {
 		return fmt.Errorf("DB.UpdatePersistence - prepare update query failed: %v", err)
 	}
 	defer query.Close()
 
-	_, err = query.Exec(task, list, group)
+	_, err = query.Exec(task, list)
 	if err != nil {
 		return fmt.Errorf("DB.UpdatePersistence - update query result failed: %v", err)
 	}
@@ -1038,21 +919,6 @@ func (s *service) UpdatePersistenceList(list int) error {
 	return nil
 }
 
-func (s *service) UpdatePersistenceGroup(group int) error {
-	query, err := s.db.Prepare("UPDATE persistence SET group_id = ? WHERE id=1")
-	if err != nil {
-		return fmt.Errorf("DB.UpdatePersistenceGroup - prepare update query failed: %v", err)
-	}
-	defer query.Close()
-
-	_, err = query.Exec(group)
-	if err != nil {
-		return fmt.Errorf("DB.UpdatePersistenceGroup - update query result failed: %v", err)
-	}
-
-	return nil
-}
-
 func (s *service) SearchLists(searchQuery string) ([]*List, error) {
 	query, err := s.db.Prepare("SELECT * FROM list ORDER BY position ASC, created_at ASC")
 	if err != nil {
@@ -1076,7 +942,6 @@ func (s *service) SearchLists(searchQuery string) ([]*List, error) {
 			&data.Colour,
 			&data.Icon,
 			&data.FilterBy,
-			&data.GroupId,
 			&data.Pinned,
 			&data.Base,
 			&data.Position,
