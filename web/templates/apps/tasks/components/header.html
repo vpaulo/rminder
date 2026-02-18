@@ -1,0 +1,63 @@
+{{define "header"}}
+    <header>
+        <div class="header__start">
+            <!-- logo -->
+            <a href="/" alt="Home"><span class="app__logo"></span></a>
+            <!-- app name -->
+            <span class="app__name">RMINDER</span>
+            <span class="app__separator">/</span>
+            <span class="app__stage">Beta</span>
+            <span class="app__version">0.3.1</span>
+        </div>
+        <!-- Logout -->
+        <div class="header-end">
+            <rm-app-switcher>
+                <button class="apps-icon" popovertarget="app-switcher"></button>
+                <div id="app-switcher" popover>
+                    <a href="/" alt="Home">Home</a>
+                    <span>Tasks</span>
+                </div>
+            </rm-app-switcher>
+            <rm-settings-switcher>
+                <button class="settings-icon" popovertarget="settings-switcher"></button>
+                <div id="settings-switcher" popover>
+                    <span data-action="import">Import</span>
+                    <span data-action="export">Export</span>
+                </div>
+                {{template "upload-file-modal"}}
+            </rm-settings-switcher>
+            <a class="icon logout-icon" href="/logout"></a>
+        </div>
+    </header>
+{{end}}
+
+{{define "upload-file-modal"}}
+	<dialog class="file-form-container"
+	hx-get="/v0/lists/all"
+	hx-target=".lists__container"
+	hx-trigger="click[event.target.matches('button')] delay:100ms from:form">
+        <form
+        hx-post="/v1/import"
+        hx-encoding="multipart/form-data"
+        method="POST"
+        hx-trigger="submit, keyup[enterKey]"
+        hx-target=".lists__container"
+        hx-swap="none"
+        hx-on::after-request="this.reset();this.parentElement.close()">
+        	<div id="messages"></div>
+            <label for="file" class="checkbox__container">Select data file</label>
+            <input
+              type="file"
+              id="file"
+              name="file"
+              accept="application/json"
+              class="btn" required/>
+            <fieldset class="form-actions">
+            	<div class="main-actions">
+	               	<div class="btn default" hx-on:click="this.closest('form').reset();this.closest('.file-form-container').close()">Cancel</div>
+	                <button class="btn primary" type="submit">Upload</button>
+	            </div>
+            </fieldset>
+        </form>
+    </dialog>
+{{end}}

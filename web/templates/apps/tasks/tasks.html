@@ -1,0 +1,134 @@
+{{define "task-list"}}
+  <ul class="tasks__list">
+  {{range .Tasks}}
+    {{template "task" (dict "Task" . "SelectedTask" $.SelectedTask)}}
+  {{end}}
+  </ul>
+{{end}}
+
+{{define "task-completed-elem"}}
+	<span
+	   class="completed-ckeck{{if .Completed}} completed{{end}}"
+	   title="Set it as complete"
+	   hx-put="{{concat "/v0/tasks/" (itoa .ID) "/completed"}}"
+	   hx-trigger="click"
+	   hx-swap="outerHTML"
+	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .completed-ckeck"}}"
+	></span>
+{{end}}
+
+{{define "task-important-elem"}}
+	<span
+	   class="importance-check{{if .Important}} important{{end}}"
+	   title="Set it as important"
+	   hx-put="{{concat "/v0/tasks/" (itoa .ID) "/important"}}"
+	   hx-trigger="click"
+	   hx-swap="outerHTML"
+	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .importance-check"}}"
+	></span>
+{{end}}
+
+{{define "task"}}
+	<li
+		class="drag-item"
+		data-id="{{itoa .Task.ID}}"
+		data-position="{{itoa .Task.Position}}"
+		hx-get="/v0/lists/all"
+		hx-target=".lists__container"
+		hx-trigger="click delay:20ms"
+		draggable="true"
+	>
+		{{template "task-completed-elem" .Task}}
+	    <label
+	      class="show-details"
+	      hx-get="{{concat "/v0/tasks/" (itoa .Task.ID)}}"
+	      hx-trigger="change"
+	      hx-target=".details"
+	    >
+	      <span>{{.Task.Title}}</span>
+		  {{if and (ne .Task.StartAt "") (ne .Task.EndAt "")}}
+			<span class="dates">{{formatDateOnly .Task.StartAt}} to {{formatDateOnly .Task.EndAt}}</span>
+		  {{else if ne .Task.StartAt ""}}
+			<span class="dates">Start {{formatDateOnly .Task.StartAt}}</span>
+		  {{else if ne .Task.EndAt ""}}
+			<span class="dates">Due {{formatDateOnly .Task.EndAt}}</span>
+		  {{end}}
+	      {{if eq .SelectedTask .Task.ID}}
+	      	<input class="hidden" type="radio" name="task-detail" value="{{itoa .Task.ID}}" checked/>
+	      {{else}}
+	     	<input class="hidden" type="radio" name="task-detail" value="{{itoa .Task.ID}}"/>
+	      {{end}}
+	    </label>
+	    <span>{{repeatStr "!" .Task.Priority}}</span>
+	    {{template "task-important-elem" .Task}}
+  </li>
+{{end}}
+
+{{define "persisted-list-content"}}
+	{{range .Lists}}
+	    {{if eq .ID $.Persistence.ListId}}
+			{{if eq .FilterBy ""}}
+				{{template "lists-content" (dict "List" . "Persistence" $.Persistence "IsMultilist" false)}}
+			{{else}}
+				{{template "multi-list-content" (dict "Lists" $.MultiList "Title" .Name "Persistence" $.Persistence)}}
+			{{end}}
+	    {{end}}
+ 	{{end}}
+{{end}}
+
+{{define "multi-list-content"}}
+	{{if eq (len .Lists) 0}}
+		{{template "no-results-screen"}}
+	{{else}}
+		<div>
+			<div class="search-toolbar">
+		      	<span class="search-title">{{.Title}}</span>
+		   	</div>
+		{{range .Lists}}
+			{{if and (gt (len .Tasks) 0) (eq .FilterBy "")}}
+				{{template "lists-content" (dict "List" . "Persistence" $.Persistence "IsMultilist" true)}}
+			{{end}}
+ 		{{end}}
+		</div>
+	{{end}}
+{{end}}
+
+{{define "lists-content"}}
+	<div{{if .IsMultilist}} class="multi"{{end}}>
+	    <div class="list-toolbar">
+	        <span class="list-title">{{.List.Name}}</span>
+	    </div>
+	    <div
+	    	class="container"
+	    	hx-get="/v0/lists/all"
+	     	hx-target=".lists__container"
+	     	hx-trigger="submit delay:20ms">
+			{{if not .IsMultilist}}
+		        <form
+		        	class="add-tasks"
+		         	hx-post="/v0/tasks/create"
+		          	method="POST"
+		           	hx-target=".tasks"
+		            hx-on::after-request="this.reset()">
+		            <label class="add-task--label" for="task"></label>
+		            <input
+		                type="text"
+		                name="task"
+		                id="task"
+		                aria-label="Add a task"
+		                placeholder="Add a task"
+		                required
+		                minlength="3"
+		                maxlength="255"
+		                hx-validate="true"
+		            />
+		            <input type="text" name="list" class="hidden" value="{{itoa .List.ID}}"/>
+		            <button class="add-task" type="submit">Add</button>
+		        </form>
+			{{end}}
+	        <div class="tasks">
+	            {{template "task-list" (dict "Tasks" .List.Tasks "SelectedTask" 0)}}
+	        </div>
+	    </div>
+	</div>
+{{end}}

@@ -45,5 +45,5 @@ package/*.deb
 # Helpers
 IMPROVEMENTS.md
 CHANGE_LOG.md
-tasks
+todo.md
 prototypes
