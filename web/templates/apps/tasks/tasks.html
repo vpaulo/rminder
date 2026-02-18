@@ -10,7 +10,7 @@
 	<span
 	   class="completed-ckeck{{if .Completed}} completed{{end}}"
 	   title="Set it as complete"
-	   hx-put="{{concat "/v0/tasks/" (itoa .ID) "/completed"}}"
+	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/completed"}}"
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
 	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .completed-ckeck"}}"
@@ -21,7 +21,7 @@
 	<span
 	   class="importance-check{{if .Important}} important{{end}}"
 	   title="Set it as important"
-	   hx-put="{{concat "/v0/tasks/" (itoa .ID) "/important"}}"
+	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/important"}}"
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
 	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .importance-check"}}"
@@ -33,7 +33,7 @@
 		class="drag-item"
 		data-id="{{itoa .Task.ID}}"
 		data-position="{{itoa .Task.Position}}"
-		hx-get="/v0/lists/all"
+		hx-get="/partials/lists/all"
 		hx-target=".lists__container"
 		hx-trigger="click delay:20ms"
 		draggable="true"
@@ -41,7 +41,7 @@
 		{{template "task-completed-elem" .Task}}
 	    <label
 	      class="show-details"
-	      hx-get="{{concat "/v0/tasks/" (itoa .Task.ID)}}"
+	      hx-get="{{concat "/partials/tasks/" (itoa .Task.ID)}}"
 	      hx-trigger="change"
 	      hx-target=".details"
 	    >
@@ -100,13 +100,13 @@
 	    </div>
 	    <div
 	    	class="container"
-	    	hx-get="/v0/lists/all"
+	    	hx-get="/partials/lists/all"
 	     	hx-target=".lists__container"
 	     	hx-trigger="submit delay:20ms">
 			{{if not .IsMultilist}}
 		        <form
 		        	class="add-tasks"
-		         	hx-post="/v0/tasks/create"
+		         	hx-post="/partials/tasks/create"
 		          	method="POST"
 		           	hx-target=".tasks"
 		            hx-on::after-request="this.reset()">

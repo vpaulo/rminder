@@ -16,7 +16,7 @@ class SettingsSwitcherElement extends HTMLElement {
     if (!e.target.dataset.action) return;
 
     if (e.target.dataset.action === "export") {
-      const [error, data] = await tryCatch(fetch("/v1/export"));
+      const [error, data] = await tryCatch(fetch("/api/tasks/export"));
 
       if (error) {
         console.error("POST: Export lists: ", error);
