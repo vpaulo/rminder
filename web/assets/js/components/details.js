@@ -5,7 +5,9 @@ class DetailsElement extends HTMLElement {
     return this.quill.getSemanticHTML();
   }
 
-  connectedCallback() {
+  async connectedCallback() {
+    await this.#loadQuill();
+
     const task_id = this.getAttribute("task-id");
     const close_btn = this.querySelector("button.close");
     const remove_btn = this.querySelector("button.remove");
@@ -43,6 +45,25 @@ class DetailsElement extends HTMLElement {
     });
     delete_btn.addEventListener("click", () => {
       dialog?.close();
+    });
+  }
+
+  async #loadQuill() {
+    if (window.Quill) return;
+
+    if (!document.querySelector('link[href="/assets/css/libs/quill.snow.css"]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "/assets/css/libs/quill.snow.css";
+      document.head.appendChild(link);
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "/assets/js/libs/quill.js";
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
     });
   }
 }
