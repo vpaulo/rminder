@@ -1,4 +1,4 @@
-import { tryCatch } from "../../utils.js";
+import { tryCatch } from "../../helpers/tryCatch.js";
 
 /** @typedef {{ Next: number, Previous: number }} NavigationType */
 const navigationType = {

@@ -1,4 +1,4 @@
-import { tryCatch } from "../utils.js";
+import { tryCatch } from "../helpers/tryCatch.js";
 
 class SettingsSwitcherElement extends HTMLElement {
   /** @type HTMLDialogElement */
