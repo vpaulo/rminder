@@ -38,11 +38,7 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	router.GET("/login", login.LoginHandler(auth, log))
 	router.GET("/callback", login.CallbackHandler(application, auth))
 	router.GET("/logout", login.LogoutHandler(cfg.Auth, log))
-
 	router.GET("/", app.LandingPageLoadHandler(application))
-
-	// APP: Tasks
-	router.GET("/tasks", middleware.UserMiddleware(application), middleware.CSRFMiddleware(), app.AppLoadHandler)
 
 	// APP routes
 	TasksRoutes(router, application)

@@ -9,6 +9,9 @@ import (
 )
 
 func TasksRoutes(router *gin.Engine, application *app.App) {
+	// Navigation routes
+	router.GET("/tasks", middleware.UserMiddleware(application), middleware.CSRFMiddleware(), taskhandlers.Load)
+
 	// Partials: returns HTML chunks
 	partials := router.Group("/partials", middleware.UserMiddleware(application), middleware.CSRFMiddleware())
 
