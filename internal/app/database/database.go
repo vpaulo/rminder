@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -58,9 +59,43 @@ type Service interface {
 	ListTasksSearch(id int, searchQuery string) ([]*Task, error)
 }
 
+type cacheEntry struct {
+	version uint64
+	data    any
+}
+
+type queryCache struct {
+	mu      sync.RWMutex
+	version uint64
+	entries map[string]cacheEntry
+}
+
+func (c *queryCache) get(key string) (any, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	entry, ok := c.entries[key]
+	if !ok || entry.version != c.version {
+		return nil, false
+	}
+	return entry.data, true
+}
+
+func (c *queryCache) set(key string, data any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.entries[key] = cacheEntry{version: c.version, data: data}
+}
+
+func (c *queryCache) invalidate() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.version++
+}
+
 type service struct {
 	database_path string
 	db            *sql.DB
+	cache         queryCache
 }
 
 func New(database_path string) Service {
@@ -78,6 +113,7 @@ func New(database_path string) Service {
 	dbInstance := &service{
 		database_path: database_path,
 		db:            db,
+		cache:         queryCache{entries: make(map[string]cacheEntry)},
 	}
 
 	err = dbInstance.migrate()
@@ -150,6 +186,11 @@ func (s *service) Close() error {
 }
 
 func (s *service) Tasks() ([]*Task, error) {
+	const key = "tasks"
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*Task), nil
+	}
+
 	// TODO: maybe change the default for order by created_at
 	query, err := s.db.Prepare("SELECT * FROM task ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if err != nil {
@@ -186,10 +227,16 @@ func (s *service) Tasks() ([]*Task, error) {
 		tasks = append(tasks, data)
 	}
 
+	s.cache.set(key, tasks)
 	return tasks, nil
 }
 
 func (s *service) ImportantTasks() ([]*Task, error) {
+	const key = "tasks:important"
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*Task), nil
+	}
+
 	query, err := s.db.Prepare("SELECT * FROM task WHERE important = true ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.ImportantTasks - prepare query failed: %v", err)
@@ -225,10 +272,16 @@ func (s *service) ImportantTasks() ([]*Task, error) {
 		tasks = append(tasks, data)
 	}
 
+	s.cache.set(key, tasks)
 	return tasks, nil
 }
 
 func (s *service) CompletedTasks() ([]*Task, error) {
+	const key = "tasks:completed"
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*Task), nil
+	}
+
 	query, err := s.db.Prepare("SELECT * FROM task WHERE completed = true ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.CompletedTasks - prepare query failed: %v", err)
@@ -264,6 +317,7 @@ func (s *service) CompletedTasks() ([]*Task, error) {
 		tasks = append(tasks, data)
 	}
 
+	s.cache.set(key, tasks)
 	return tasks, nil
 }
 
@@ -293,6 +347,7 @@ func (s *service) CreateTask(title string, list int) error {
 		return fmt.Errorf("DB.CreateTask - create query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -308,6 +363,7 @@ func (s *service) ToggleComplete(id string) error {
 		return fmt.Errorf("DB.ToggleComplete - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -323,10 +379,16 @@ func (s *service) ToggleImportant(id string) error {
 		return fmt.Errorf("DB.ToggleImportant - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
 func (s *service) Task(id string) (*Task, error) {
+	key := "task:" + id
+	if cached, ok := s.cache.get(key); ok {
+		return cached.(*Task), nil
+	}
+
 	query, err := s.db.Prepare("SELECT * FROM task WHERE id=?")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Task - prepare query failed: %v", err)
@@ -352,6 +414,7 @@ func (s *service) Task(id string) (*Task, error) {
 		return nil, fmt.Errorf("DB.Task - query result failed: %v", err)
 	}
 
+	s.cache.set(key, task)
 	return task, nil
 }
 
@@ -367,6 +430,7 @@ func (s *service) UpdateTask(id string, title string) error {
 		return fmt.Errorf("DB.UpdateTask - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -382,6 +446,7 @@ func (s *service) UpdateTaskDescription(id string, description string) error {
 		return fmt.Errorf("DB.UpdateTaskDescription - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -402,6 +467,7 @@ func (s *service) UpdateTaskPriority(id string, priority string) error {
 		return fmt.Errorf("DB.UpdateTaskPriority - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -429,6 +495,7 @@ func (s *service) UpdateTaskStartDate(id string, date string) error {
 		return fmt.Errorf("DB.UpdateTaskStartDate - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -456,6 +523,7 @@ func (s *service) UpdateTaskEndDate(id string, date string) error {
 		return fmt.Errorf("DB.UpdateTaskEndDate - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -471,6 +539,7 @@ func (s *service) DeleteTask(id string) error {
 		return fmt.Errorf("DB.DeleteTask - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -488,10 +557,16 @@ func (s *service) ReorderTasks(reorder []Reorder) error {
 		}
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
 func (s *service) Lists(filter string) ([]*List, error) {
+	key := "lists:" + filter
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*List), nil
+	}
+
 	query, err := s.db.Prepare("SELECT * FROM list ORDER BY position ASC, created_at ASC")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Lists - prepare query failed: %v", err)
@@ -556,10 +631,16 @@ func (s *service) Lists(filter string) ([]*List, error) {
 		}
 	}
 
+	s.cache.set(key, lists)
 	return lists, nil
 }
 
 func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
+	key := fmt.Sprintf("list_tasks:%d:%s", id, filter)
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*Task), nil
+	}
+
 	var (
 		query *sql.Stmt
 		err   error
@@ -681,10 +762,16 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		tasks = append(tasks, data)
 	}
 
+	s.cache.set(key, tasks)
 	return tasks, nil
 }
 
 func (s *service) List(id string) (*List, error) {
+	key := "list:" + id
+	if cached, ok := s.cache.get(key); ok {
+		return cached.(*List), nil
+	}
+
 	query, err := s.db.Prepare("SELECT * FROM list WHERE id=?")
 	if err != nil {
 		return nil, fmt.Errorf("DB.List - prepare query failed: %v", err)
@@ -715,6 +802,7 @@ func (s *service) List(id string) (*List, error) {
 	}
 	list.Tasks = tasks
 
+	s.cache.set(key, list)
 	return list, nil
 }
 
@@ -739,6 +827,7 @@ func (s *service) CreateList(name string, swatch string, icon string, position i
 		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -754,6 +843,7 @@ func (s *service) UpdateList(id int, name string, colour string, icon string, pi
 		return fmt.Errorf("DB.UpdateList - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -769,6 +859,7 @@ func (s *service) DeleteList(id int) error {
 		return fmt.Errorf("DB.DeleteList - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -786,6 +877,7 @@ func (s *service) ReorderLists(reorder []Reorder) error {
 		}
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -837,6 +929,7 @@ func (s *service) AddImportedList(list *List) error {
 		}
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -852,10 +945,16 @@ func (s *service) AddImportedTask(task *Task, list int) error {
 		return fmt.Errorf("DB.AddImportedTask - create query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
 func (s *service) Persistence() (*Persistence, error) {
+	const key = "persistence"
+	if cached, ok := s.cache.get(key); ok {
+		return cached.(*Persistence), nil
+	}
+
 	query, err := s.db.Prepare("SELECT * FROM persistence WHERE id=1")
 	if err != nil {
 		return nil, fmt.Errorf("DB.Persistence - prepare query failed: %v", err)
@@ -871,6 +970,7 @@ func (s *service) Persistence() (*Persistence, error) {
 		return nil, fmt.Errorf("DB.Persistence - query result failed: %v", err)
 	}
 
+	s.cache.set(key, data)
 	return data, nil
 }
 
@@ -886,6 +986,7 @@ func (s *service) UpdatePersistence(task int, list int) error {
 		return fmt.Errorf("DB.UpdatePersistence - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -901,6 +1002,7 @@ func (s *service) UpdatePersistenceTask(task int) error {
 		return fmt.Errorf("DB.UpdatePersistenceTask - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
@@ -916,6 +1018,7 @@ func (s *service) UpdatePersistenceList(list int) error {
 		return fmt.Errorf("DB.UpdatePersistenceList - update query result failed: %v", err)
 	}
 
+	s.cache.invalidate()
 	return nil
 }
 
