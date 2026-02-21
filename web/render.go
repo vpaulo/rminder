@@ -3,10 +3,14 @@ package web
 import (
 	"embed"
 	"html/template"
-	"io"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+
+	i18npkg "rminder/internal/i18n"
 )
 
 //go:embed "templates"
@@ -49,8 +53,20 @@ func init() {
 	)
 }
 
-func Render(w io.Writer, name string, data any) error {
-	return templates.ExecuteTemplate(w, name, data)
+func Render(ctx *gin.Context, name string, data map[string]any) error {
+	if val, exists := ctx.Get("localizer"); exists {
+		localizer := val.(*i18n.Localizer)
+		data["T"] = func(key string) string {
+			msg, err := localizer.Localize(&i18n.LocalizeConfig{MessageID: key})
+			if err != nil {
+				return key
+			}
+			return msg
+		}
+	}
+	data["Lang"] = ctx.GetString("lang")
+	data["SupportedLanguages"] = i18npkg.SupportedLanguages
+	return templates.ExecuteTemplate(ctx.Writer, name, data)
 }
 
 func formatDate(date string) string {

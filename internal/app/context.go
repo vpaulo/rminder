@@ -6,6 +6,7 @@ import (
 	"rminder/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 func SetUserDatabase(ctx *gin.Context, db database.Service) {
@@ -42,4 +43,12 @@ func GetCSRFToken(ctx *gin.Context) string {
 
 func GetRequestID(ctx *gin.Context) string {
 	return ctx.GetString("request_id")
+}
+
+func GetLocalizer(ctx *gin.Context) *i18n.Localizer {
+	val, exists := ctx.Get("localizer")
+	if !exists {
+		return nil
+	}
+	return val.(*i18n.Localizer)
 }

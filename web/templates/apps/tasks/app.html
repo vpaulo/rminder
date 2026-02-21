@@ -21,13 +21,13 @@
         {{template "meta"}} {{template "app-styles" .}}
     </head>
     <body hx-headers='{"X-CSRF-Token": "{{.CSRFToken}}"}'>
-        {{template "header"}}
+        {{template "header" .}}
         <rm-tasks-app>
             <!-- left column -->
             {{template "sidebar" .}}
             <!-- center column -->
             <div class="main" role="main">
-                {{if eq .Persistence.ListId 0}} {{template "landing-screen"}} {{else}} {{template
+                {{if eq .Persistence.ListId 0}} {{template "landing-screen" .}} {{else}} {{template
                 "persisted-list-content" .}} {{end}}
             </div>
             <!-- right column -->

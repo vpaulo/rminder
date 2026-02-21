@@ -21,7 +21,7 @@ func LandingPageLoadHandler(s *App) gin.HandlerFunc {
 
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		err := web.Render(ctx.Writer, "home-page", map[string]any{
+		err := web.Render(ctx, "home-page", map[string]any{
 			"UserExists": userExists,
 		})
 		if err != nil {

@@ -1,30 +1,30 @@
 {{define "task-list"}}
   <ul class="tasks__list">
   {{range .Tasks}}
-    {{template "task" (dict "Task" . "SelectedTask" $.SelectedTask)}}
+    {{template "task" (dict "Task" . "SelectedTask" $.SelectedTask "T" $.T)}}
   {{end}}
   </ul>
 {{end}}
 
 {{define "task-completed-elem"}}
 	<span
-	   class="completed-ckeck{{if .Completed}} completed{{end}}"
-	   title="Set it as complete"
-	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/completed"}}"
+	   class="completed-ckeck{{if .Task.Completed}} completed{{end}}"
+	   title="{{call .T "set_as_complete"}}"
+	   hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/completed"}}"
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
-	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .completed-ckeck"}}"
+	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "'] .completed-ckeck"}}"
 	></span>
 {{end}}
 
 {{define "task-important-elem"}}
 	<span
-	   class="importance-check{{if .Important}} important{{end}}"
-	   title="Set it as important"
-	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/important"}}"
+	   class="importance-check{{if .Task.Important}} important{{end}}"
+	   title="{{call .T "set_as_important"}}"
+	   hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/important"}}"
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
-	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .importance-check"}}"
+	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "'] .importance-check"}}"
 	></span>
 {{end}}
 
@@ -38,7 +38,7 @@
 		hx-trigger="click delay:20ms"
 		draggable="true"
 	>
-		{{template "task-completed-elem" .Task}}
+		{{template "task-completed-elem" (dict "Task" .Task "T" .T)}}
 	    <label
 	      class="show-details"
 	      hx-get="{{concat "/partials/tasks/" (itoa .Task.ID)}}"
@@ -47,11 +47,11 @@
 	    >
 	      <span>{{.Task.Title}}</span>
 		  {{if and (ne .Task.StartAt "") (ne .Task.EndAt "")}}
-			<span class="dates">{{formatDateOnly .Task.StartAt}} to {{formatDateOnly .Task.EndAt}}</span>
+			<span class="dates">{{formatDateOnly .Task.StartAt}} {{call .T "to"}} {{formatDateOnly .Task.EndAt}}</span>
 		  {{else if ne .Task.StartAt ""}}
-			<span class="dates">Start {{formatDateOnly .Task.StartAt}}</span>
+			<span class="dates">{{call .T "start"}} {{formatDateOnly .Task.StartAt}}</span>
 		  {{else if ne .Task.EndAt ""}}
-			<span class="dates">Due {{formatDateOnly .Task.EndAt}}</span>
+			<span class="dates">{{call .T "due"}} {{formatDateOnly .Task.EndAt}}</span>
 		  {{end}}
 	      {{if eq .SelectedTask .Task.ID}}
 	      	<input class="hidden" type="radio" name="task-detail" value="{{itoa .Task.ID}}" checked/>
@@ -60,7 +60,7 @@
 	      {{end}}
 	    </label>
 	    <span>{{repeatStr "!" .Task.Priority}}</span>
-	    {{template "task-important-elem" .Task}}
+	    {{template "task-important-elem" (dict "Task" .Task "T" .T)}}
   </li>
 {{end}}
 
@@ -68,9 +68,9 @@
 	{{range .Lists}}
 	    {{if eq .ID $.Persistence.ListId}}
 			{{if eq .FilterBy ""}}
-				{{template "lists-content" (dict "List" . "Persistence" $.Persistence "IsMultilist" false)}}
+				{{template "lists-content" (dict "List" . "Persistence" $.Persistence "IsMultilist" false "T" $.T)}}
 			{{else}}
-				{{template "multi-list-content" (dict "Lists" $.MultiList "Title" .Name "Persistence" $.Persistence)}}
+				{{template "multi-list-content" (dict "Lists" $.MultiList "Title" .Name "Persistence" $.Persistence "T" $.T)}}
 			{{end}}
 	    {{end}}
  	{{end}}
@@ -78,7 +78,7 @@
 
 {{define "multi-list-content"}}
 	{{if eq (len .Lists) 0}}
-		{{template "no-results-screen"}}
+		{{template "no-results-screen" .}}
 	{{else}}
 		<div>
 			<div class="search-toolbar">
@@ -86,7 +86,7 @@
 		   	</div>
 		{{range .Lists}}
 			{{if and (gt (len .Tasks) 0) (eq .FilterBy "")}}
-				{{template "lists-content" (dict "List" . "Persistence" $.Persistence "IsMultilist" true)}}
+				{{template "lists-content" (dict "List" . "Persistence" $.Persistence "IsMultilist" true "T" $.T)}}
 			{{end}}
  		{{end}}
 		</div>
@@ -115,19 +115,19 @@
 		                type="text"
 		                name="task"
 		                id="task"
-		                aria-label="Add a task"
-		                placeholder="Add a task"
+		                aria-label="{{call .T "add_task"}}"
+		                placeholder="{{call .T "add_task"}}"
 		                required
 		                minlength="3"
 		                maxlength="255"
 		                hx-validate="true"
 		            />
 		            <input type="text" name="list" class="hidden" value="{{itoa .List.ID}}"/>
-		            <button class="add-task" type="submit">Add</button>
+		            <button class="add-task" type="submit">{{call .T "add"}}</button>
 		        </form>
 			{{end}}
 	        <div class="tasks">
-	            {{template "task-list" (dict "Tasks" .List.Tasks "SelectedTask" 0)}}
+	            {{template "task-list" (dict "Tasks" .List.Tasks "SelectedTask" 0 "T" .T)}}
 	        </div>
 	    </div>
 	</div>

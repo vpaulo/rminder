@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"rminder/internal/app"
+	languagehandlers "rminder/internal/handlers/language"
 	"rminder/internal/login"
 	"rminder/internal/login/authenticator"
 	"rminder/internal/middleware"
@@ -26,6 +27,7 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.SecurityHeadersMiddleware())
+	router.Use(middleware.LocaleMiddleware())
 
 	// To store custom types in our cookies,
 	// we must first register them using gob.Register
@@ -39,6 +41,7 @@ func New(auth *authenticator.Authenticator, log *logger.Logger, cfg *config.Conf
 	router.GET("/callback", login.CallbackHandler(application, auth))
 	router.GET("/logout", login.LogoutHandler(cfg.Auth, log))
 	router.GET("/", app.LandingPageLoadHandler(application))
+	router.GET("/language/:lang", languagehandlers.Set)
 
 	// APP routes
 	TasksRoutes(router, application)
