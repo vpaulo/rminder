@@ -14,17 +14,22 @@
         <rm-app-switcher>
             <button class="apps-icon" popovertarget="app-switcher"></button>
             <div id="app-switcher" popover>
-                <a href="/" alt="Home">Home</a>
-                <span>Tasks</span>
+                <a href="/" alt="Home">{{call .T "home"}}</a>
+                <span>{{call .T "tasks"}}</span>
             </div>
         </rm-app-switcher>
         <rm-settings-switcher>
             <button class="settings-icon" popovertarget="settings-switcher"></button>
             <div id="settings-switcher" popover>
-                <span data-action="import">Import</span>
-                <span data-action="export">Export</span>
+                <span data-action="import">{{call .T "import"}}</span>
+                <span data-action="export">{{call .T "export"}}</span>
+                <div class="lang-switcher">
+                    {{range .SupportedLanguages}}
+                    <a href="/language/{{.Code}}" class="{{if eq .Code $.Lang}}active{{end}}">{{.Name}}</a>
+                    {{end}}
+                </div>
             </div>
-            {{template "upload-file-modal"}}
+            {{template "upload-file-modal" .}}
         </rm-settings-switcher>
         <a class="icon logout-icon" href="/logout"></a>
     </div>
@@ -46,7 +51,7 @@
         hx-on::after-request="this.reset();this.parentElement.close()"
     >
         <div id="messages"></div>
-        <label for="file" class="checkbox__container">Select data file</label>
+        <label for="file" class="checkbox__container">{{call .T "select_data_file"}}</label>
         <input type="file" id="file" name="file" accept="application/json" class="btn" required />
         <fieldset class="form-actions">
             <div class="main-actions">
@@ -54,9 +59,9 @@
                     class="btn default"
                     hx-on:click="this.closest('form').reset();this.closest('.file-form-container').close()"
                 >
-                    Cancel
+                    {{call .T "cancel"}}
                 </div>
-                <button class="btn primary" type="submit">Upload</button>
+                <button class="btn primary" type="submit">{{call .T "upload"}}</button>
             </div>
         </fieldset>
     </form>

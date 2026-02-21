@@ -1,16 +1,16 @@
 {{define "sidebar"}}
 	<rm-sidebar>
-        {{template "sidebar-header"}}
-        {{template "search"}}
-        {{template "sidebar-lists" (dict "Lists" .Lists "Persistence" .Persistence)}}
-        {{template "sidebar-footer" .Lists}}
+        {{template "sidebar-header" .}}
+        {{template "search" .}}
+        {{template "sidebar-lists" (dict "Lists" .Lists "Persistence" .Persistence "T" .T)}}
+        {{template "sidebar-footer" (dict "Lists" .Lists "T" .T)}}
     </rm-sidebar>
 {{end}}
 
 {{define "sidebar-header"}}
 	<div class="header">
         <label>
-        <span class="menu" aria-label="Toggle sidebar"></span>
+        <span class="menu" aria-label="{{call .T "toggle_sidebar"}}"></span>
         <input class="hidden" type="checkbox" value="1" checked/>
         </label>
     </div>
@@ -33,7 +33,7 @@
 				class="searchbox"
 				name="query"
 				autocomplete="off"
-				placeholder="Search"
+				placeholder="{{call .T "search"}}"
 				required
 				minlength="3"
 				hx-validate="true"/>
@@ -51,17 +51,17 @@
 		<div class="pinned-lists">
 	     	{{range .Lists}}
 	     		{{if .Pinned}}
-	     			{{template "list-item" (dict "List" . "SelectedList" $.Persistence.ListId)}}
+	     			{{template "list-item" (dict "List" . "SelectedList" $.Persistence.ListId "T" $.T)}}
 	     		{{end}}
 	     	{{end}}
 		</div>
 		<!-- Groups/Lists -->
 		<div class="lists">
-		    <p class="lists-label">My lists</p>
+		    <p class="lists-label">{{call .T "my_lists"}}</p>
 		    <div class="lists-holder">
 		        {{range .Lists}}
 		        	{{if not .Pinned}}
-		        		{{template "list-item" (dict "List" . "SelectedList" $.Persistence.ListId)}}
+		        		{{template "list-item" (dict "List" . "SelectedList" $.Persistence.ListId "T" $.T)}}
 		        	{{end}}
 		        {{end}}
 		    </div>
@@ -108,7 +108,7 @@
         <div class="footer-actions">
             <button class="add-list">
                 <span class="add-list--icon"></span>
-                <span>Add list</span>
+                <span>{{call .T "add_list"}}</span>
             </button>
         </div>
     </footer>
@@ -127,13 +127,13 @@
                 name="new-list"
                 type="text"
                 value=""
-                placeholder="List name"
+                placeholder="{{call .T "add_list"}}"
                 required
                 minlength="3"
                 maxlength="255"
                 hx-validate="true"/>
             <label class="checkbox__container">
-               	<span>Pin</span>
+               	<span>{{call .T "pin"}}</span>
                	<input class="hidden" name="pin" type="checkbox" value="1"/>
                	<span class="checkmark"></span>
             </label>
@@ -165,75 +165,75 @@
           		<summary>
             		<div class="summary">
               			<span class="icon filter-icon"></span>
-                 		<span>Filters</span>
+                 		<span>{{call .T "filters"}}</span>
               		</div>
             	</summary>
                	<fieldset class="filters-fieldset">
                 	<div>
-		            <label for="include">Include</label>
+		            <label for="include">{{call .T "include"}}</label>
 		            <select name="include">
-						<option value="" selected>No Filter</option>
-						<option value="OR">Any</option>
-						<option value="AND">All</option>
+						<option value="" selected>{{call .T "no_filter"}}</option>
+						<option value="OR">{{call .T "any"}}</option>
+						<option value="AND">{{call .T "all"}}</option>
 		            </select>
                	</div>
                 <div>
-		            <label for="completed">Completed</label>
+		            <label for="completed">{{call .T "completed"}}</label>
 		            <select name="completed">
-						<option value="" selected>Any</option>
-						<option value="TRUE">Yes</option>
-						<option value="FALSE">No</option>
+						<option value="" selected>{{call .T "any"}}</option>
+						<option value="TRUE">{{call .T "yes"}}</option>
+						<option value="FALSE">{{call .T "no"}}</option>
 		            </select>
                	</div>
 				<div>
-		            <label for="important">Important</label>
+		            <label for="important">{{call .T "important"}}</label>
 		            <select name="important">
-						<option value="" selected>Any</option>
-						<option value="TRUE">Yes</option>
-						<option value="FALSE">No</option>
+						<option value="" selected>{{call .T "any"}}</option>
+						<option value="TRUE">{{call .T "yes"}}</option>
+						<option value="FALSE">{{call .T "no"}}</option>
 		            </select>
 				</div>
           		<div>
-		            <label for="priority">Priority</label>
+		            <label for="priority">{{call .T "priority"}}</label>
 		            <select name="priority">
-						<option value="" selected>Any</option>
+						<option value="" selected>{{call .T "any"}}</option>
 		                {{range $i, $value := priorityValues}}
 		                    <option value="{{itoa $i}}">{{$value}}</option>
 		                {{end}}
 		            </select>
           		</div>
 				<div>
-  					<label for="date">Date</label>
+  					<label for="date">{{call .T "date"}}</label>
 		            <select name="date">
-						<option value="" selected>No Date</option>
-						<option value="td">Today</option>
-						<option value="wd">With Date</option>
-						<option value="od">On Date</option>
-						<option value="bd">Before a Date</option>
-						<option value="af">After a Date</option>
-						<option value="rg">On Range</option>
+						<option value="" selected>{{call .T "no_date"}}</option>
+						<option value="td">{{call .T "today"}}</option>
+						<option value="wd">{{call .T "with_date"}}</option>
+						<option value="od">{{call .T "on_date"}}</option>
+						<option value="bd">{{call .T "before_date"}}</option>
+						<option value="af">{{call .T "after_date"}}</option>
+						<option value="rg">{{call .T "on_range"}}</option>
 		            </select>
 				</div>
 				<div>
-	            	<label for="from">Start Range</label>
+	            	<label for="from">{{call .T "start_range"}}</label>
 					<input name="from" type="date">
 	            </div>
 				<div>
-	            	<label for="to">End Range</label>
+	            	<label for="to">{{call .T "end_range"}}</label>
 					<input name="to" type="date">
 	            </div>
                	</fieldset>
            	</details>
-            <input type="text" name="position" class="hidden" value="{{len .}}"/>
+            <input type="text" name="position" class="hidden" value="{{len .Lists}}"/>
             <fieldset class="form-actions">
             	<div class="main-actions">
-	               	<div class="btn default cancel-new-list">Cancel</div>
-	                <button class="btn primary add-new-list" type="submit">Add</button>
+	               	<div class="btn default cancel-new-list">{{call .T "cancel"}}</div>
+	                <button class="btn primary add-new-list" type="submit">{{call .T "add"}}</button>
 	            </div>
 				<button
 					class="btn warning remove-list hidden"
 					hx-params="none"
-                   	hx-target=".lists__container">Delete</button>
+                   	hx-target=".lists__container">{{call .T "delete"}}</button>
             </fieldset>
         </form>
     </dialog>

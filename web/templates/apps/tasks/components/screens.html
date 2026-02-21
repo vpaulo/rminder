@@ -4,17 +4,17 @@
  			{{template "screen-logo"}}
     	</div>
        	<div class="instructions">
-	        <p><span>Next/Previous Task</span><span><i class="key j"></i> or <i class="key k"></i></span></p>
-	        <p><span>Next/Previous List</span><span><i class="key bl"></i> or <i class="key br"></i></span></p>
+	        <p><span>{{call .T "next_prev_task"}}</span><span><i class="key j"></i> or <i class="key k"></i></span></p>
+	        <p><span>{{call .T "next_prev_list"}}</span><span><i class="key bl"></i> or <i class="key br"></i></span></p>
 
-      		<p><span>New Task</span><span><i class="key a"></i></span></p>
-        	<p><span>New List</span><span><i class="key n"></i></span></p>
+      		<p><span>{{call .T "new_task"}}</span><span><i class="key a"></i></span></p>
+        	<p><span>{{call .T "new_list"}}</span><span><i class="key n"></i></span></p>
 
-           	<p><span>Search</span><span><i class="key f"></i></span></p>
+           	<p><span>{{call .T "search"}}</span><span><i class="key f"></i></span></p>
 
-            <p><span>Toggle Task Completion</span><span><i class="key x"></i></span></p>
-            <p><span>Toggle Task Importance</span><span><i class="key i"></i></span></p>
-            <p><span>Switch Task Priority</span><span><i class="key p"></i></span></p>
+            <p><span>{{call .T "toggle_task_completion"}}</span><span><i class="key x"></i></span></p>
+            <p><span>{{call .T "toggle_task_importance"}}</span><span><i class="key i"></i></span></p>
+            <p><span>{{call .T "switch_task_priority"}}</span><span><i class="key p"></i></span></p>
        	</div>
    	</div>
 {{end}}
@@ -25,7 +25,7 @@
  			{{template "screen-logo"}}
     	</div>
        	<div class="message">
-      		<p>No Tasks Where Found</p>
+      		<p>{{call .T "no_tasks_found"}}</p>
        	</div>
    	</div>
 {{end}}

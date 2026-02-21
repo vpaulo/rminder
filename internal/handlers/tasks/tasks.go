@@ -50,7 +50,7 @@ func Load(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Render(ctx.Writer, "tasks-page", map[string]any{
+	err = web.Render(ctx, "tasks-page", map[string]any{
 		"Lists":       lists,
 		"MultiList":   multiList,
 		"Persistence": persistence,
@@ -98,7 +98,7 @@ func GetTasks(ctx *gin.Context) {
 
 	if slug == "" {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Render(ctx.Writer, "tasks-page", map[string]any{
+		err = web.Render(ctx, "tasks-page", map[string]any{
 			"Lists":       lists,
 			"MultiList":   ([]*database.List)(nil),
 			"Persistence": persistence,
@@ -109,7 +109,7 @@ func GetTasks(ctx *gin.Context) {
 		}
 	} else {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = web.Render(ctx.Writer, "task-list", map[string]any{
+		err = web.Render(ctx, "task-list", map[string]any{
 			"Tasks":        tasks,
 			"SelectedTask": persistence.TaskId,
 		})
@@ -153,7 +153,9 @@ func GetTask(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "details", task)
+	err = web.Render(ctx, "details", map[string]any{
+		"Task": task,
+	})
 	if err != nil {
 		log.Error("error rendering in TaskList", "error", err)
 		app.ErrorInternalHTML(ctx, "Failed to render task details.")
@@ -207,7 +209,7 @@ func CreateTask(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "task-list", map[string]any{
+	err = web.Render(ctx, "task-list", map[string]any{
 		"Tasks":        tasks,
 		"SelectedTask": persistence.TaskId,
 	})
@@ -320,11 +322,11 @@ func UpdateTask(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		if slug == "important" {
-			err = web.Render(ctx.Writer, "task-important-elem", task)
+			err = web.Render(ctx, "task-important-elem", map[string]any{"Task": task})
 		} else if slug == "completed" {
-			err = web.Render(ctx.Writer, "task-completed-elem", task)
+			err = web.Render(ctx, "task-completed-elem", map[string]any{"Task": task})
 		} else {
-			err = web.Render(ctx.Writer, "task", map[string]any{
+			err = web.Render(ctx, "task", map[string]any{
 				"Task":         task,
 				"SelectedTask": persistence.TaskId,
 			})

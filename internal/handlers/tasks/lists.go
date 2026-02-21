@@ -35,7 +35,7 @@ func GetLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+	err = web.Render(ctx, "sidebar-lists", map[string]any{
 		"Lists":       lists,
 		"Persistence": persistence,
 	})
@@ -97,13 +97,13 @@ func GetList(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	if list.FilterBy == "" {
-		err = web.Render(ctx.Writer, "lists-content", map[string]any{
+		err = web.Render(ctx, "lists-content", map[string]any{
 			"List":        list,
 			"Persistence": persistence,
 			"IsMultilist": false,
 		})
 	} else {
-		err = web.Render(ctx.Writer, "multi-list-content", map[string]any{
+		err = web.Render(ctx, "multi-list-content", map[string]any{
 			"Lists":       lists,
 			"Title":       list.Name,
 			"Persistence": persistence,
@@ -182,7 +182,7 @@ func CreateList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+	err = web.Render(ctx, "sidebar-lists", map[string]any{
 		"Lists":       lists,
 		"Persistence": persistence,
 	})
@@ -241,7 +241,7 @@ func DeleteList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+	err = web.Render(ctx, "sidebar-lists", map[string]any{
 		"Lists":       lists,
 		"Persistence": persistence,
 	})
@@ -316,7 +316,7 @@ func UpdateList(ctx *gin.Context) {
 	}
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
+	err = web.Render(ctx, "sidebar-lists", map[string]any{
 		"Lists":       lists,
 		"Persistence": persistence,
 	})
@@ -373,7 +373,7 @@ func SearchLists(ctx *gin.Context) {
 
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	err = web.Render(ctx.Writer, "multi-list-content", map[string]any{
+	err = web.Render(ctx, "multi-list-content", map[string]any{
 		"Lists":       lists,
 		"Title":       "Search Results",
 		"Persistence": persistence,

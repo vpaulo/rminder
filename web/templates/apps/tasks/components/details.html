@@ -1,34 +1,34 @@
 {{define "details"}}
-    <rm-task-details task-id="{{itoa .ID}}">
+    <rm-task-details task-id="{{itoa .Task.ID}}">
         <div class="details__body">
             <div class="detail__title">
                 <form
                   class="add-tasks"
-                  hx-put="{{concat "/partials/tasks/" (itoa .ID) "/title"}}"
+                  hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/title"}}"
                   method="POST"
                   hx-swap="outerHTML"
-                  hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
+                  hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "']"}}">
                     <input
                         class="title"
                         name="title"
                         type="text"
-                        value="{{.Title}}"
+                        value="{{.Task.Title}}"
                         minlength="3"
                         maxlength="255"
                         hx-validate="true"/>
-                    <button class="rename" type="submit">Rename</button>
+                    <button class="rename" type="submit">{{call .T "rename"}}</button>
                 </form>
             </div>
             <div class="details__priority">
-                <label for="priority">Priority</label>
+                <label for="priority">{{call .T "priority"}}</label>
                 <select
                     name="priority"
-                    hx-put="{{concat "/partials/tasks/" (itoa .ID) "/priority"}}"
+                    hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/priority"}}"
                     hx-trigger="change"
                     hx-swap="outerHTML"
-                   	hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
+                   	hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "']"}}">
                     {{range $i, $value := priorityValues}}
-                        {{if eq $i $.Priority}}
+                        {{if eq $i $.Task.Priority}}
                             <option value="{{itoa $i}}" selected>{{$value}}</option>
                         {{else}}
                             <option value="{{itoa $i}}">{{$value}}</option>
@@ -38,65 +38,65 @@
             </div>
             <div class="details__schedule">
             	<label>
-             		<span>Start Date</span>
+             		<span>{{call .T "start_date"}}</span>
              		<input
                			name="from"
                   		type="date"
-                    	value="{{formatDateOnly .StartAt}}"
-                      	hx-put="{{concat "/partials/tasks/" (itoa .ID) "/date-start"}}"
+                    	value="{{formatDateOnly .Task.StartAt}}"
+                      	hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/date-start"}}"
                        	hx-trigger="change"
                         hx-swap="outerHTML"
-                        hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
+                        hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "']"}}">
              	</label>
              	<label>
-              		<span>Due Date</span>
+              		<span>{{call .T "due_date"}}</span>
               		<input
                 		name="to"
                   		type="date"
-                    	value="{{formatDateOnly .EndAt}}"
-                     	hx-put="{{concat "/partials/tasks/" (itoa .ID) "/date-end"}}"
+                    	value="{{formatDateOnly .Task.EndAt}}"
+                     	hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/date-end"}}"
                      	hx-trigger="change"
                       	hx-swap="outerHTML"
-                       hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">
+                       hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "']"}}">
               	</label>
             </div>
             <div class="detail__note">
                 <form
-                    hx-put="{{concat "/partials/tasks/" (itoa .ID) "/description"}}"
+                    hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/description"}}"
                     hx-vals='js:{description: getDescription()}'
                     hx-swap="none" method="POST">
-                    <div id="note-editor" class="ql-container ql-snow">{{rawHTML .Description}}</div>
-                    <button class="add-note" type="submit">Add</button>
+                    <div id="note-editor" class="ql-container ql-snow">{{rawHTML .Task.Description}}</div>
+                    <button class="add-note" type="submit">{{call .T "add"}}</button>
                 </form>
             </div>
         </div>
         <div class="details__footer">
             <button
             	class="close"
-            	hx-put="{{concat "/partials/tasks/" (itoa .ID) "/remove-persistence"}}"
+            	hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/remove-persistence"}}"
             	hx-swap="none">
                 <i class="close-icon"></i>
             </button>
-            <span class="creation-date" title="Creation date">{{formatDate .CreatedAt}}</span>
+            <span class="creation-date" title="Creation date">{{formatDate .Task.CreatedAt}}</span>
             <button class="remove">
                 <i class="trash-icon"></i>
             </button>
         </div>
-        {{template "delete-modal" .ID}}
+        {{template "delete-modal" (dict "ID" .Task.ID "T" .T)}}
     </rm-task-details>
 {{end}}
 
 {{define "delete-modal"}}
     <dialog class="modal">
         <div class="modal__content">
-            <span>Task will be permanent deleted, you won't be able to undo this action.</span>
+            <span>{{call .T "delete_task_warning"}}</span>
             <div class="modal__actions">
-                <button class="btn default">Cancel</button>
+                <button class="btn default">{{call .T "cancel"}}</button>
                 <button
                   class="btn warning"
-                  hx-delete="{{concat "/partials/tasks/" (itoa .)}}"
+                  hx-delete="{{concat "/partials/tasks/" (itoa .ID)}}"
                   hx-swap="outerHTML"
-                  hx-target="{{concat ".tasks__list > li[data-id='" (itoa .) "']"}}">Delete task</button>
+                  hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "']"}}">{{call .T "delete_task"}}</button>
             </div>
         </div>
     </dialog>
