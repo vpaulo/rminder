@@ -8,12 +8,12 @@
 
 {{define "task-completed-elem"}}
 	<span
-	   class="completed-ckeck{{if .Completed}} completed{{end}}"
+	   class="completed-check{{if .Completed}} completed{{end}}"
 	   title="Set it as complete"
 	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/completed"}}"
 	   hx-trigger="click"
 	   hx-swap="outerHTML"
-	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .completed-ckeck"}}"
+	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .completed-check"}}"
 	></span>
 {{end}}
 

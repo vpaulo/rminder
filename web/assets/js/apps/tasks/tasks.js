@@ -184,7 +184,7 @@ class TasksAppElement extends HTMLElement {
     const selected = [...this.querySelectorAll(".tasks__list > li input")]?.findIndex((e) => e.checked);
 
     if (selected >= 0) {
-      this.querySelectorAll(".tasks__list > li .completed-ckeck")[selected].click();
+      this.querySelectorAll(".tasks__list > li .completed-check")[selected].click();
     }
   }
 

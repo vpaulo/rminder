@@ -1,96 +1,98 @@
-rm-settings-switcher {
-    --popover-top: 0;
-    --popover-right: 0;
-    display: block;
-    position: relative;
-
-    :popover-open {
-        position: absolute;
-        inset: unset;
-        border: 0;
-        box-shadow: 1px 2px 3px var(--base-colour);
-        display: flex;
-    }
-
-    #settings-switcher {
-        top: var(--popover-top);
-        right: var(--popover-right);
-
-        gap: 20px;
-        flex-direction: column;
-        padding: 20px;
-        width: 200px;
-
-        > * {
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-decoration: 0;
-            width: 100%;
-            color: var(--base-colour);
-        }
-    }
-
-    > button {
-        border: 0;
-        padding: 0;
-        cursor: pointer;
-        width: var(--size-40);
-        height: var(--size-40);
+@layer components {
+    rm-settings-switcher {
+        --popover-top: 0;
+        --popover-right: 0;
         display: block;
-        background-color: var(--base-colour);
-        mask: url("/assets/icons/settings-icon.svg") no-repeat 50%;
+        position: relative;
 
-        &:hover {
-            background-color: var(--primary);
-        }
-    }
-
-    .file-form-container {
-        border: 0;
-        box-shadow: 1px 2px 3px var(--base-colour);
-    }
-
-    form {
-        --icon-colour: var(--base-colour);
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-        padding: 10px;
-
-        fieldset {
-            display: flex;
-            margin: 0;
-            padding: 0;
+        :popover-open {
+            position: absolute;
+            inset: unset;
             border: 0;
-            gap: 10px;
-        }
-
-        .form-actions {
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        .main-actions {
+            box-shadow: 1px 2px 3px var(--base-colour);
             display: flex;
-            gap: 10px;
         }
 
-        label {
-            border: 2px solid rgba(0, 0, 0, 0);
-        }
+        #settings-switcher {
+            top: var(--popover-top);
+            right: var(--popover-right);
 
-        #file {
-            padding: 5px 0;
-            width: 300px;
+            gap: 20px;
+            flex-direction: column;
+            padding: 20px;
+            width: 200px;
 
-            &::file-selector-button {
-                padding: 0 16px;
-                height: 40px;
+            > * {
+                font-size: 1rem;
+                font-weight: 600;
                 cursor: pointer;
+                letter-spacing: 1px;
+                text-decoration: 0;
+                width: 100%;
+                color: var(--base-colour);
+            }
+        }
+
+        > button {
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            width: var(--size-40);
+            height: var(--size-40);
+            display: block;
+            background-color: var(--base-colour);
+            mask: url("/assets/icons/settings-icon.svg") no-repeat 50%;
+
+            &:hover {
+                background-color: var(--primary);
+            }
+        }
+
+        .file-form-container {
+            border: 0;
+            box-shadow: 1px 2px 3px var(--base-colour);
+        }
+
+        form {
+            --icon-colour: var(--base-colour);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 10px;
+
+            fieldset {
+                display: flex;
+                margin: 0;
+                padding: 0;
                 border: 0;
+                gap: 10px;
+            }
+
+            .form-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .main-actions {
+                display: flex;
+                gap: 10px;
+            }
+
+            label {
+                border: 2px solid rgba(0, 0, 0, 0);
+            }
+
+            #file {
+                padding: 5px 0;
+                width: 300px;
+
+                &::file-selector-button {
+                    padding: 0 16px;
+                    height: var(--size-40);
+                    cursor: pointer;
+                    border: 0;
+                }
             }
         }
     }
