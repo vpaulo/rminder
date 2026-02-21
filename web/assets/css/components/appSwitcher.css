@@ -1,49 +1,51 @@
-rm-app-switcher {
-    --popover-top: 0;
-    --popover-right: 0;
-    display: block;
-    position: relative;
-
-    :popover-open {
-        position: absolute;
-        inset: unset;
-        border: 0;
-        box-shadow: 1px 2px 3px var(--base-colour);
-        display: flex;
-    }
-
-    #app-switcher {
-        top: var(--popover-top);
-        right: var(--popover-right);
-
-        gap: 20px;
-        flex-direction: column;
-        padding: 20px;
-        width: 200px;
-
-        > * {
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-decoration: 0;
-            width: 100%;
-            color: var(--base-colour);
-        }
-    }
-
-    button {
-        border: 0;
-        padding: 0;
-        cursor: pointer;
-        width: var(--size-40);
-        height: var(--size-40);
+@layer components {
+    rm-app-switcher {
+        --popover-top: 0;
+        --popover-right: 0;
         display: block;
-        background-color: var(--base-colour);
-        mask: url("/assets/icons/apps-icon.svg") no-repeat 50%;
+        position: relative;
 
-        &:hover {
-            background-color: var(--primary);
+        :popover-open {
+            position: absolute;
+            inset: unset;
+            border: 0;
+            box-shadow: 1px 2px 3px var(--base-colour);
+            display: flex;
+        }
+
+        #app-switcher {
+            top: var(--popover-top);
+            right: var(--popover-right);
+
+            gap: 20px;
+            flex-direction: column;
+            padding: 20px;
+            width: 200px;
+
+            > * {
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                letter-spacing: 1px;
+                text-decoration: none;
+                width: 100%;
+                color: var(--base-colour);
+            }
+        }
+
+        button {
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            width: var(--size-40);
+            height: var(--size-40);
+            display: block;
+            background-color: var(--base-colour);
+            mask: url("/assets/icons/apps-icon.svg") no-repeat 50%;
+
+            &:hover {
+                background-color: var(--primary);
+            }
         }
     }
-}
+} /* end @layer components */
