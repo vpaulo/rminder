@@ -1,0 +1,136 @@
+@layer base {
+    input {
+        border: none;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    input[type="date"] {
+        display: block;
+        width: 100%;
+        height: var(--size-40);
+        border: 2px solid var(--base-grey);
+        outline: 0;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        background-color: transparent;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: var(--size-40) 1fr;
+        height: 100%;
+        background-color: var(--background);
+        color: var(--base-colour);
+    }
+    button {
+        color: var(--base-colour);
+    }
+    select {
+        display: block;
+        width: 100%;
+        height: var(--size-40);
+        border: 2px solid var(--base-grey);
+        outline: 0;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        background-color: transparent;
+    }
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--gap-10);
+    }
+}
+
+@layer base {
+    .app__logo {
+        display: flex;
+        align-items: center;
+        width: var(--size-40);
+        height: var(--size-40);
+        justify-content: center;
+        background-image: url("/assets/icons/logo.svg");
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+}
+
+@layer components {
+    .btn {
+        color: var(--base-colour);
+        border: 0;
+        padding: 5px 10px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(130%);
+        }
+
+        &.default {
+            background-color: var(--base-grey);
+        }
+
+        &.primary {
+            background-color: var(--primary);
+            color: var(--colour-neutral-100);
+        }
+
+        &.warning {
+            background-color: var(--base-red);
+            color: var(--colour-neutral-100);
+        }
+    }
+
+    .header__start {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-10);
+    }
+    .app__stage,
+    .app__version {
+        font-size: 0.8rem;
+    }
+    .app__version {
+        font-weight: bold;
+    }
+
+    .header-end {
+        display: flex;
+
+        > a {
+            cursor: pointer;
+            width: var(--size-40);
+            height: var(--size-40);
+            display: block;
+            background-color: var(--base-colour);
+
+            &:hover {
+                background-color: var(--primary);
+            }
+        }
+    }
+
+    .icon {
+        background-color: var(--base-colour);
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+    }
+
+    .logout-icon {
+        mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
+    }
+}
+
+@layer utilities {
+    .hidden {
+        display: none;
+    }
+}
