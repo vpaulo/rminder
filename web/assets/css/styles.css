@@ -1,195 +1,90 @@
-@layer base, components, utilities;
+@layer reset, base, components, utilities;
 
-@layer base {
-    :root {
-        --colour-red-300: hsl(0, 100%, 70%);
-        --colour-cyan-800: hsl(180, 100%, 20%);
-        --colour-cyan-700: hsl(180, 100%, 30%);
-        --colour-pink-500: hsl(330, 100%, 50%);
-        --colour-fresh-blue-500: hsl(208, 100%, 50%);
-        --colour-sunset-orange-600: hsl(31, 96%, 53%);
-        --colour-volcano-400: hsl(19, 100%, 72%);
-        --colour-sunrise-yellow-1000: hsl(44, 100%, 19%);
-        --colour-lime-700: hsl(79, 95%, 36%);
-        --colour-indigo-400: hsl(269, 73%, 71%);
+:root {
+    /* Text */
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-        --colour-neutral-100: #ffffff;
-        --colour-neutral-200: #fafafa;
-        --colour-neutral-300: #f5f5f5;
-        --colour-neutral-400: #ededed;
-        --colour-neutral-500: #d9d9d9;
-        --colour-neutral-600: #cacfd2;
-        --colour-neutral-700: #8c8c8c;
-        --colour-neutral-800: #595959;
-        --colour-neutral-900: #414141;
-        --colour-neutral-1000: #262626;
-        --colour-neutral-1100: #1f1f1f;
-        --colour-neutral-1200: #141414;
-        --colour-neutral-1300: #000000;
+    /*--text-xx-small: 0.55rem;
+    --text-x-small: 0.75rem;
+    --text-small: 0.85rem;
+    --text-normal: 1rem;
+    --text-medium: 1.1rem;
+    --text-large: 1.5rem;
+    --text-x-large: 1.8rem;
+    --text-xx-large: 2.5rem;
 
-        --vh: 0;
-        --size-40: 40px;
-        --gap-10: 10px;
-        --gap-20: 20px;
-        --sidebar-width: 40px;
-        --main-width: 100%;
-        --details-width: 0;
-        --lists-visibility: none;
-        --modal-width: 400px;
-        --base-colour: var(--colour-neutral-900);
-        --base-grey: var(--colour-neutral-400);
-        --base-red: var(--colour-red-300);
-        --primary: var(--colour-fresh-blue-500);
-        --background: var(--colour-neutral-300);
-        --swatch: var(--colour-neutral-900);
-
-        height: 100%;
-        overflow: hidden;
+    @media (max-width: 639px) {
+        --text-xx-small: 0.65rem;
+        --text-x-small: 0.85rem;
+        --text-small: 0.95rem;
+        --text-normal: 1.1rem;
+        --text-medium: 1.2rem;
+        --text-large: 1.5rem;
+        --text-x-large: 1.8rem;
+        --text-xx-large: 2.5rem;
     }
 
-    *,
-    *:before,
-    *::after {
-        box-sizing: border-box;
-    }
-    html {
-        scroll-behavior: smooth;
-    }
-    body,
-    input,
-    button,
-    textarea {
-        font-family: "Open Sans", Arial, sans-serif;
-    }
-    input {
-        border: none;
-        background: none;
-        box-shadow: none;
-        border-radius: 0;
-    }
-    input[type="date"] {
-        display: block;
-        width: 100%;
-        height: var(--size-40);
-        border: 2px solid var(--base-grey);
-        outline: 0;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        background-color: transparent;
-    }
-    body {
-        margin: 0;
-        padding: 0;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: var(--size-40) 1fr;
-        height: 100%;
-        background-color: var(--background);
-        color: var(--base-colour);
-    }
-    button {
-        color: var(--base-colour);
-    }
-    select {
-        display: block;
-        width: 100%;
-        height: var(--size-40);
-        border: 2px solid var(--base-grey);
-        outline: 0;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        background-color: transparent;
-    }
-    header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--gap-10);
-    }
+    --colour-white: #ffffff;
+    --colour-soft-white-grey: #f8f9fa;
+    --colour-light-grey: #e9ecef;
+    --colour-silver-grey: #dee2e6;
+    --colour-cool-mid-grey: #adb5bd;
+    --colour-neutral-grey: #6c757d;
+    --colour-steel-grey: #495057;
+    --colour-charcoal: #343a40;
+    --colour-near-black: #212529;
+    --colour-black: #000000;*/
+
+    /*=================================================*/
+
+    --colour-red-300: hsl(0, 100%, 70%);
+    --colour-cyan-800: hsl(180, 100%, 20%);
+    --colour-cyan-700: hsl(180, 100%, 30%);
+    --colour-pink-500: hsl(330, 100%, 50%);
+    --colour-fresh-blue-500: hsl(208, 100%, 50%);
+    --colour-sunset-orange-600: hsl(31, 96%, 53%);
+    --colour-volcano-400: hsl(19, 100%, 72%);
+    --colour-sunrise-yellow-1000: hsl(44, 100%, 19%);
+    --colour-lime-700: hsl(79, 95%, 36%);
+    --colour-indigo-400: hsl(269, 73%, 71%);
+
+    --colour-neutral-100: #ffffff;
+    --colour-neutral-200: #fafafa;
+    --colour-neutral-300: #f5f5f5;
+    --colour-neutral-400: #ededed;
+    --colour-neutral-500: #d9d9d9;
+    --colour-neutral-600: #cacfd2;
+    --colour-neutral-700: #8c8c8c;
+    --colour-neutral-800: #595959;
+    --colour-neutral-900: #414141;
+    --colour-neutral-1000: #262626;
+    --colour-neutral-1100: #1f1f1f;
+    --colour-neutral-1200: #141414;
+    --colour-neutral-1300: #000000;
+
+    --vh: 0;
+    --size-40: 40px;
+    --gap-10: 10px;
+    --gap-20: 20px;
+    --sidebar-width: 40px;
+    --main-width: 100%;
+    --details-width: 0;
+    --lists-visibility: none;
+    --modal-width: 400px;
+    --base-colour: var(--colour-neutral-900);
+    --base-grey: var(--colour-neutral-400);
+    --base-red: var(--colour-red-300);
+    --primary: var(--colour-fresh-blue-500);
+    --background: var(--colour-neutral-300);
+    --swatch: var(--colour-neutral-900);
 }
 
-@layer components {
-    .btn {
-        color: var(--base-colour);
-        border: 0;
-        padding: 5px 10px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        cursor: pointer;
-
-        &:hover {
-            filter: brightness(130%);
-        }
-
-        &.default {
-            background-color: var(--base-grey);
-        }
-
-        &.primary {
-            background-color: var(--primary);
-            color: var(--colour-neutral-100);
-        }
-
-        &.warning {
-            background-color: var(--base-red);
-            color: var(--colour-neutral-100);
-        }
-    }
-
-    .header__start {
-        display: flex;
-        align-items: center;
-        gap: var(--gap-10);
-    }
-    .app__logo {
-        display: flex;
-        align-items: center;
-        width: var(--size-40);
-        height: var(--size-40);
-        justify-content: center;
-        background-image: url("/assets/icons/logo.svg");
-        background-repeat: no-repeat;
-        background-position: 50%;
-    }
-    .app__stage,
-    .app__version {
-        font-size: 0.8rem;
-    }
-    .app__version {
-        font-weight: bold;
-    }
-
-    .header-end {
-        display: flex;
-
-        > a {
-            cursor: pointer;
-            width: var(--size-40);
-            height: var(--size-40);
-            display: block;
-            background-color: var(--base-colour);
-
-            &:hover {
-                background-color: var(--primary);
-            }
-        }
-    }
-
-    .icon {
-        background-color: var(--base-colour);
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-    }
-
-    .logout-icon {
-        mask: url("/assets/icons/logout-icon.svg") no-repeat 50%;
-    }
+/* Dark mode - explicit theme choice overrides system preference */
+html[data-theme="dark"] {
 }
 
-@layer utilities {
-    .hidden {
-        display: none;
+/* Fallback to system preference when no explicit theme is set */
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme]) {
     }
 }
