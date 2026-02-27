@@ -7,12 +7,14 @@ build:
 	@echo "Building..."
 	# @templ generate
 
+	@npm run build:css
 	@go build -o bin/rminder cmd/rminder/main.go
 
 build-prod:
 	@echo "Building PROD..."
 	# @templ generate
 
+	@npm run build:css
 	@go build -a -ldflags "-s -w" -o bin/rminder cmd/rminder/main.go
 	#upx --best --lzma bin/rminder
 	#upx --ultra-brute bin/rminder
