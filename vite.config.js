@@ -14,6 +14,9 @@ export default defineConfig({
         entryFileNames: "_[name].js",
       },
     },
-    cssMinify: true,
+    cssMinify: "lightningcss",
+  },
+  css: {
+    transformer: "lightningcss",
   },
 });
