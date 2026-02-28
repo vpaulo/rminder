@@ -11,7 +11,7 @@
         height: var(--size-40);
         border: 2px solid var(--base-grey);
         outline: 0;
-        font-size: 0.8rem;
+        font-size: var(--text-small);
         letter-spacing: 1px;
         background-color: transparent;
     }
@@ -22,7 +22,7 @@
         grid-template-columns: 1fr;
         grid-template-rows: var(--size-40) 1fr;
         height: 100%;
-        background-color: var(--background);
+        background-color: var(--bg);
         color: var(--base-colour);
     }
     button {
@@ -34,7 +34,7 @@
         height: var(--size-40);
         border: 2px solid var(--base-grey);
         outline: 0;
-        font-size: 0.8rem;
+        font-size: var(--text-small);
         letter-spacing: 1px;
         background-color: transparent;
     }
@@ -42,7 +42,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: var(--gap-10);
+        gap: var(--space);
     }
 }
 
@@ -65,7 +65,7 @@
         border: 0;
         padding: 5px 10px;
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: var(--text-small);
         letter-spacing: 1px;
         cursor: pointer;
 
@@ -79,23 +79,23 @@
 
         &.primary {
             background-color: var(--primary);
-            color: var(--colour-neutral-100);
+            color: var(--colour-white);
         }
 
         &.warning {
             background-color: var(--base-red);
-            color: var(--colour-neutral-100);
+            color: var(--colour-white);
         }
     }
 
     .header__start {
         display: flex;
         align-items: center;
-        gap: var(--gap-10);
+        gap: var(--space);
     }
     .app__stage,
     .app__version {
-        font-size: 0.8rem;
+        font-size: var(--text-small);
     }
     .app__version {
         font-weight: bold;

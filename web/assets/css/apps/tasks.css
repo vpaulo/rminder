@@ -6,7 +6,7 @@
 @layer components {
     rm-tasks-app {
         display: flex;
-        gap: var(--gap-20);
+        gap: var(--space-large);
 
         .main {
             min-width: 250px;
@@ -81,14 +81,14 @@
                 p {
                     display: flex;
                     justify-content: space-between;
-                    gap: 20px;
+                    gap: var(--space-large);
 
                     > span {
                         display: flex;
                         align-items: center;
-                        gap: 4px;
+                        gap: var(--space-x-small);
                         width: 100%;
-                        font-size: 1rem;
+                        font-size: var(--text-normal);
                         letter-spacing: 1px;
 
                         &:first-child {
@@ -105,7 +105,7 @@
 
         .search-screen {
             .message p {
-                font-size: 2rem;
+                font-size: var(--text-x-large);
                 letter-spacing: 1px;
             }
         }
@@ -125,7 +125,7 @@
         .tasks__list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: var(--space);
             margin: 0;
             padding: 0;
             list-style: none;
@@ -134,9 +134,9 @@
         .tasks__list > li {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--space);
             padding: 0 12px;
-            background-color: var(--colour-neutral-100);
+            background-color: var(--colour-white);
         }
         .tasks__list > li:hover,
         .tasks__list > li:has(input:checked) {
@@ -148,7 +148,7 @@
             width: 100%;
         }
         #task {
-            font-size: 1.3rem;
+            font-size: var(--text-medium);
             color: var(--primary);
             padding: 16px 12px;
             width: 100%;
@@ -169,7 +169,7 @@
         .add-task {
             background: transparent;
             border: transparent;
-            font-size: 1rem;
+            font-size: var(--text-normal);
             font-weight: 600;
             cursor: pointer;
             letter-spacing: 1px;
@@ -197,13 +197,13 @@
             width: 100%;
             height: 100%;
             text-align: left;
-            font-size: 1.2rem;
+            font-size: var(--text-medium);
             color: var(--base-colour);
             padding: 8px 0;
             cursor: pointer;
 
             .dates {
-                font-size: 10px;
+                font-size: var(--text-xx-small);
                 letter-spacing: 1px;
             }
         }
@@ -242,13 +242,13 @@
         .detail__title {
             display: flex;
             align-items: center;
-            gap: var(--gap-10);
+            gap: var(--space);
         }
         .title,
         .note {
             width: 100%;
             color: var(--base-colour);
-            font-size: 0.9rem;
+            font-size: var(--text-small);
             padding: 8px 6px;
         }
         .title:focus,
@@ -355,7 +355,7 @@
             overflow: auto;
         }
         .details__body > div {
-            background-color: var(--colour-neutral-100);
+            background-color: var(--colour-white);
             margin: 10px 0;
             padding: 10px 12px;
         }
@@ -375,22 +375,22 @@
         .details__priority {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: var(--space-x-small);
 
             label {
-                font-size: 0.9rem;
+                font-size: var(--text-small);
             }
         }
 
         .details__schedule {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: var(--space);
 
             label {
                 display: flex;
                 flex-direction: column;
-                font-size: 0.9rem;
+                font-size: var(--text-small);
             }
         }
         /* TODO: Check new CSS features as nesting */
@@ -414,7 +414,7 @@
         .add-note {
             background-color: transparent;
             border: 1px solid transparent;
-            font-size: 0.8rem;
+            font-size: var(--text-small);
             color: var(--primary);
             font-weight: 600;
             padding: 0;
@@ -487,7 +487,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: var(--colour-neutral-100);
+            background-color: var(--colour-white);
             padding: 10px 12px;
             height: var(--size-40);
         }
@@ -496,7 +496,7 @@
             letter-spacing: 2px;
         }
         .creation-date {
-            font-size: 0.8rem;
+            font-size: var(--text-small);
         }
 
         .modal {
@@ -505,13 +505,14 @@
         .modal__content {
             width: var(--modal-width);
             padding: 20px;
-            background: var(--colour-neutral-100);
+            color: var(--base-colour);
+            background: var(--colour-white);
         }
         .modal__actions {
             display: flex;
             justify-content: flex-end;
             padding-top: 10px;
-            gap: 10px;
+            gap: var(--space);
         }
         @media (hover: hover) and (pointer: fine) {
             .completed-check:hover,
@@ -532,7 +533,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                background-color: var(--colour-neutral-100);
+                background-color: var(--colour-white);
             }
         }
     }
@@ -550,13 +551,13 @@
 
                 .pinned-lists {
                     flex-direction: column;
-                    gap: 0;
+                    gap: var(--space-none);
                     padding: 0;
 
                     .list {
                         flex: 0 0 auto;
                         border: 0;
-                        border-bottom: 2px solid var(--background);
+                        border-bottom: 2px solid var(--bg);
                     }
                 }
             }

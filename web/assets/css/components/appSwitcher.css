@@ -17,13 +17,14 @@
             top: var(--popover-top);
             right: var(--popover-right);
 
-            gap: 20px;
+            gap: var(--space-large);
             flex-direction: column;
+            background-color: var(--colour-white);
             padding: 20px;
             width: 200px;
 
             > * {
-                font-size: 1rem;
+                font-size: var(--text-normal);
                 font-weight: 600;
                 cursor: pointer;
                 letter-spacing: 1px;
