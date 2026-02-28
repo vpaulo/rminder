@@ -1,41 +1,45 @@
 @layer reset, base, components, utilities;
 
 :root {
+    /*color-scheme: light dark;*/
+
     /* Text */
     --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-    /*--text-xx-small: 0.55rem;
-    --text-x-small: 0.75rem;
-    --text-small: 0.85rem;
-    --text-normal: 1rem;
-    --text-medium: 1.1rem;
-    --text-large: 1.5rem;
-    --text-x-large: 1.8rem;
-    --text-xx-large: 2.5rem;
+    --text-xx-small: 0.65rem; /*10px*/
+    --text-x-small: 0.75rem; /*12px*/
+    --text-small: 0.85rem; /*13.6px*/
+    --text-normal: 1rem; /*16px*/
+    --text-medium: 1.25rem; /*20px*/
+    --text-large: 1.5rem; /*24px*/
+    --text-x-large: 2rem; /*32px*/
+    --text-xx-large: 2.5rem; /*40px*/
+    --text-xxx-large: 5rem; /*80px*/
 
-    @media (max-width: 639px) {
-        --text-xx-small: 0.65rem;
-        --text-x-small: 0.85rem;
-        --text-small: 0.95rem;
-        --text-normal: 1.1rem;
-        --text-medium: 1.2rem;
-        --text-large: 1.5rem;
-        --text-x-large: 1.8rem;
-        --text-xx-large: 2.5rem;
-    }
+    /* Spacing */
+    --space-none: 0;
+    --space-x-small: 4px;
+    --space-small: 8px;
+    --space: 12px;
+    --space-medium: 16px;
+    --space-large: 20px;
+    --space-x-large: 24px;
 
+    /* Colours: fixed */
     --colour-white: #ffffff;
-    --colour-soft-white-grey: #f8f9fa;
-    --colour-light-grey: #e9ecef;
-    --colour-silver-grey: #dee2e6;
-    --colour-cool-mid-grey: #adb5bd;
-    --colour-neutral-grey: #6c757d;
-    --colour-steel-grey: #495057;
-    --colour-charcoal: #343a40;
-    --colour-near-black: #212529;
-    --colour-black: #000000;*/
+    --colour-black: #000000;
 
-    /*=================================================*/
+    --colour-neutral-200: #fafafa; /* not used */
+    --colour-neutral-300: #f5f5f5;
+    --colour-neutral-400: #ededed;
+    --colour-neutral-500: #d9d9d9;
+    --colour-neutral-600: #cacfd2;
+    --colour-neutral-700: #8c8c8c;
+    --colour-neutral-800: #595959; /* not used */
+    --colour-neutral-900: #414141;
+    --colour-neutral-1000: #262626; /* not used */
+    --colour-neutral-1100: #1f1f1f; /* not used */
+    --colour-neutral-1200: #141414; /* not used */
 
     --colour-red-300: hsl(0, 100%, 70%);
     --colour-cyan-800: hsl(180, 100%, 20%);
@@ -48,43 +52,20 @@
     --colour-lime-700: hsl(79, 95%, 36%);
     --colour-indigo-400: hsl(269, 73%, 71%);
 
-    --colour-neutral-100: #ffffff;
-    --colour-neutral-200: #fafafa;
-    --colour-neutral-300: #f5f5f5;
-    --colour-neutral-400: #ededed;
-    --colour-neutral-500: #d9d9d9;
-    --colour-neutral-600: #cacfd2;
-    --colour-neutral-700: #8c8c8c;
-    --colour-neutral-800: #595959;
-    --colour-neutral-900: #414141;
-    --colour-neutral-1000: #262626;
-    --colour-neutral-1100: #1f1f1f;
-    --colour-neutral-1200: #141414;
-    --colour-neutral-1300: #000000;
+    /* Colors: Named */
+    --base-colour: var(--colour-neutral-900);
+    --base-grey: var(--colour-neutral-400);
+    --base-red: var(--colour-red-300);
+    --primary: var(--colour-fresh-blue-500);
+    --bg: var(--colour-neutral-300);
+    --bg-canvas: var(--colour-neutral-1000);
+    --swatch: var(--colour-neutral-900);
 
     --vh: 0;
     --size-40: 40px;
-    --gap-10: 10px;
-    --gap-20: 20px;
     --sidebar-width: 40px;
     --main-width: 100%;
     --details-width: 0;
     --lists-visibility: none;
     --modal-width: 400px;
-    --base-colour: var(--colour-neutral-900);
-    --base-grey: var(--colour-neutral-400);
-    --base-red: var(--colour-red-300);
-    --primary: var(--colour-fresh-blue-500);
-    --background: var(--colour-neutral-300);
-    --swatch: var(--colour-neutral-900);
-}
-
-/* Dark mode - explicit theme choice overrides system preference */
-html[data-theme="dark"] {
-}
-
-/* Fallback to system preference when no explicit theme is set */
-@media (prefers-color-scheme: dark) {
-    html:not([data-theme]) {
-    }
 }

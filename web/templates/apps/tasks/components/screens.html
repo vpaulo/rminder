@@ -1,64 +1,61 @@
 {{define "landing-screen"}}
-	<div class="landing-screen">
-  		<div>
- 			{{template "screen-logo"}}
-    	</div>
-       	<div class="instructions">
-	        <p><span>Next/Previous Task</span><span><i class="key j"></i> or <i class="key k"></i></span></p>
-	        <p><span>Next/Previous List</span><span><i class="key bl"></i> or <i class="key br"></i></span></p>
+<div class="landing-screen">
+    <div>{{template "screen-logo"}}</div>
+    <div class="instructions">
+        <p>
+            <span>Next/Previous Task</span><span><i class="key j"></i> or <i class="key k"></i></span>
+        </p>
+        <p>
+            <span>Next/Previous List</span><span><i class="key bl"></i> or <i class="key br"></i></span>
+        </p>
 
-      		<p><span>New Task</span><span><i class="key a"></i></span></p>
-        	<p><span>New List</span><span><i class="key n"></i></span></p>
+        <p>
+            <span>New Task</span><span><i class="key a"></i></span>
+        </p>
+        <p>
+            <span>New List</span><span><i class="key n"></i></span>
+        </p>
 
-           	<p><span>Search</span><span><i class="key f"></i></span></p>
+        <p>
+            <span>Search</span><span><i class="key f"></i></span>
+        </p>
 
-            <p><span>Toggle Task Completion</span><span><i class="key x"></i></span></p>
-            <p><span>Toggle Task Importance</span><span><i class="key i"></i></span></p>
-            <p><span>Switch Task Priority</span><span><i class="key p"></i></span></p>
-       	</div>
-   	</div>
-{{end}}
-
-{{define "no-results-screen"}}
-	<div class="search-screen">
-  		<div>
- 			{{template "screen-logo"}}
-    	</div>
-       	<div class="message">
-      		<p>No Tasks Where Found</p>
-       	</div>
-   	</div>
-{{end}}
-
-{{define "screen-logo"}}
-	<svg
-       	width="200"
-       	height="200"
-       	version="1.1"
-       	viewBox="0 0 507.2 507.2"
-       	xmlns="http://www.w3.org/2000/svg"
-   	>
-       	<circle
-           	style="fill: var(--base-grey)"
-            cx="253.6"
-           	cy="253.6"
-            r="253.6"
-       	/>
-       	<path
-           	style="fill: var(--colour-neutral-500)"
-            d="M188.8,368l130.4,130.4c108-28.8,188-127.2,188-244.8c0-2.4,0-4.8,0-7.2L404.8,152L188.8,368z"
-       	/>
-       	<g>
-           	<path
-               	style="fill: var(--colour-neutral-100)"
-                d="M260,310.4c11.2,11.2,11.2,30.4,0,41.6l-23.2,23.2c-11.2,11.2-30.4,11.2-41.6,0L93.6,272.8
+        <p>
+            <span>Toggle Task Completion</span><span><i class="key x"></i></span>
+        </p>
+        <p>
+            <span>Toggle Task Importance</span><span><i class="key i"></i></span>
+        </p>
+        <p>
+            <span>Switch Task Priority</span><span><i class="key p"></i></span>
+        </p>
+    </div>
+</div>
+{{end}} {{define "no-results-screen"}}
+<div class="search-screen">
+    <div>{{template "screen-logo"}}</div>
+    <div class="message">
+        <p>No Tasks Where Found</p>
+    </div>
+</div>
+{{end}} {{define "screen-logo"}}
+<svg width="200" height="200" version="1.1" viewBox="0 0 507.2 507.2" xmlns="http://www.w3.org/2000/svg">
+    <circle style="fill: var(--base-grey)" cx="253.6" cy="253.6" r="253.6" />
+    <path
+        style="fill: var(--colour-neutral-500)"
+        d="M188.8,368l130.4,130.4c108-28.8,188-127.2,188-244.8c0-2.4,0-4.8,0-7.2L404.8,152L188.8,368z"
+    />
+    <g>
+        <path
+            style="fill: var(--colour-white)"
+            d="M260,310.4c11.2,11.2,11.2,30.4,0,41.6l-23.2,23.2c-11.2,11.2-30.4,11.2-41.6,0L93.6,272.8
     c-11.2-11.2-11.2-30.4,0-41.6l23.2-23.2c11.2-11.2,30.4-11.2,41.6,0L260,310.4z"
-           	/>
-           	<path
-                style="fill: var(--colour-neutral-100)"
-                d="M348.8,133.6c11.2-11.2,30.4-11.2,41.6,0l23.2,23.2c11.2,11.2,11.2,30.4,0,41.6l-176,175.2
+        />
+        <path
+            style="fill: var(--colour-white)"
+            d="M348.8,133.6c11.2-11.2,30.4-11.2,41.6,0l23.2,23.2c11.2,11.2,11.2,30.4,0,41.6l-176,175.2
     c-11.2,11.2-30.4,11.2-41.6,0l-23.2-23.2c-11.2-11.2-11.2-30.4,0-41.6L348.8,133.6z"
-            />
-       	</g>
-   	</svg>
+        />
+    </g>
+</svg>
 {{end}}

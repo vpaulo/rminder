@@ -17,13 +17,14 @@
             top: var(--popover-top);
             right: var(--popover-right);
 
-            gap: 20px;
+            gap: var(--space-large);
             flex-direction: column;
+            background-color: var(--colour-white);
             padding: 20px;
             width: 200px;
 
             > * {
-                font-size: 1rem;
+                font-size: var(--text-normal);
                 font-weight: 600;
                 cursor: pointer;
                 letter-spacing: 1px;
@@ -58,7 +59,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 20px;
+            gap: var(--space-large);
             padding: 10px;
 
             fieldset {
@@ -66,7 +67,7 @@
                 margin: 0;
                 padding: 0;
                 border: 0;
-                gap: 10px;
+                gap: var(--space);
             }
 
             .form-actions {
@@ -76,7 +77,7 @@
 
             .main-actions {
                 display: flex;
-                gap: 10px;
+                gap: var(--space);
             }
 
             label {

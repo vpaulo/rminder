@@ -11,15 +11,15 @@
         &:has(.header input:checked) {
             --sidebar-width: 320px;
             --lists-visibility: inline;
-            background-color: var(--colour-neutral-100);
+            background-color: var(--colour-white);
 
             .pinned-lists {
-                gap: 10px;
+                gap: var(--space);
                 padding: 10px;
 
                 .list {
                     flex: 1 1 auto;
-                    border: 2px solid var(--background);
+                    border: 2px solid var(--bg);
                 }
             }
 
@@ -30,7 +30,7 @@
         .header {
             display: flex;
             align-content: center;
-            border-bottom: 2px solid var(--background);
+            border-bottom: 2px solid var(--bg);
             padding: 10px;
         }
         .header > label {
@@ -46,7 +46,7 @@
         .pinned-lists {
             display: flex;
             flex-wrap: wrap;
-            border-bottom: 2px solid var(--background);
+            border-bottom: 2px solid var(--bg);
         }
 
         .lists {
@@ -66,16 +66,16 @@
             align-items: flex-start;
             justify-content: space-between;
             padding: 10px;
-            border-bottom: 2px solid var(--background);
+            border-bottom: 2px solid var(--bg);
             cursor: pointer;
-            gap: var(--gap-10);
+            gap: var(--space);
 
             &:has(input:checked) {
                 background-color: var(--list-colour);
-                color: var(--colour-neutral-100);
+                color: var(--colour-white);
 
                 .icon {
-                    --list-colour: var(--colour-neutral-100);
+                    --list-colour: var(--colour-white);
                 }
             }
 
@@ -84,7 +84,7 @@
             }
         }
         .list span:not(.ident.icon) {
-            font-size: 0.8rem;
+            font-size: var(--text-small);
             display: var(--lists-visibility);
         }
         .list.hidden {
@@ -106,18 +106,18 @@
             display: var(--lists-visibility);
             padding: 10px;
             margin: 0;
-            font-size: 1rem;
+            font-size: var(--text-normal);
             letter-spacing: 1px;
         }
 
         footer {
             padding: 10px;
-            border-top: 2px solid var(--background);
+            border-top: 2px solid var(--bg);
 
             label {
                 display: flex;
-                font-size: 0.9rem;
-                gap: 4px;
+                font-size: var(--text-small);
+                gap: var(--space-x-small);
             }
         }
 
@@ -132,7 +132,7 @@
             width: 100%;
             height: var(--size-40);
             color: var(--base-colour);
-            font-size: 0.9rem;
+            font-size: var(--text-small);
             padding: 8px 6px;
             text-overflow: ellipsis;
             background-color: var(--base-grey);
@@ -147,11 +147,11 @@
             align-items: center;
             background: transparent;
             border: transparent;
-            font-size: 1rem;
+            font-size: var(--text-normal);
             font-weight: 600;
             cursor: pointer;
             letter-spacing: 1px;
-            gap: 10px;
+            gap: var(--space);
             padding: 0;
 
             &:focus {
@@ -179,6 +179,7 @@
         }
 
         .list-form-container {
+            background-color: var(--colour-white);
             border: 0;
             box-shadow: 1px 2px 3px var(--base-colour);
         }
@@ -188,7 +189,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 20px;
+            gap: var(--space-large);
             padding: 10px;
 
             fieldset {
@@ -196,7 +197,7 @@
                 margin: 0;
                 padding: 0;
                 border: 0;
-                gap: 10px;
+                gap: var(--space);
             }
 
             .form-actions {
@@ -206,7 +207,7 @@
 
             .main-actions {
                 display: flex;
-                gap: 10px;
+                gap: var(--space);
             }
 
             label {
@@ -335,7 +336,7 @@
                 top: 7px;
                 width: 5px;
                 height: 10px;
-                border: solid var(--colour-neutral-100);
+                border: solid var(--colour-white);
                 border-width: 0 3px 3px 0;
                 transform: rotate(45deg);
             }
@@ -357,7 +358,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 0;
+            gap: var(--space-none);
             padding: 10px;
             position: relative;
         }
@@ -366,7 +367,7 @@
             width: 100%;
             height: var(--size-40);
             color: var(--base-colour);
-            font-size: 0.9rem;
+            font-size: var(--text-small);
             padding: 8px 20px 8px 6px;
             text-overflow: ellipsis;
             background-color: var(--base-grey);
@@ -432,7 +433,7 @@
                 display: flex;
                 align-items: center;
                 height: var(--size-40);
-                gap: 10px;
+                gap: var(--space);
 
                 &:hover {
                     .icon {
@@ -455,12 +456,12 @@
         > div {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: var(--space-x-small);
             width: 100%;
         }
 
         label {
-            font-size: 0.9rem;
+            font-size: var(--text-small);
             min-width: 150px;
         }
     }
