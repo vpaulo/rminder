@@ -152,8 +152,18 @@ func GetTask(ctx *gin.Context) {
 		return
 	}
 
+	subtasks, err := db.Subtasks(task.ID)
+	if err != nil {
+		log.Error("error fetching subtasks", "taskID", taskID, "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load subtasks.")
+		return
+	}
+
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "details", task)
+	err = web.Render(ctx.Writer, "details", map[string]any{
+		"Task":     task,
+		"Subtasks": subtasks,
+	})
 	if err != nil {
 		log.Error("error rendering in TaskList", "error", err)
 		app.ErrorInternalHTML(ctx, "Failed to render task details.")
@@ -226,6 +236,13 @@ func DeleteTask(ctx *gin.Context) {
 	var err error
 
 	if taskID != "" {
+		// Delete subtasks first, then the parent
+		id, _ := strconv.Atoi(taskID)
+		subtasks, _ := db.Subtasks(id)
+		for _, sub := range subtasks {
+			_ = db.DeleteTask(strconv.Itoa(sub.ID))
+		}
+
 		err = db.DeleteTask(taskID)
 		if err != nil {
 			log.Error("error deleting task", "taskID", taskID, "error", err)
@@ -334,6 +351,66 @@ func UpdateTask(ctx *gin.Context) {
 			log.Error("error rendering in Task", "error", err)
 			app.ErrorInternalHTML(ctx, "Failed to render task.")
 		}
+	}
+}
+
+func CreateSubtask(ctx *gin.Context) {
+	db := app.GetUserDatabase(ctx)
+	log := app.GetLogger(ctx)
+
+	parentID := ctx.Param("taskID")
+
+	err := ctx.Request.ParseForm()
+	if err != nil {
+		log.Error("error parsing form", "error", err)
+		app.ErrorBadRequestHTML(ctx, "Invalid form data.")
+		return
+	}
+
+	title := ctx.Request.FormValue("task")
+	pid, e := strconv.Atoi(parentID)
+	if e != nil || pid == 0 {
+		log.Error("invalid parent task id", "parentID", parentID)
+		app.ErrorBadRequestHTML(ctx, "Invalid parent task ID.")
+		return
+	}
+
+	parent, err := db.Task(parentID)
+	if err != nil {
+		log.Error("error fetching parent task", "parentID", parentID, "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load parent task.")
+		return
+	}
+
+	if title != "" && len(title) >= 3 && len(title) <= 255 {
+		err = db.CreateSubtask(title, parent.ListId, pid)
+		if err != nil {
+			log.Error("error creating subtask", "error", err)
+			app.ErrorInternalHTML(ctx, "Failed to create subtask.")
+			return
+		}
+		log.Info("subtask created", "title", title, "parentID", pid)
+	} else {
+		log.Error("error title validation failed", "title", title)
+		app.ErrorBadRequestHTML(ctx, "Title must be between 3 and 255 characters.")
+		return
+	}
+
+	subtasks, err := db.Subtasks(pid)
+	if err != nil {
+		log.Error("error fetching subtasks", "parentID", pid, "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load subtasks.")
+		return
+	}
+
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	err = web.Render(ctx.Writer, "subtask-list", map[string]any{
+		"Subtasks": subtasks,
+		"ParentID": pid,
+	})
+	if err != nil {
+		log.Error("error rendering subtask-list", "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to render subtasks.")
 	}
 }
 
