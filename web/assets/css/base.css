@@ -129,6 +129,30 @@
     }
 }
 
+@layer components {
+    .details__subtasks {
+        .subtasks {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space);
+        }
+        .subtask:not(input) {
+            display: flex;
+            align-items: center;
+            gap: var(--space);
+            background-color: var(--colour-white);
+            padding: 0 0 0 12px;
+
+            &:hover {
+                background-color: var(--base-grey);
+            }
+        }
+        .subtask-title {
+            width: 100%;
+        }
+    }
+}
+
 @layer utilities {
     .hidden {
         display: none;

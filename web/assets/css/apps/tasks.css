@@ -142,9 +142,11 @@
         .tasks__list > li:has(input:checked) {
             background-color: var(--base-grey);
         }
-        .add-tasks {
+        .add-tasks,
+        .add-subtask {
             display: flex;
             align-items: center;
+            gap: var(--space-x-small);
             width: 100%;
         }
         #task {
@@ -245,23 +247,27 @@
             gap: var(--space);
         }
         .title,
-        .note {
+        .note,
+        .subtask {
             width: 100%;
             color: var(--base-colour);
             font-size: var(--text-small);
             padding: 8px 6px;
         }
         .title:focus,
-        .note:focus {
+        .note:focus,
+        .subtask:focus {
             outline: none;
         }
-        .title {
+        .title,
+        .subtask {
             text-overflow: ellipsis;
         }
         .completed .title {
             text-decoration: line-through from-font var(--primary);
         }
-        .title:focus {
+        .title:focus,
+        .subtask:focus {
             background-color: var(--base-grey);
         }
 
@@ -382,12 +388,14 @@
             }
         }
 
-        .details__schedule {
+        .details__schedule,
+        .details__subtasks {
             display: flex;
             flex-direction: column;
             gap: var(--space);
 
-            label {
+            label,
+            .subtasks-title {
                 display: flex;
                 flex-direction: column;
                 font-size: var(--text-small);
@@ -411,7 +419,8 @@
             margin-top: 10px;
         }
         .rename,
-        .add-note {
+        .add-note,
+        .submit-subtask {
             background-color: transparent;
             border: 1px solid transparent;
             font-size: var(--text-small);
@@ -421,15 +430,18 @@
             cursor: pointer;
         }
         .rename:hover,
-        .add-note:hover {
+        .add-note:hover,
+        .submit-subtask:hover {
             border-bottom-color: var(--primary);
         }
         .rename:focus,
-        .add-note:focus {
+        .add-note:focus,
+        .submit-subtask:focus {
             outline: none;
         }
         .remove,
-        .close {
+        .close,
+        .subtask-delete {
             background: transparent;
             border: 0;
             width: 36px;
@@ -438,7 +450,8 @@
             line-height: 1px;
         }
         .remove:focus,
-        .close:focus {
+        .close:focus,
+        .subtask-delete:focus {
             outline: none;
         }
         .remove {
@@ -454,8 +467,11 @@
             width: 27px;
             height: 27px;
         }
-        .remove:hover .trash-icon {
-            background-color: var(--base-red);
+        .remove:hover,
+        .subtask-delete:hover {
+            .trash-icon {
+                background-color: var(--base-red);
+            }
         }
         .close {
             border-right: 1px solid var(--base-grey);

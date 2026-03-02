@@ -24,6 +24,7 @@ func TasksRoutes(router *gin.Engine, application *app.App) {
 	tasks.GET("/:taskID", taskhandlers.GetTask)
 	tasks.DELETE("/:taskID", taskhandlers.DeleteTask)
 	tasks.PUT("/:taskID/:slug", taskhandlers.UpdateTask)
+	tasks.POST("/:taskID/subtask", taskhandlers.CreateSubtask)
 
 	lists := partials.Group("/lists")
 	lists.GET("/all", taskhandlers.GetLists)

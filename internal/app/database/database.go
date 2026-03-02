@@ -28,6 +28,8 @@ type Service interface {
 	ImportantTasks() ([]*Task, error)
 	CompletedTasks() ([]*Task, error)
 	CreateTask(title string, list int) error
+	CreateSubtask(title string, listID int, parentID int) error
+	Subtasks(parentID int) ([]*Task, error)
 	ToggleComplete(ID string) error
 	ToggleImportant(ID string) error
 	Task(ID string) (*Task, error)
@@ -351,6 +353,67 @@ func (s *service) CreateTask(title string, list int) error {
 	return nil
 }
 
+func (s *service) CreateSubtask(title string, listID int, parentID int) error {
+	query, err := s.db.Prepare("INSERT INTO task (title, list_id, parent_id, position) VALUES (?,?,?,0)")
+	if err != nil {
+		return fmt.Errorf("DB.CreateSubtask - prepare create query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(title, listID, parentID)
+	if err != nil {
+		return fmt.Errorf("DB.CreateSubtask - create query result failed: %v", err)
+	}
+
+	s.cache.invalidate()
+	return nil
+}
+
+func (s *service) Subtasks(parentID int) ([]*Task, error) {
+	key := fmt.Sprintf("subtasks:%d", parentID)
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*Task), nil
+	}
+
+	query, err := s.db.Prepare("SELECT * FROM task WHERE parent_id=? ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, created_at ASC")
+	if err != nil {
+		return nil, fmt.Errorf("DB.Subtasks - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query(parentID)
+	if err != nil {
+		return nil, fmt.Errorf("DB.Subtasks - query result failed: %v", err)
+	}
+
+	tasks := make([]*Task, 0)
+	for result.Next() {
+		data := new(Task)
+		err := result.Scan(
+			&data.ID,
+			&data.Title,
+			&data.Description,
+			&data.Completed,
+			&data.Important,
+			&data.Priority,
+			&data.Position,
+			&data.StartAt,
+			&data.EndAt,
+			&data.ListId,
+			&data.ParentId,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Subtasks - result scan failed: %v", err)
+		}
+		tasks = append(tasks, data)
+	}
+
+	s.cache.set(key, tasks)
+	return tasks, nil
+}
+
 func (s *service) ToggleComplete(id string) error {
 	query, err := s.db.Prepare("UPDATE task SET completed = NOT completed, updated_at = CURRENT_TIMESTAMP WHERE id=?")
 	if err != nil {
@@ -646,7 +709,7 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		err   error
 	)
 
-	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
+	query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? AND parent_id=0 ORDER BY CASE WHEN completed = true THEN 1 ELSE 0 END, position ASC, created_at ASC")
 	if filter != "" {
 		// TODO: find better way for this, do not like it
 		fl := make([]string, 0)
@@ -724,7 +787,7 @@ func (s *service) ListTasks(id int, filter string) ([]*Task, error) {
 		}
 
 		if len(fl) > 0 {
-			query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? AND " + strings.Join(fl, fmt.Sprintf(" %s ", op)))
+			query, err = s.db.Prepare("SELECT * FROM task WHERE list_id=? AND parent_id=0 AND " + strings.Join(fl, fmt.Sprintf(" %s ", op)))
 		}
 	}
 
