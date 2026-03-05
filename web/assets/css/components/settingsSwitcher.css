@@ -84,6 +84,22 @@
                 border: 2px solid rgba(0, 0, 0, 0);
             }
 
+            .upload-indicator {
+                display: none;
+                font-size: var(--text-small);
+                opacity: 0.6;
+                align-self: center;
+            }
+
+            &.htmx-request .upload-indicator {
+                display: inline;
+            }
+
+            &.htmx-request button[type="submit"] {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
             #file {
                 padding: 5px 0;
                 width: 300px;
