@@ -95,6 +95,12 @@ func (c *queryCache) invalidate() {
 	c.version++
 }
 
+func (c *queryCache) invalidateKey(key string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	delete(c.entries, key)
+}
+
 type service struct {
 	database_path string
 	db            *sql.DB
@@ -350,7 +356,8 @@ func (s *service) CreateTask(title string, list int) error {
 		return fmt.Errorf("DB.CreateTask - create query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey("tasks")
+	s.cache.invalidateKey("lists:")
 	return nil
 }
 
@@ -366,7 +373,7 @@ func (s *service) CreateSubtask(title string, listID int, parentID int) error {
 		return fmt.Errorf("DB.CreateSubtask - create query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey(fmt.Sprintf("subtasks:%d", parentID))
 	return nil
 }
 
@@ -427,7 +434,13 @@ func (s *service) ToggleComplete(id string) error {
 		return fmt.Errorf("DB.ToggleComplete - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		task.Completed = !task.Completed
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
+	s.cache.invalidateKey("tasks:completed")
 	return nil
 }
 
@@ -443,7 +456,13 @@ func (s *service) ToggleImportant(id string) error {
 		return fmt.Errorf("DB.ToggleImportant - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		task.Important = !task.Important
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
+	s.cache.invalidateKey("tasks:important")
 	return nil
 }
 
@@ -494,7 +513,12 @@ func (s *service) UpdateTask(id string, title string) error {
 		return fmt.Errorf("DB.UpdateTask - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		task.Title = title
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
 	return nil
 }
 
@@ -510,7 +534,12 @@ func (s *service) UpdateTaskDescription(id string, description string) error {
 		return fmt.Errorf("DB.UpdateTaskDescription - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		task.Description = description
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
 	return nil
 }
 
@@ -531,7 +560,14 @@ func (s *service) UpdateTaskPriority(id string, priority string) error {
 		return fmt.Errorf("DB.UpdateTaskPriority - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		if p, err := strconv.Atoi(priority); err == nil {
+			task.Priority = p
+		}
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
 	return nil
 }
 
@@ -547,7 +583,15 @@ func (s *service) UpdateTaskList(id string, listID string) error {
 		return fmt.Errorf("DB.UpdateTaskList - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		if lid, err := strconv.Atoi(listID); err == nil {
+			task.ListId = lid
+		}
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
+	s.cache.invalidateKey("lists:")
 	return nil
 }
 
@@ -575,7 +619,12 @@ func (s *service) UpdateTaskStartDate(id string, date string) error {
 		return fmt.Errorf("DB.UpdateTaskStartDate - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		task.StartAt = timeUpdate
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
 	return nil
 }
 
@@ -603,7 +652,12 @@ func (s *service) UpdateTaskEndDate(id string, date string) error {
 		return fmt.Errorf("DB.UpdateTaskEndDate - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get("task:" + id); ok {
+		task := *cached.(*Task)
+		task.EndAt = timeUpdate
+		s.cache.set("task:"+id, &task)
+	}
+	s.cache.invalidateKey("tasks")
 	return nil
 }
 
@@ -619,7 +673,10 @@ func (s *service) DeleteTask(id string) error {
 		return fmt.Errorf("DB.DeleteTask - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey("task:" + id)
+	s.cache.invalidateKey("tasks")
+	s.cache.invalidateKey("tasks:completed")
+	s.cache.invalidateKey("tasks:important")
 	return nil
 }
 
@@ -637,7 +694,15 @@ func (s *service) ReorderTasks(reorder []Reorder) error {
 		}
 	}
 
-	s.cache.invalidate()
+	for _, order := range reorder {
+		key := fmt.Sprintf("task:%d", order.ID)
+		if cached, ok := s.cache.get(key); ok {
+			task := *cached.(*Task)
+			task.Position = order.Position
+			s.cache.set(key, &task)
+		}
+	}
+	s.cache.invalidateKey("tasks")
 	return nil
 }
 
@@ -907,7 +972,7 @@ func (s *service) CreateList(name string, swatch string, icon string, position i
 		return fmt.Errorf("DB.CreateList - create query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey("lists:")
 	return nil
 }
 
@@ -923,7 +988,16 @@ func (s *service) UpdateList(id int, name string, colour string, icon string, pi
 		return fmt.Errorf("DB.UpdateList - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	if cached, ok := s.cache.get(fmt.Sprintf("list:%d", id)); ok {
+		list := *cached.(*List)
+		list.Name = name
+		list.Colour = colour
+		list.Icon = icon
+		list.Pinned = pinned
+		list.FilterBy = filter
+		s.cache.set(fmt.Sprintf("list:%d", id), &list)
+	}
+	s.cache.invalidateKey("lists:")
 	return nil
 }
 
@@ -939,7 +1013,8 @@ func (s *service) DeleteList(id int) error {
 		return fmt.Errorf("DB.DeleteList - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey(fmt.Sprintf("list:%d", id))
+	s.cache.invalidateKey("lists:")
 	return nil
 }
 
@@ -957,7 +1032,15 @@ func (s *service) ReorderLists(reorder []Reorder) error {
 		}
 	}
 
-	s.cache.invalidate()
+	for _, order := range reorder {
+		key := fmt.Sprintf("list:%d", order.ID)
+		if cached, ok := s.cache.get(key); ok {
+			list := *cached.(*List)
+			list.Position = order.Position
+			s.cache.set(key, &list)
+		}
+	}
+	s.cache.invalidateKey("lists:")
 	return nil
 }
 
@@ -1025,7 +1108,6 @@ func (s *service) AddImportedTask(task *Task, list int) error {
 		return fmt.Errorf("DB.AddImportedTask - create query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
 	return nil
 }
 
@@ -1066,7 +1148,7 @@ func (s *service) UpdatePersistence(task int, list int) error {
 		return fmt.Errorf("DB.UpdatePersistence - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey("persistence")
 	return nil
 }
 
@@ -1082,7 +1164,7 @@ func (s *service) UpdatePersistenceTask(task int) error {
 		return fmt.Errorf("DB.UpdatePersistenceTask - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey("persistence")
 	return nil
 }
 
@@ -1098,7 +1180,7 @@ func (s *service) UpdatePersistenceList(list int) error {
 		return fmt.Errorf("DB.UpdatePersistenceList - update query result failed: %v", err)
 	}
 
-	s.cache.invalidate()
+	s.cache.invalidateKey("persistence")
 	return nil
 }
 
