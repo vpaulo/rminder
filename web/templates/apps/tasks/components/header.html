@@ -30,20 +30,14 @@
     </div>
 </header>
 {{end}} {{define "upload-file-modal"}}
-<dialog
-    class="file-form-container"
-    hx-get="/partials/lists/all"
-    hx-target=".lists__container"
-    hx-trigger="click[event.target.matches('button')] delay:100ms from:form"
->
+<dialog class="file-form-container">
     <form
         hx-post="/api/tasks/import"
         hx-encoding="multipart/form-data"
         method="POST"
         hx-trigger="submit, keyup[enterKey]"
-        hx-target=".lists__container"
         hx-swap="none"
-        hx-on::after-request="this.reset();this.parentElement.close()"
+        hx-on::after-request="if(event.detail.successful){this.reset();this.parentElement.close();htmx.ajax('GET','/partials/lists/all',{target:'.lists__container',swap:'outerHTML'})}"
     >
         <div id="messages"></div>
         <label for="file" class="checkbox__container">Select data file</label>
@@ -57,6 +51,7 @@
                     Cancel
                 </div>
                 <button class="btn primary" type="submit">Upload</button>
+                <span class="upload-indicator">Uploading...</span>
             </div>
         </fieldset>
     </form>
