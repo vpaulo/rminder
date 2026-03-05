@@ -159,10 +159,24 @@ func GetTask(ctx *gin.Context) {
 		return
 	}
 
+	allLists, err := db.Lists("")
+	if err != nil {
+		log.Error("error fetching lists", "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load lists.")
+		return
+	}
+	var realLists []*database.List
+	for _, l := range allLists {
+		if l.FilterBy == "" {
+			realLists = append(realLists, l)
+		}
+	}
+
 	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = web.Render(ctx.Writer, "details", map[string]any{
 		"Task":     task,
 		"Subtasks": subtasks,
+		"Lists":    realLists,
 	})
 	if err != nil {
 		log.Error("error rendering in TaskList", "error", err)
@@ -295,6 +309,8 @@ func UpdateTask(ctx *gin.Context) {
 			err = db.ToggleComplete(taskID)
 		case "priority":
 			err = db.UpdateTaskPriority(taskID, ctx.Request.FormValue("priority"))
+		case "list":
+			err = db.UpdateTaskList(taskID, ctx.Request.FormValue("list"))
 		case "date-start":
 			err = db.UpdateTaskStartDate(taskID, ctx.Request.FormValue("from"))
 		case "date-end":
@@ -325,6 +341,8 @@ func UpdateTask(ctx *gin.Context) {
 	if slug == "description" {
 		// TODO return proper message
 		_, _ = ctx.Writer.Write([]byte("Updated description"))
+	} else if slug == "list" {
+		_, _ = ctx.Writer.Write([]byte(""))
 	} else {
 		// get task
 		task, err := db.Task(taskID)
