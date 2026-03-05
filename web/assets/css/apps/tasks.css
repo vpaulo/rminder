@@ -382,7 +382,8 @@ rm-tasks-app {
             align-items: flex-end;
         }
 
-        .details__priority {
+        .details__priority,
+        .details__list {
             display: flex;
             flex-direction: column;
             gap: var(--space-x-small);

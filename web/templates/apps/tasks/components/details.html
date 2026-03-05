@@ -36,6 +36,23 @@
                     {{end}}
                 </select>
             </div>
+            <div class="details__list">
+                <label for="list">List</label>
+                <select
+                    name="list"
+                    hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/list"}}"
+                    hx-trigger="change"
+                    hx-swap="outerHTML"
+                    hx-target="{{concat ".tasks__list > li[data-id='" (itoa .Task.ID) "']"}}">
+                    {{range .Lists}}
+                        {{if eq .ID $.Task.ListId}}
+                            <option value="{{itoa .ID}}" selected>{{.Name}}</option>
+                        {{else}}
+                            <option value="{{itoa .ID}}">{{.Name}}</option>
+                        {{end}}
+                    {{end}}
+                </select>
+            </div>
             <div class="details__schedule">
             	<label>
              		<span>Start Date</span>
