@@ -1,4 +1,14 @@
 @layer base {
+    body {
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: var(--size-40) 1fr;
+        height: 100%;
+        background-color: var(--bg);
+        color: var(--base-colour);
+    }
     input {
         border: none;
         background: none;
@@ -15,16 +25,7 @@
         letter-spacing: 1px;
         background-color: transparent;
     }
-    body {
-        margin: 0;
-        padding: 0;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: var(--size-40) 1fr;
-        height: 100%;
-        background-color: var(--bg);
-        color: var(--base-colour);
-    }
+
     button {
         color: var(--base-colour);
     }

@@ -3,6 +3,14 @@
     overflow: hidden;
 }
 
+/* This to override Quill base styles */
+rm-tasks-app {
+    #note-editor {
+        width: 100%;
+        height: 300px;
+    }
+}
+
 @layer components {
     rm-tasks-app {
         display: flex;
@@ -372,10 +380,6 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-        }
-        #note-editor {
-            width: 100%;
-            height: 300px;
         }
 
         .details__priority {
