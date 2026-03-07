@@ -358,6 +358,8 @@ func (s *service) CreateTask(title string, list int) error {
 
 	s.cache.invalidateKey("tasks")
 	s.cache.invalidateKey("lists:")
+	s.cache.invalidateKey(fmt.Sprintf("list_tasks:%d:", list))
+	s.cache.invalidateKey(fmt.Sprintf("list:%d", list))
 	return nil
 }
 
@@ -1002,6 +1004,17 @@ func (s *service) UpdateList(id int, name string, colour string, icon string, pi
 }
 
 func (s *service) DeleteList(id int) error {
+	taskQuery, err := s.db.Prepare("DELETE FROM task WHERE list_id=?")
+	if err != nil {
+		return fmt.Errorf("DB.DeleteList - prepare task delete query failed: %v", err)
+	}
+	defer taskQuery.Close()
+
+	_, err = taskQuery.Exec(id)
+	if err != nil {
+		return fmt.Errorf("DB.DeleteList - task delete query failed: %v", err)
+	}
+
 	query, err := s.db.Prepare("DELETE FROM list WHERE id=?")
 	if err != nil {
 		return fmt.Errorf("DB.DeleteList - prepare update query failed: %v", err)
@@ -1014,7 +1027,11 @@ func (s *service) DeleteList(id int) error {
 	}
 
 	s.cache.invalidateKey(fmt.Sprintf("list:%d", id))
+	s.cache.invalidateKey(fmt.Sprintf("list_tasks:%d:", id))
 	s.cache.invalidateKey("lists:")
+	s.cache.invalidateKey("tasks")
+	s.cache.invalidateKey("tasks:completed")
+	s.cache.invalidateKey("tasks:important")
 	return nil
 }
 
