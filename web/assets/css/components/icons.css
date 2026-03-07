@@ -1,0 +1,8 @@
+@layer components {
+    .icon {
+        background-color: var(--base-colour);
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+    }
+}

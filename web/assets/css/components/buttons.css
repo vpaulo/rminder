@@ -1,0 +1,29 @@
+@layer components {
+    .btn {
+        color: var(--base-colour);
+        border: 0;
+        padding: 5px 10px;
+        font-weight: 600;
+        font-size: var(--text-small);
+        letter-spacing: 1px;
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(130%);
+        }
+
+        &.default {
+            background-color: var(--base-grey);
+        }
+
+        &.primary {
+            background-color: var(--primary);
+            color: var(--colour-white);
+        }
+
+        &.warning {
+            background-color: var(--base-red);
+            color: var(--colour-white);
+        }
+    }
+}

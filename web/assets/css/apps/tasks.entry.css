@@ -2,6 +2,9 @@
 @import "../styles.css";
 @import "../base.css";
 @import "../utilities.css";
+@import "../components/icons.css";
+@import "../components/header.css";
+@import "../components/buttons.css";
 @import "../components/sidebar.css";
 @import "../components/listNavigation.css";
 @import "../components/appSwitcher.css";
