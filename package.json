@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "build:css": "vite build"
+    "build:css": "vite build",
+    "build:js": "vite build --config vite.js.config.js",
+    "build": "npm run build:css && npm run build:js"
   },
   "devDependencies": {
     "lightningcss": "^1.31.1",
