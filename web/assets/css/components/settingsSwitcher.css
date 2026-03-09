@@ -19,7 +19,7 @@
 
             gap: var(--space-large);
             flex-direction: column;
-            background-color: var(--colour-white);
+            background-color: var(--bg-light);
             padding: 20px;
             width: 200px;
 

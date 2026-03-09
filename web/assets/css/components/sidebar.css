@@ -11,7 +11,7 @@
         &:has(.header input:checked) {
             --sidebar-width: 320px;
             --lists-visibility: inline;
-            background-color: var(--colour-white);
+            background-color: var(--bg-light);
 
             .pinned-lists {
                 gap: var(--space);
@@ -179,7 +179,7 @@
         }
 
         .list-form-container {
-            background-color: var(--colour-white);
+            background-color: var(--bg-light);
             border: 0;
             box-shadow: 1px 2px 3px var(--base-colour);
         }
@@ -336,7 +336,7 @@
                 top: 7px;
                 width: 5px;
                 height: 10px;
-                border: solid var(--colour-white);
+                border: solid var(--bg-light);
                 border-width: 0 3px 3px 0;
                 transform: rotate(45deg);
             }
