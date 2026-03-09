@@ -14,6 +14,10 @@ rm-tasks-app {
     rm-task-details .ql-container.ql-snow {
         border: 1px solid var(--base-grey);
     }
+
+    rm-task-details .ql-editor.ql-blank::before {
+        color: var(--base-colour);
+    }
 }
 
 @layer components {
@@ -146,7 +150,7 @@ rm-tasks-app {
                 display: flex;
                 align-items: center;
                 gap: var(--space);
-                background-color: var(--colour-white);
+                background-color: var(--bg-light);
                 padding: 0 0 0 12px;
 
                 &:hover {
@@ -172,7 +176,7 @@ rm-tasks-app {
             align-items: center;
             gap: var(--space);
             padding: 0 12px;
-            background-color: var(--colour-white);
+            background-color: var(--bg-light);
         }
         .tasks__list > li:hover,
         .tasks__list > li:has(input:checked) {
@@ -397,7 +401,7 @@ rm-tasks-app {
             overflow: auto;
         }
         .details__body > div {
-            background-color: var(--colour-white);
+            background-color: var(--bg-light);
             margin: 10px 0;
             padding: 10px 12px;
         }
@@ -529,7 +533,7 @@ rm-tasks-app {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: var(--colour-white);
+            background-color: var(--bg-light);
             padding: 10px 12px;
             height: var(--size-40);
         }
@@ -548,7 +552,7 @@ rm-tasks-app {
             width: var(--modal-width);
             padding: 20px;
             color: var(--base-colour);
-            background: var(--colour-white);
+            background: var(--bg-light);
         }
         .modal__actions {
             display: flex;
@@ -575,7 +579,7 @@ rm-tasks-app {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                background-color: var(--colour-white);
+                background-color: var(--bg-light);
             }
         }
     }
@@ -633,7 +637,7 @@ rm-tasks-app {
             }
 
             .details {
-                --details-width: calc(100% - var(--size-40) - var(--gap-20));
+                --details-width: calc(100% - var(--size-40) - var(--space-large));
             }
         }
 

@@ -1,7 +1,7 @@
 @layer reset, base, components, utilities;
 
 :root {
-    /*color-scheme: light dark;*/
+    color-scheme: light dark;
 
     /* Text */
     --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -53,13 +53,14 @@
     --colour-indigo-400: hsl(269, 73%, 71%);
 
     /* Colors: Named */
-    --base-colour: var(--colour-neutral-900);
-    --base-grey: var(--colour-neutral-400);
+    --base-colour: light-dark(var(--colour-neutral-900), var(--colour-white));
+    --base-grey: light-dark(var(--colour-neutral-400), var(--colour-neutral-900));
     --base-red: var(--colour-red-300);
     --primary: var(--colour-fresh-blue-500);
-    --bg: var(--colour-neutral-300);
+    --bg: light-dark(var(--colour-neutral-300), var(--colour-neutral-1200));
     --bg-canvas: var(--colour-neutral-1000);
     --swatch: var(--colour-neutral-900);
+    --bg-light: light-dark(var(--colour-white), var(--colour-neutral-1000));
 
     --vh: 0;
     --size-40: 40px;
