@@ -10,10 +10,6 @@
 	<span
 	   class="completed-check{{if .Completed}} completed{{end}}"
 	   title="Set it as complete"
-	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/completed"}}"
-	   hx-trigger="click"
-	   hx-swap="outerHTML"
-	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .completed-check"}}"
 	></span>
 {{end}}
 
@@ -21,10 +17,6 @@
 	<span
 	   class="importance-check{{if .Important}} important{{end}}"
 	   title="Set it as important"
-	   hx-put="{{concat "/partials/tasks/" (itoa .ID) "/important"}}"
-	   hx-trigger="click"
-	   hx-swap="outerHTML"
-	   hx-target="{{concat ".tasks__list > li[data-id='" (itoa .ID) "'] .importance-check"}}"
 	></span>
 {{end}}
 
@@ -33,17 +25,11 @@
 		class="drag-item"
 		data-id="{{itoa .Task.ID}}"
 		data-position="{{itoa .Task.Position}}"
-		hx-get="/partials/lists/all"
-		hx-target=".lists__container"
-		hx-trigger="click delay:20ms"
 		draggable="true"
 	>
 		{{template "task-completed-elem" .Task}}
 	    <label
 	      class="show-details"
-	      hx-get="{{concat "/partials/tasks/" (itoa .Task.ID)}}"
-	      hx-trigger="change"
-	      hx-target=".details"
 	    >
 	      <span>{{.Task.Title}}</span>
 		  {{if and (ne .Task.StartAt "") (ne .Task.EndAt "")}}
@@ -98,18 +84,12 @@
 	    <div class="list-toolbar">
 	        <span class="list-title">{{.List.Name}}</span>
 	    </div>
-	    <div
-	    	class="container"
-	    	hx-get="/partials/lists/all"
-	     	hx-target=".lists__container"
-	     	hx-trigger="submit delay:20ms">
+	    <div class="container">
 			{{if not .IsMultilist}}
 		        <form
 		        	class="add-tasks"
-		         	hx-post="/partials/tasks/create"
-		          	method="POST"
-		           	hx-target=".tasks"
-		            hx-on::after-request="this.reset()">
+		         	method="POST"
+		        >
 		            <label class="add-task--label" for="task"></label>
 		            <input
 		                type="text"
@@ -120,7 +100,6 @@
 		                required
 		                minlength="3"
 		                maxlength="255"
-		                hx-validate="true"
 		            />
 		            <input type="text" name="list" class="hidden" value="{{itoa .List.ID}}"/>
 		            <button class="add-task" type="submit">Add</button>

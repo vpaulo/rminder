@@ -91,11 +91,11 @@
                 align-self: center;
             }
 
-            &.htmx-request .upload-indicator {
+            &.uploading .upload-indicator {
                 display: inline;
             }
 
-            &.htmx-request button[type="submit"] {
+            &.uploading button[type="submit"] {
                 opacity: 0.5;
                 pointer-events: none;
             }

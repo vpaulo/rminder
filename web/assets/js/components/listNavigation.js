@@ -1,3 +1,5 @@
+import { apiHTML, swapHTML } from "../utils/fetch.js";
+
 class ListNavigationElement extends HTMLElement {
   /** @type string */
   listId;
@@ -19,6 +21,7 @@ class ListNavigationElement extends HTMLElement {
   formContainer;
 
   #editListHandler;
+  #labelChangeHandler;
 
   /**
    *
@@ -51,9 +54,8 @@ class ListNavigationElement extends HTMLElement {
       .split(";")
       .map((f) => f.split("=")[1]);
 
-    form.removeAttribute("hx-post");
-    form.setAttribute("hx-put", `/partials/lists/${this.listId}`);
-    removeBtn.setAttribute("hx-delete", `/partials/lists/${this.listId}`);
+    // Mark form as an update for the existing list
+    form.dataset.listId = this.listId;
 
     name.value = this.listName;
     pinned.toggleAttribute("checked", this.pinned === "");
@@ -71,10 +73,12 @@ class ListNavigationElement extends HTMLElement {
     startRangeEl.value = startRange;
     endRangeEl.value = endRange;
 
-    // if you edit htmx attributes through js you need to run this
-    htmx.process(form);
-
     this.formContainer.showModal();
+  }
+
+  async #handleLabelChange() {
+    const html = await apiHTML("GET", `/partials/lists/${this.listId}`);
+    swapHTML(".main", html, "innerHTML");
   }
 
   connectedCallback() {
@@ -90,14 +94,17 @@ class ListNavigationElement extends HTMLElement {
     this.filter = this.dataset.filter;
 
     this.#editListHandler = (e) => this.edit(e);
+    this.#labelChangeHandler = () => this.#handleLabelChange();
 
     this.style.setProperty("--list-colour", `var(${this.colour})`);
 
     this.settings?.addEventListener("click", this.#editListHandler);
+    this.querySelector("label.list")?.addEventListener("change", this.#labelChangeHandler);
   }
 
   disconnectedCallback() {
     this.settings?.removeEventListener("click", this.#editListHandler);
+    this.querySelector("label.list")?.removeEventListener("change", this.#labelChangeHandler);
   }
 }
 
