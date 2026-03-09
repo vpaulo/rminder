@@ -1,4 +1,5 @@
 import { tryCatch } from "../../helpers/tryCatch.js";
+import { apiHTML, swapHTML, csrfToken } from "../../utils/fetch.js";
 
 /** @typedef {{ Next: number, Previous: number }} NavigationType */
 const navigationType = {
@@ -12,10 +13,6 @@ const navigationElement = {
 };
 
 /** @typedef {{ id: number, position: number }} Reorder */
-
-function csrfToken() {
-  return document.querySelector('meta[name="csrf-token"]')?.content || "";
-}
 
 class TasksAppElement extends HTMLElement {
   /** @type {ResizeObserver} */
@@ -342,6 +339,68 @@ class TasksAppElement extends HTMLElement {
     this.tasksList?.addEventListener("dragstart", this.handleDragStart, false);
     this.tasksList?.addEventListener("dragover", this.handleDragOver, false);
     this.tasksList?.addEventListener("drop", this.handleDrop, false);
+
+    // Task list interactions (replacing HTMX)
+    this.#bindTaskListEvents();
+  }
+
+  #bindTaskListEvents() {
+    // Toggle completed
+    this.addEventListener("click", async (e) => {
+      const check = e.target.closest(".tasks__list .completed-check");
+      if (!check) return;
+      const li = check.closest("li[data-id]");
+      if (!li) return;
+      const id = li.dataset.id;
+      const html = await apiHTML("PUT", `/partials/tasks/${id}/completed`);
+      swapHTML(`.tasks__list > li[data-id='${id}'] .completed-check`, html, "outerHTML");
+    });
+
+    // Toggle important
+    this.addEventListener("click", async (e) => {
+      const check = e.target.closest(".tasks__list .importance-check");
+      if (!check) return;
+      const li = check.closest("li[data-id]");
+      if (!li) return;
+      const id = li.dataset.id;
+      const html = await apiHTML("PUT", `/partials/tasks/${id}/important`);
+      swapHTML(`.tasks__list > li[data-id='${id}'] .importance-check`, html, "outerHTML");
+    });
+
+    // Task click → refresh lists sidebar (for count update)
+    this.addEventListener("click", async (e) => {
+      const li = e.target.closest(".tasks__list > li.drag-item");
+      if (!li) return;
+      // small delay so the server can process any prior action
+      setTimeout(async () => {
+        const html = await apiHTML("GET", "/partials/lists/all");
+        swapHTML(".lists__container", html, "outerHTML");
+      }, 20);
+    });
+
+    // Task radio change → load task detail
+    this.addEventListener("change", async (e) => {
+      const input = e.target.closest("input[name='task-detail']");
+      if (!input) return;
+      const id = input.value;
+      const html = await apiHTML("GET", `/partials/tasks/${id}`);
+      swapHTML(".details", html, "innerHTML");
+    });
+
+    // Add task form submit
+    this.addEventListener("submit", async (e) => {
+      const form = e.target.closest("form.add-tasks");
+      if (!form) return;
+      e.preventDefault();
+      const html = await apiHTML("POST", "/partials/tasks/create", new URLSearchParams(new FormData(form)));
+      swapHTML(".tasks", html, "innerHTML");
+      form.reset();
+      // refresh sidebar list counts
+      setTimeout(async () => {
+        const listsHtml = await apiHTML("GET", "/partials/lists/all");
+        swapHTML(".lists__container", listsHtml, "outerHTML");
+      }, 20);
+    });
   }
 
   disconnectedCallback() {

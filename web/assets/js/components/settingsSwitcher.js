@@ -1,4 +1,5 @@
 import { tryCatch } from "../helpers/tryCatch.js";
+import { apiHTML, swapHTML, csrfToken } from "../utils/fetch.js";
 
 class SettingsSwitcherElement extends HTMLElement {
   /** @type HTMLDialogElement */
@@ -7,6 +8,8 @@ class SettingsSwitcherElement extends HTMLElement {
   fileElem;
   /** @type HTMLDivElement */
   messages;
+  /** @type HTMLFormElement */
+  importForm;
 
   maxFileSize = 10 * 1024 * 1024; // 10MB
   allowedTypes = ["application/json"];
@@ -78,26 +81,66 @@ class SettingsSwitcherElement extends HTMLElement {
     this.messages.textContent = message;
   }
 
+  async #handleImportSubmit(e) {
+    e.preventDefault();
+    if (!this.validateFile(this.inputElem.files[0])) return;
+
+    this.importForm.classList.add("uploading");
+
+    const [error] = await tryCatch(
+      fetch("/api/tasks/import", {
+        method: "POST",
+        headers: { "X-CSRF-Token": csrfToken() },
+        body: new FormData(this.importForm),
+      }),
+    );
+
+    this.importForm.classList.remove("uploading");
+
+    if (error) {
+      this.showError("Import failed.");
+      return;
+    }
+
+    this.importForm.reset();
+    this.formContainer.close();
+
+    const html = await apiHTML("GET", "/partials/lists/all");
+    swapHTML(".lists__container", html, "outerHTML");
+  }
+
+  #handleCancelUpload() {
+    this.importForm.reset();
+    this.formContainer.close();
+  }
+
   connectedCallback() {
     const rect = this.getBoundingClientRect();
     const bodyRect = document.body.getBoundingClientRect();
     this.formContainer = this.querySelector(".file-form-container");
     this.inputElem = this.querySelector("#file");
     this.messages = this.querySelector("#messages");
+    this.importForm = this.querySelector(".file-form-container form");
 
     this.style.setProperty("--popover-top", `${rect.bottom}px`);
     this.style.setProperty("--popover-right", `${bodyRect.right - rect.right + 10}px`);
 
     this.handleClick = this.#handleClick.bind(this);
     this.handleFiles = this.#handleFiles.bind(this);
+    this.handleImportSubmit = this.#handleImportSubmit.bind(this);
+    this.handleCancelUpload = this.#handleCancelUpload.bind(this);
 
     this.addEventListener("click", this.handleClick, false);
     this.inputElem.addEventListener("change", this.handleFiles, false);
+    this.importForm?.addEventListener("submit", this.handleImportSubmit, false);
+    this.querySelector(".cancel-upload")?.addEventListener("click", this.handleCancelUpload, false);
   }
 
   disconnectedCallback() {
     this.removeEventListener("click", this.handleClick, false);
     this.inputElem.removeEventListener("change", this.handleFiles, false);
+    this.importForm?.removeEventListener("submit", this.handleImportSubmit, false);
+    this.querySelector(".cancel-upload")?.removeEventListener("click", this.handleCancelUpload, false);
   }
 }
 

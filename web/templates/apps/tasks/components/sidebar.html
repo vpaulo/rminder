@@ -17,17 +17,10 @@
 {{end}}
 
 {{define "search"}}
-	<div
-       	class="searchbox__container"
-       	hx-get="/partials/lists/all"
-       	hx-target=".lists__container"
-       	hx-trigger="submit delay:20ms">
+	<div class="searchbox__container">
 		<form
 			class="searchbox__form"
-			hx-post="/partials/lists/search"
-	       	method="POST"
-		    hx-trigger="submit, keyup[enterKey]"
-		    hx-target=".main">
+	       	method="POST">
 		 	<input
 				type="text"
 				class="searchbox"
@@ -35,8 +28,7 @@
 				autocomplete="off"
 				placeholder="Search"
 				required
-				minlength="3"
-				hx-validate="true"/>
+				minlength="3"/>
 			<i class="icon clear-icon"></i>
 			<button type="submit" class="searchbox__button">
 				<i class="icon search-icon"></i>
@@ -79,12 +71,7 @@
 		data-position="{{itoa .List.Position}}"
 		data-filter="{{.List.FilterBy}}"
 		draggable="true">
-        <label
-            class="list"
-            hx-get="{{concat "/partials/lists/" (itoa .List.ID)}}"
-            hx-trigger="change"
-            hx-target=".main"
-        >
+        <label class="list">
             <span class="ident icon {{.List.Icon}}"></span>
             <span class="name">{{.List.Name}}</span>
 	        <span class="count">{{len .List.Tasks}}</span>
@@ -116,12 +103,7 @@
 
 {{define "list-modal"}}
 	<dialog class="list-form-container">
-        <form
-        hx-post="/partials/lists/create"
-        method="POST"
-        hx-trigger="submit, keyup[enterKey]"
-        hx-target=".lists__container"
-        hx-on::after-request="this.reset();this.parentElement.close()">
+        <form method="POST">
             <input
                 class="new-list"
                 name="new-list"
@@ -130,8 +112,7 @@
                 placeholder="List name"
                 required
                 minlength="3"
-                maxlength="255"
-                hx-validate="true"/>
+                maxlength="255"/>
             <label class="checkbox__container">
                	<span>Pin</span>
                	<input class="hidden" name="pin" type="checkbox" value="1"/>
@@ -232,8 +213,7 @@
 	            </div>
 				<button
 					class="btn warning remove-list hidden"
-					hx-params="none"
-                   	hx-target=".lists__container">Delete</button>
+					type="button">Delete</button>
             </fieldset>
         </form>
     </dialog>

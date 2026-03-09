@@ -31,25 +31,13 @@
 </header>
 {{end}} {{define "upload-file-modal"}}
 <dialog class="file-form-container">
-    <form
-        hx-post="/api/tasks/import"
-        hx-encoding="multipart/form-data"
-        method="POST"
-        hx-trigger="submit, keyup[enterKey]"
-        hx-swap="none"
-        hx-on::after-request="if(event.detail.successful){this.reset();this.parentElement.close();htmx.ajax('GET','/partials/lists/all',{target:'.lists__container',swap:'outerHTML'})}"
-    >
+    <form method="POST" enctype="multipart/form-data">
         <div id="messages"></div>
         <label for="file" class="checkbox__container">Select data file</label>
         <input type="file" id="file" name="file" accept="application/json" class="btn" required />
         <fieldset class="form-actions">
             <div class="main-actions">
-                <div
-                    class="btn default"
-                    hx-on:click="this.closest('form').reset();this.closest('.file-form-container').close()"
-                >
-                    Cancel
-                </div>
+                <div class="btn default cancel-upload">Cancel</div>
                 <button class="btn primary" type="submit">Upload</button>
                 <span class="upload-indicator">Uploading...</span>
             </div>
