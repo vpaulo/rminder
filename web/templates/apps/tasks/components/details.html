@@ -3,7 +3,7 @@
         <div class="details__body">
             <div class="detail__title">
                 <form
-                  class="add-tasks"
+                  class="add-tasks{{if .Task.Completed}} completed{{end}}"
                   hx-put="{{concat "/partials/tasks/" (itoa .Task.ID) "/title"}}"
                   method="POST"
                   hx-swap="outerHTML"

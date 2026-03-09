@@ -436,13 +436,7 @@ func (s *service) ToggleComplete(id string) error {
 		return fmt.Errorf("DB.ToggleComplete - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		task.Completed = !task.Completed
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
-	s.cache.invalidateKey("tasks:completed")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -458,13 +452,7 @@ func (s *service) ToggleImportant(id string) error {
 		return fmt.Errorf("DB.ToggleImportant - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		task.Important = !task.Important
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
-	s.cache.invalidateKey("tasks:important")
+	s.cache.invalidate()
 	return nil
 }
 

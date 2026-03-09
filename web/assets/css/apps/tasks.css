@@ -249,7 +249,7 @@ rm-tasks-app {
                 letter-spacing: 1px;
             }
         }
-        .completed .show-details {
+        .completed + .show-details {
             text-decoration: line-through from-font var(--primary);
         }
         .completed-check,
