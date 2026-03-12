@@ -249,6 +249,11 @@ rm-tasks-app {
                 letter-spacing: 1px;
             }
         }
+        .priority {
+            display: block;
+            width: 3ch;
+            text-align: center;
+        }
         .completed + .show-details {
             text-decoration: line-through from-font var(--primary);
         }

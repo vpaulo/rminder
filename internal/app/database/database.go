@@ -550,14 +550,7 @@ func (s *service) UpdateTaskPriority(id string, priority string) error {
 		return fmt.Errorf("DB.UpdateTaskPriority - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		if p, err := strconv.Atoi(priority); err == nil {
-			task.Priority = p
-		}
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -573,15 +566,7 @@ func (s *service) UpdateTaskList(id string, listID string) error {
 		return fmt.Errorf("DB.UpdateTaskList - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		if lid, err := strconv.Atoi(listID); err == nil {
-			task.ListId = lid
-		}
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
-	s.cache.invalidateKey("lists:")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -609,12 +594,7 @@ func (s *service) UpdateTaskStartDate(id string, date string) error {
 		return fmt.Errorf("DB.UpdateTaskStartDate - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		task.StartAt = timeUpdate
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -642,12 +622,7 @@ func (s *service) UpdateTaskEndDate(id string, date string) error {
 		return fmt.Errorf("DB.UpdateTaskEndDate - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		task.EndAt = timeUpdate
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -663,10 +638,7 @@ func (s *service) DeleteTask(id string) error {
 		return fmt.Errorf("DB.DeleteTask - update query result failed: %v", err)
 	}
 
-	s.cache.invalidateKey("task:" + id)
-	s.cache.invalidateKey("tasks")
-	s.cache.invalidateKey("tasks:completed")
-	s.cache.invalidateKey("tasks:important")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -684,15 +656,7 @@ func (s *service) ReorderTasks(reorder []Reorder) error {
 		}
 	}
 
-	for _, order := range reorder {
-		key := fmt.Sprintf("task:%d", order.ID)
-		if cached, ok := s.cache.get(key); ok {
-			task := *cached.(*Task)
-			task.Position = order.Position
-			s.cache.set(key, &task)
-		}
-	}
-	s.cache.invalidateKey("tasks")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -1037,15 +1001,7 @@ func (s *service) ReorderLists(reorder []Reorder) error {
 		}
 	}
 
-	for _, order := range reorder {
-		key := fmt.Sprintf("list:%d", order.ID)
-		if cached, ok := s.cache.get(key); ok {
-			list := *cached.(*List)
-			list.Position = order.Position
-			s.cache.set(key, &list)
-		}
-	}
-	s.cache.invalidateKey("lists:")
+	s.cache.invalidate()
 	return nil
 }
 
