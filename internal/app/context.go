@@ -2,6 +2,7 @@ package app
 
 import (
 	"rminder/internal/app/database"
+	"rminder/internal/app/sse"
 	"rminder/internal/app/user"
 	"rminder/internal/pkg/logger"
 
@@ -42,4 +43,12 @@ func GetCSRFToken(ctx *gin.Context) string {
 
 func GetRequestID(ctx *gin.Context) string {
 	return ctx.GetString("request_id")
+}
+
+func SetSSEBroker(ctx *gin.Context, broker *sse.Broker) {
+	ctx.Set("sse_broker", broker)
+}
+
+func GetSSEBroker(ctx *gin.Context) *sse.Broker {
+	return ctx.MustGet("sse_broker").(*sse.Broker)
 }

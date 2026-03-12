@@ -503,12 +503,7 @@ func (s *service) UpdateTask(id string, title string) error {
 		return fmt.Errorf("DB.UpdateTask - update query result failed: %v", err)
 	}
 
-	if cached, ok := s.cache.get("task:" + id); ok {
-		task := *cached.(*Task)
-		task.Title = title
-		s.cache.set("task:"+id, &task)
-	}
-	s.cache.invalidateKey("tasks")
+	s.cache.invalidate()
 	return nil
 }
 
@@ -663,10 +658,7 @@ func (s *service) DeleteTask(id string) error {
 		return fmt.Errorf("DB.DeleteTask - update query result failed: %v", err)
 	}
 
-	s.cache.invalidateKey("task:" + id)
-	s.cache.invalidateKey("tasks")
-	s.cache.invalidateKey("tasks:completed")
-	s.cache.invalidateKey("tasks:important")
+	s.cache.invalidate()
 	return nil
 }
 
