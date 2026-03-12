@@ -34,6 +34,11 @@ func TasksRoutes(router *gin.Engine, application *app.App) {
 	lists.DELETE("/:listID", taskhandlers.DeleteList)
 	lists.PUT("/:listID", taskhandlers.UpdateList)
 
+	groups := partials.Group("/groups")
+	groups.POST("/create", taskhandlers.CreateGroup)
+	groups.PUT("/:groupID", taskhandlers.UpdateGroup)
+	groups.DELETE("/:groupID", taskhandlers.DeleteGroup)
+
 	// API: returns JSON
 	api := router.Group("/api", middleware.UserMiddleware(application), middleware.CSRFMiddleware())
 

@@ -16,33 +16,7 @@ import (
 )
 
 func GetLists(ctx *gin.Context) {
-	db := app.GetUserDatabase(ctx)
-	log := app.GetLogger(ctx)
-
-	lists, err := db.Lists("")
-	if err != nil {
-		log.Error("error handling GetLists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load lists.")
-		return
-	}
-
-	persistence, err := db.Persistence()
-	if err != nil {
-		log.Error("error handling GetLists Persistence", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load lists.")
-		return
-	}
-
-	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
-		"Lists":       lists,
-		"Persistence": persistence,
-	})
-	if err != nil {
-		log.Error("error rendering in GetLists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to render lists.")
-	}
+	renderSidebarLists(ctx)
 }
 
 func GetList(ctx *gin.Context) {
@@ -167,29 +141,7 @@ func CreateList(ctx *gin.Context) {
 		return
 	}
 
-	lists, err := db.Lists("")
-	if err != nil {
-		log.Error("error handling lists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load lists.")
-		return
-	}
-
-	persistence, err := db.Persistence()
-	if err != nil {
-		log.Error("error handling CreateList Persistence", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load list state.")
-		return
-	}
-
-	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
-		"Lists":       lists,
-		"Persistence": persistence,
-	})
-	if err != nil {
-		log.Error("error rendering in Lists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to render lists.")
-	}
+	renderSidebarLists(ctx)
 }
 
 func DeleteList(ctx *gin.Context) {
@@ -216,13 +168,6 @@ func DeleteList(ctx *gin.Context) {
 		return
 	}
 
-	lists, err := db.Lists("")
-	if err != nil {
-		log.Error("error handling DeleteList lists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load lists.")
-		return
-	}
-
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling DeleteList Persistence", "error", err)
@@ -237,18 +182,9 @@ func DeleteList(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to update list state.")
 			return
 		}
-		persistence.ListId = 0
 	}
 
-	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
-		"Lists":       lists,
-		"Persistence": persistence,
-	})
-	if err != nil {
-		log.Error("error rendering in Lists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to render lists.")
-	}
+	renderSidebarLists(ctx)
 }
 
 func UpdateList(ctx *gin.Context) {
@@ -301,29 +237,7 @@ func UpdateList(ctx *gin.Context) {
 		return
 	}
 
-	lists, err := db.Lists("")
-	if err != nil {
-		log.Error("error handling lists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load lists.")
-		return
-	}
-
-	persistence, err := db.Persistence()
-	if err != nil {
-		log.Error("error handling UpdateList Persistence", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to load list state.")
-		return
-	}
-
-	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = web.Render(ctx.Writer, "sidebar-lists", map[string]any{
-		"Lists":       lists,
-		"Persistence": persistence,
-	})
-	if err != nil {
-		log.Error("error rendering in Lists", "error", err)
-		app.ErrorInternalHTML(ctx, "Failed to render lists.")
-	}
+	renderSidebarLists(ctx)
 }
 
 func SearchLists(ctx *gin.Context) {
