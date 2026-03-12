@@ -23,6 +23,12 @@ func Load(ctx *gin.Context) {
 		return
 	}
 
+	groups, err := db.Groups()
+	if err != nil {
+		log.Error("error handling Tasks app Load Groups", "error", err)
+		return
+	}
+
 	persistence, err := db.Persistence()
 	if err != nil {
 		log.Error("error handling Tasks app Load Persistence", "error", err)
@@ -52,6 +58,7 @@ func Load(ctx *gin.Context) {
 
 	err = web.Render(ctx.Writer, "tasks-page", map[string]any{
 		"Lists":       lists,
+		"Groups":      groups,
 		"MultiList":   multiList,
 		"Persistence": persistence,
 		"CSRFToken":   app.GetCSRFToken(ctx),

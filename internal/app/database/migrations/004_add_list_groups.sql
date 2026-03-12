@@ -1,0 +1,11 @@
+-- Add list_group table and group_id to list
+
+CREATE TABLE IF NOT EXISTS list_group (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    position INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE list ADD COLUMN group_id INTEGER DEFAULT 0;

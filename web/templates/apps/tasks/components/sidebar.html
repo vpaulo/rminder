@@ -2,8 +2,8 @@
 	<rm-sidebar>
         {{template "sidebar-header"}}
         {{template "search"}}
-        {{template "sidebar-lists" (dict "Lists" .Lists "Persistence" .Persistence)}}
-        {{template "sidebar-footer" .Lists}}
+        {{template "sidebar-lists" (dict "Lists" .Lists "Groups" .Groups "Persistence" .Persistence)}}
+        {{template "sidebar-footer" (dict "Lists" .Lists "Groups" .Groups)}}
     </rm-sidebar>
 {{end}}
 
@@ -55,12 +55,16 @@
 	     		{{end}}
 	     	{{end}}
 		</div>
-		<!-- Groups/Lists -->
+		<!-- Groups -->
+		{{range .Groups}}
+			{{template "group-item" (dict "Group" . "SelectedList" $.Persistence.ListId)}}
+		{{end}}
+		<!-- Ungrouped Lists -->
 		<div class="lists">
 		    <p class="lists-label">My lists</p>
 		    <div class="lists-holder">
 		        {{range .Lists}}
-		        	{{if not .Pinned}}
+		        	{{if and (not .Pinned) (eq .GroupId 0)}}
 		        		{{template "list-item" (dict "List" . "SelectedList" $.Persistence.ListId)}}
 		        	{{end}}
 		        {{end}}
@@ -102,16 +106,69 @@
     </rm-list-nav>
 {{end}}
 
+{{define "group-item"}}
+	<rm-group-nav data-group-id="{{itoa .Group.ID}}">
+		<div class="group-header">
+			<span class="group-name">{{.Group.Name}}</span>
+			<div class="group-settings">
+				<span class="icon ellipsis-vertical-icon"></span>
+			</div>
+		</div>
+		<div class="group-lists">
+			{{range .Group.Lists}}
+				{{template "list-item" (dict "List" . "SelectedList" $.SelectedList)}}
+			{{end}}
+		</div>
+	</rm-group-nav>
+{{end}}
+
 {{define "sidebar-footer"}}
 	<footer>
-        {{template "list-modal" .}}
+        {{template "list-modal" .Lists}}
+        {{template "group-modal" .Groups}}
         <div class="footer-actions">
             <button class="add-list">
                 <span class="add-list--icon"></span>
                 <span>Add list</span>
             </button>
+            <button class="add-group">
+                <span class="add-group--icon"></span>
+                <span>Add group</span>
+            </button>
         </div>
     </footer>
+{{end}}
+
+{{define "group-modal"}}
+	<dialog class="group-form-container">
+        <form
+        hx-post="/partials/groups/create"
+        method="POST"
+        hx-trigger="submit"
+        hx-target=".lists__container"
+        hx-on::after-request="this.reset();this.parentElement.close()">
+            <input
+                class="new-group"
+                name="name"
+                type="text"
+                value=""
+                placeholder="Group name"
+                required
+                minlength="3"
+                maxlength="255"/>
+            <fieldset class="form-actions">
+            	<div class="main-actions">
+	               	<div class="btn default cancel-new-group">Cancel</div>
+	                <button class="btn primary add-new-group" type="submit">Add</button>
+	            </div>
+				<button
+					class="btn warning remove-group hidden"
+					hx-trigger="click"
+					hx-target=".lists__container"
+					type="button">Delete</button>
+            </fieldset>
+        </form>
+    </dialog>
 {{end}}
 
 {{define "list-modal"}}
