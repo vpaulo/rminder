@@ -59,7 +59,7 @@
 	     	<input class="hidden" type="radio" name="task-detail" value="{{itoa .Task.ID}}"/>
 	      {{end}}
 	    </label>
-	    <span>{{repeatStr "!" .Task.Priority}}</span>
+	    <span class="priority">{{repeatStr "!" .Task.Priority}}</span>
 	    {{template "task-important-elem" .Task}}
   </li>
 {{end}}
