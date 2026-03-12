@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"rminder/internal/app/database"
+	"rminder/internal/app/sse"
 	"rminder/internal/app/user"
 	"rminder/internal/pkg/config"
 	"rminder/internal/pkg/logger"
@@ -17,6 +18,7 @@ type App struct {
 	users          map[string]*user.User
 	logger         *logger.Logger
 	config         *config.Config
+	SSEBroker      *sse.Broker
 }
 
 func New(log *logger.Logger, cfg *config.Config) *App {
@@ -25,6 +27,7 @@ func New(log *logger.Logger, cfg *config.Config) *App {
 		users:          make(map[string]*user.User),
 		logger:         log,
 		config:         cfg,
+		SSEBroker:      sse.NewBroker(),
 	}
 }
 

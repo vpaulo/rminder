@@ -160,6 +160,7 @@ func CreateList(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to create list.")
 			return
 		}
+		publishEvent(ctx, "list_created")
 		log.Info("list created", "name", list)
 	} else {
 		log.Error("error form field validation failed", "name", list)
@@ -209,6 +210,7 @@ func DeleteList(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to delete list.")
 			return
 		}
+		publishEvent(ctx, "list_deleted")
 		log.Info("list deleted", "listID", listID)
 	} else {
 		log.Error("error list id is empty")
@@ -294,6 +296,7 @@ func UpdateList(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to update list.")
 			return
 		}
+		publishEvent(ctx, "list_updated")
 		log.Info("list updated", "listID", listID, "name", name)
 	} else {
 		log.Error("error form field validation failed", "listID", listID)
@@ -405,6 +408,7 @@ func ReorderLists(ctx *gin.Context) {
 	}
 
 	log.Info("lists reordered")
+	publishEvent(ctx, "list_reordered")
 	ctx.IndentedJSON(http.StatusOK, gin.H{
 		"message": "Lists order update successful.",
 		"status":  http.StatusOK,
@@ -480,6 +484,7 @@ func ImportLists(ctx *gin.Context) {
 	}
 
 	log.Info("lists imported", "count", len(lists))
+	publishEvent(ctx, "list_imported")
 	ctx.IndentedJSON(http.StatusOK, gin.H{
 		"message": "Lists imported successfuly.",
 		"status":  http.StatusOK,

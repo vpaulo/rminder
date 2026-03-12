@@ -4,12 +4,20 @@ import (
 	"net/http"
 	"rminder/internal/app"
 	"rminder/internal/app/database"
+	"rminder/internal/app/sse"
 	"rminder/web"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+func publishEvent(ctx *gin.Context, eventType string) {
+	broker := app.GetSSEBroker(ctx)
+	user := app.GetUser(ctx)
+	broker.Publish(user.Id, sse.Event{Type: eventType, Time: time.Now().UTC().Format(time.RFC3339)})
+}
 
 func Load(ctx *gin.Context) {
 	db := app.GetUserDatabase(ctx)
@@ -209,6 +217,7 @@ func CreateTask(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to create task.")
 			return
 		}
+		publishEvent(ctx, "task_created")
 		log.Info("task created", "title", title, "listID", list)
 	} else {
 		log.Error("error title validation failed", "title", title, "listID", list)
@@ -263,6 +272,7 @@ func DeleteTask(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to delete task.")
 			return
 		}
+		publishEvent(ctx, "task_deleted")
 		log.Info("task deleted", "taskID", taskID)
 	} else {
 		log.Error("error task id is empty")
@@ -324,6 +334,7 @@ func UpdateTask(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to update task.")
 			return
 		}
+		publishEvent(ctx, "task_updated")
 		log.Info("task updated", "taskID", taskID, "field", slug)
 	} else {
 		log.Error("error task id is empty")
@@ -407,6 +418,7 @@ func CreateSubtask(ctx *gin.Context) {
 			app.ErrorInternalHTML(ctx, "Failed to create subtask.")
 			return
 		}
+		publishEvent(ctx, "subtask_created")
 		log.Info("subtask created", "title", title, "parentID", pid)
 	} else {
 		log.Error("error title validation failed", "title", title)
@@ -453,6 +465,7 @@ func ReorderTasks(ctx *gin.Context) {
 	}
 
 	log.Info("tasks reordered")
+	publishEvent(ctx, "task_reordered")
 	ctx.IndentedJSON(http.StatusOK, gin.H{
 		"message": "Tasks order update successful.",
 		"status":  http.StatusOK,

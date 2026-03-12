@@ -26,6 +26,8 @@ class TasksAppElement extends HTMLElement {
   tasksList;
   /** @type {HTMLLIElement} */
   draggedTask = null;
+  /** @type {EventSource} */
+  #sseSource = null;
 
   /** @type {function(KeyboardEvent): void} */
   #keybidings(e) {
@@ -342,6 +344,8 @@ class TasksAppElement extends HTMLElement {
     this.tasksList?.addEventListener("dragstart", this.handleDragStart, false);
     this.tasksList?.addEventListener("dragover", this.handleDragOver, false);
     this.tasksList?.addEventListener("drop", this.handleDrop, false);
+
+    this.#connectSSE();
   }
 
   disconnectedCallback() {
@@ -353,6 +357,23 @@ class TasksAppElement extends HTMLElement {
     this.tasksList?.removeEventListener("dragstart", this.handleDragStart, false);
     this.tasksList?.removeEventListener("dragover", this.handleDragOver, false);
     this.tasksList?.removeEventListener("drop", this.handleDrop, false);
+
+    this.#sseSource?.close();
+  }
+
+  #connectSSE() {
+    this.#sseSource = new EventSource("/events");
+    this.#sseSource.onmessage = (e) => {
+      try {
+        const event = JSON.parse(e.data);
+        console.log("SSE: ", event);
+        document.dispatchEvent(new CustomEvent("db-updated", { detail: event }));
+      } catch (_) {}
+    };
+    this.#sseSource.onerror = () => {
+      this.#sseSource.close();
+      setTimeout(() => this.#connectSSE(), 5000);
+    };
   }
 }
 

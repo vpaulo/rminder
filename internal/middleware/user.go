@@ -39,6 +39,7 @@ func UserMiddleware(s *app.App) gin.HandlerFunc {
 		}
 		app.SetUserDatabase(ctx, db)
 		app.SetLogger(ctx, log)
+		app.SetSSEBroker(ctx, s.SSEBroker)
 
 		ctx.Next()
 	}
