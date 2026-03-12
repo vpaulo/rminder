@@ -62,6 +62,56 @@ func Load(ctx *gin.Context) {
 	}
 }
 
+func LoadTask(ctx *gin.Context) {
+	db := app.GetUserDatabase(ctx)
+	log := app.GetLogger(ctx)
+
+	taskID := ctx.Param("taskID")
+	if taskID == "" {
+		app.ErrorBadRequestHTML(ctx, "Task ID must not be empty.")
+		return
+	}
+
+	task, err := db.Task(taskID)
+	if err != nil {
+		log.Error("error handling task", "taskID", taskID, "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load task.")
+		return
+	}
+
+	subtasks, err := db.Subtasks(task.ID)
+	if err != nil {
+		log.Error("error fetching subtasks", "taskID", taskID, "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load subtasks.")
+		return
+	}
+
+	allLists, err := db.Lists("")
+	if err != nil {
+		log.Error("error fetching lists", "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to load lists.")
+		return
+	}
+	var realLists []*database.List
+	for _, l := range allLists {
+		if l.FilterBy == "" {
+			realLists = append(realLists, l)
+		}
+	}
+
+	ctx.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	err = web.Render(ctx.Writer, "task-page", map[string]any{
+		"Task":      task,
+		"Subtasks":  subtasks,
+		"Lists":     realLists,
+		"CSRFToken": app.GetCSRFToken(ctx),
+	})
+	if err != nil {
+		log.Error("error rendering task-page", "error", err)
+		app.ErrorInternalHTML(ctx, "Failed to render task.")
+	}
+}
+
 func GetTasks(ctx *gin.Context) {
 	db := app.GetUserDatabase(ctx)
 	log := app.GetLogger(ctx)
