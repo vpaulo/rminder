@@ -1,4 +1,18 @@
-{{define "app-styles"}}
+{{define "task-page"}}
+<!doctype html>
+<html lang="en">
+    <head>
+        {{template "meta"}}
+        <meta name="csrf-token" content="{{.CSRFToken}}" />
+        <link href="/assets/css/dist/tasks.min.css" rel="stylesheet" />
+        <script src="/assets/js/dist/tasks.min.js" type="module"></script>
+    </head>
+    <body>
+        {{template "header"}}
+        <main class="task-page">{{template "details" .}}</main>
+    </body>
+</html>
+{{end}} {{define "app-styles"}}
 <meta name="csrf-token" content="{{.CSRFToken}}" />
 <link href="/assets/css/dist/tasks.min.css" rel="stylesheet" />
 <script src="/assets/js/libs/htmx.min.js"></script>
