@@ -60,6 +60,11 @@ type Service interface {
 
 	SearchLists(searchQuery string) ([]*List, error)
 	ListTasksSearch(id int, searchQuery string) ([]*Task, error)
+
+	Groups() ([]*ListGroup, error)
+	CreateGroup(name string, position int) error
+	UpdateGroup(id int, name string) error
+	DeleteGroup(id int) error
 }
 
 type cacheEntry struct {
@@ -694,6 +699,7 @@ func (s *service) Lists(filter string) ([]*List, error) {
 			&data.Position,
 			&data.CreatedAt,
 			&data.UpdatedAt,
+			&data.GroupId,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("DB.Lists - result scan failed: %v", err)
@@ -890,7 +896,8 @@ func (s *service) List(id string) (*List, error) {
 		&list.Base,
 		&list.Position,
 		&list.CreatedAt,
-		&list.UpdatedAt)
+		&list.UpdatedAt,
+		&list.GroupId)
 	if err != nil {
 		return nil, fmt.Errorf("DB.List - query result failed: %v", err)
 	}
@@ -1228,4 +1235,115 @@ func (s *service) ListTasksSearch(id int, searchQuery string) ([]*Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (s *service) Groups() ([]*ListGroup, error) {
+	const key = "groups"
+	if cached, ok := s.cache.get(key); ok {
+		return cached.([]*ListGroup), nil
+	}
+
+	query, err := s.db.Prepare("SELECT * FROM list_group ORDER BY position ASC, created_at ASC")
+	if err != nil {
+		return nil, fmt.Errorf("DB.Groups - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	result, err := query.Query()
+	if err != nil {
+		return nil, fmt.Errorf("DB.Groups - query result failed: %v", err)
+	}
+
+	groups := make([]*ListGroup, 0)
+	for result.Next() {
+		data := new(ListGroup)
+		err := result.Scan(
+			&data.ID,
+			&data.Name,
+			&data.Position,
+			&data.CreatedAt,
+			&data.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("DB.Groups - result scan failed: %v", err)
+		}
+		groups = append(groups, data)
+	}
+
+	// Populate each group with its lists
+	lists, err := s.Lists("")
+	if err != nil {
+		return nil, fmt.Errorf("DB.Groups - get lists failed: %v", err)
+	}
+	for _, g := range groups {
+		g.Lists = make([]*List, 0)
+		for _, l := range lists {
+			if l.GroupId == g.ID {
+				g.Lists = append(g.Lists, l)
+			}
+		}
+	}
+
+	s.cache.set(key, groups)
+	return groups, nil
+}
+
+func (s *service) CreateGroup(name string, position int) error {
+	query, err := s.db.Prepare("INSERT INTO list_group (name, position) VALUES (?, ?)")
+	if err != nil {
+		return fmt.Errorf("DB.CreateGroup - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(name, position)
+	if err != nil {
+		return fmt.Errorf("DB.CreateGroup - exec failed: %v", err)
+	}
+
+	s.cache.invalidate()
+	return nil
+}
+
+func (s *service) UpdateGroup(id int, name string) error {
+	query, err := s.db.Prepare("UPDATE list_group SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("DB.UpdateGroup - prepare query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(name, id)
+	if err != nil {
+		return fmt.Errorf("DB.UpdateGroup - exec failed: %v", err)
+	}
+
+	s.cache.invalidate()
+	return nil
+}
+
+func (s *service) DeleteGroup(id int) error {
+	// Unassign lists from this group first
+	unassign, err := s.db.Prepare("UPDATE list SET group_id = 0 WHERE group_id = ?")
+	if err != nil {
+		return fmt.Errorf("DB.DeleteGroup - prepare unassign query failed: %v", err)
+	}
+	defer unassign.Close()
+
+	_, err = unassign.Exec(id)
+	if err != nil {
+		return fmt.Errorf("DB.DeleteGroup - unassign exec failed: %v", err)
+	}
+
+	query, err := s.db.Prepare("DELETE FROM list_group WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("DB.DeleteGroup - prepare delete query failed: %v", err)
+	}
+	defer query.Close()
+
+	_, err = query.Exec(id)
+	if err != nil {
+		return fmt.Errorf("DB.DeleteGroup - delete exec failed: %v", err)
+	}
+
+	s.cache.invalidate()
+	return nil
 }
